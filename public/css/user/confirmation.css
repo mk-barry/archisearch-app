@@ -1,0 +1,57 @@
+/* User Confirmation Step Styles */
+.header-accent.success-accent { background: #10b981; }
+
+.icon-box-large.success-box {
+    background: #f0fdf4;
+    color: #10b981;
+    border: 2px solid #bbf7d0;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.status-badge.accepted { background: #f0fdf4; color: #10b981; border: 1px solid #bbf7d0; }
+.status-badge.processing { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.status-badge.submitted { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+
+.doc-info-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 0.75rem;
+    text-align: left;
+}
+
+.ext-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 0.7rem;
+    color: white;
+}
+
+.ext-jpg { background: #a855f7; }
+.ext-pdf { background: #ef4444; }
+
+.info-alert-blue {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    color: #1d4ed8;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    text-align: left;
+}

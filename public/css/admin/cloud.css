@@ -1,0 +1,71 @@
+/* Cloud Backup Interface Styles */
+.selection-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 80px;
+    width: 100%;
+}
+
+.selection-card:hover {
+    border-color: #cbd5e1;
+}
+
+.selection-card input[type="radio"] {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 0.75rem 0 0 !important;
+    flex-shrink: 0;
+    accent-color: var(--primary-blue);
+    cursor: pointer;
+}
+
+.selection-card.active {
+    border-color: var(--primary-blue);
+    background: #eff6ff;
+}
+
+.selection-card .icon-inner {
+    width: 40px;
+    height: 40px;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.selection-card.active .icon-inner {
+    background: var(--primary-blue);
+    color: white;
+}
+
+.cloud-stat-box {
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    flex: 1;
+}
+
+.cloud-stat-box .number {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.cloud-stat-box .label {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.bg-green-light { background: #ecfdf5; border: 1px solid #10b981; color: #10b981; }
+.bg-orange-light { background: #fffcf0; border: 1px solid #f59e0b; color: #f59e0b; }
+.bg-red-light { background: #fef2f2; border: 1px solid #ef4444; color: #ef4444; }

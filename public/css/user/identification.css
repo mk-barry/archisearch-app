@@ -1,0 +1,110 @@
+/* User Identification Step Styles */
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.step.active { color: #2563eb; }
+.step.finished { color: #10b981; }
+
+.step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.step.active .step-num { background: #2563eb; color: white; }
+.step.finished .step-num { background: #10b981; color: white; }
+
+.step-divider {
+    height: 1px;
+    width: 40px;
+    background: #e2e8f0;
+    position: absolute;
+    right: -3.5rem;
+    top: 14px;
+}
+
+.finished .step-divider { background: #10b981; }
+
+.form-group {
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.form-input {
+    width: 100%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 1rem 0.75rem 2.8rem;
+    font-size: 0.9rem;
+    color: #1e293b;
+    transition: all 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.05);
+}
+
+.form-help {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 0.25rem;
+}
+
+.inline-context {
+    background: #eff6ff;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
