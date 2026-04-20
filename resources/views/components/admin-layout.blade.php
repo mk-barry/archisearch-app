@@ -111,7 +111,7 @@
         <!-- Main Wrapper -->
         <div style="flex: 1; display: flex; flex-direction: column;">
             <!-- Top Nav -->
-            <nav class="top-nav">
+            <!-- <nav class="top-nav">
                 <div class="breadcrumb" style="font-size: 0.9rem; color: #64748b;">
                     Portail Admin <svg style="display:inline-block; vertical-align:middle; margin: 0 4px;" width="14"
                         height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -150,7 +150,7 @@
                         </div>
                     </div>
                 </div>
-            </nav>
+            </nav> -->
 
             <main>
                 {{ $slot }}

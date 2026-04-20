@@ -1,4 +1,4 @@
-<x-dashboard-layout active="administrateurs">
+<x-super-admin-layout active="administrateurs">
     <x-slot:title>Gestion des administrateurs - ArchiSearch</x-slot>
 
     <div class="page-header">
@@ -151,4 +151,4 @@
             <button class="page-btn">Suivant</button>
         </div>
     </div>
-</x-dashboard-layout>
+</x-super-admin-layout>

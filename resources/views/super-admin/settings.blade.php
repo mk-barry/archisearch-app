@@ -1,4 +1,4 @@
-<x-dashboard-layout active="parametres">
+<x-super-admin-layout active="parametres">
     <x-slot:title>Paramètres globaux - ArchiSearch</x-slot>
 
         <div class="page-header">
@@ -146,4 +146,4 @@
             <button class="btn-outline">Annuler</button>
             <button class="btn-primary" style="padding: 0.75rem 2rem;">Enregistrer les paramètres</button>
         </div>
-</x-dashboard-layout>
+</x-super-admin-layout>

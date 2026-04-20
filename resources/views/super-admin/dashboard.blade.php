@@ -1,4 +1,4 @@
-<x-dashboard-layout active="supervision">
+<x-super-admin-layout active="supervision">
     <x-slot:title>Supervision - ArchiSearch</x-slot>
 
     <div class="page-header">
@@ -159,4 +159,4 @@
             </div>
         </div>
     </div>
-</x-dashboard-layout>
+</x-super-admin-layout>

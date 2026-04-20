@@ -1,4 +1,4 @@
-<x-dashboard-layout active="logs">
+<x-super-admin-layout active="logs">
     <x-slot:title>Journaux système - ArchiSearch</x-slot>
 
     <div class="page-header">
@@ -112,4 +112,4 @@
             </tbody>
         </table>
     </div>
-</x-dashboard-layout>
+</x-super-admin-layout>

@@ -106,7 +106,7 @@
         <!-- Main Wrapper -->
         <div style="flex: 1; display: flex; flex-direction: column;">
             <!-- Top Nav -->
-            <nav class="top-nav">
+            <!-- <nav class="top-nav">
                 <div class="search-bar" style="position: relative; width: 300px;">
                     <svg style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"
                         width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -135,7 +135,7 @@
                         <span style="font-size: 0.75rem; color: #64748b;">Super Administrateur</span>
                     </div>
                 </div>
-            </nav>
+            </nav> -->
 
             <main>
                 {{ $slot }}
