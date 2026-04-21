@@ -9,9 +9,9 @@
     <!-- Controls Row -->
     <div class="controls-row">
         <div class="search-filter-group">
-            <div class="input-wrapper" style="width: 350px;">
-                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" placeholder="Rechercher un administrateur..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.75rem; border: 1px solid #e2e8f0; border-radius: 10px; background: white;">
+            <div class="input-wrapper" style="display: flex; width: 350px; background: white; justify-content: center; align-items: center; gap: 5px; border-radius: 10px;">
+                <svg class="input-icon" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" placeholder="Rechercher un administrateur..." style="width: 80%; padding: 0.75rem 1rem 0.75rem 1rem; border: none; outline: none;">
             </div>
             
             <button class="btn-outline">

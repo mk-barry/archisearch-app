@@ -50,23 +50,28 @@
             <div class="card-title">Téléversements récents (7j)</div>
             <div style="height: 250px; position: relative; margin-top: 2rem;">
                 <!-- Dotted Grid Lines -->
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <!-- <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="border-top: 1px dashed #e2e8f0; width: 100%;"></div>
                     <div style="border-top: 1px dashed #e2e8f0; width: 100%;"></div>
                     <div style="border-top: 1px dashed #e2e8f0; width: 100%;"></div>
                     <div style="border-top: 1px dashed #e2e8f0; width: 100%;"></div>
                     <div style="border-top: 1px dashed #e2e8f0; width: 100%;"></div>
-                </div>
+                </div> -->
                 <!-- Simulated Chart with SVG -->
-                <svg viewBox="0 0 700 200" style="width: 100%; height: 100%; overflow: visible; position: relative; z-index: 2;">
-                    <path d="M0,180 Q100,160 200,170 T400,120 T600,150 T700,100" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="0" />
+                <!-- <svg viewBox="0 0 700 200" style="width: 100%; height: 100%; overflow: visible; position: relative; z-index: 2;"> -->
+                    <!-- <path d="M0,180 Q100,160 200,170 T400,120 T600,150 T700,100" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="0" /> -->
                     <!-- Points -->
-                    <circle cx="200" cy="170" r="4" fill="#2563eb" />
+                    <!-- <circle cx="200" cy="170" r="4" fill="#2563eb" />
                     <circle cx="400" cy="120" r="4" fill="#2563eb" />
-                    <circle cx="700" cy="100" r="4" fill="#2563eb" />
-                </svg>
-                <div style="display: flex; justify-content: space-between; margin-top: 1rem; color: #94a3b8; font-size: 0.75rem;">
+                    <circle cx="700" cy="100" r="4" fill="#2563eb" /> -->
+                <!-- </svg> -->
+                <!-- <div style="display: flex; justify-content: space-between; margin-top: 1rem; color: #94a3b8; font-size: 0.75rem;">
                     <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+                </div> -->
+                <div style="width: 600px;">
+                    <canvas id="myline">
+
+                    </canvas>   
                 </div>
             </div>
         </div>
@@ -175,10 +180,10 @@
 
         <div class="dashboard-card">
             <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
-                Invités en attente de soumission
-                <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                    Envoyer rappels
+                <span style="font-size: 0.8rem; font-weight: bold;">Invités en attente de soumission</span>
+                <button class="btn-primary" style="padding: 0.2rem 0.2rem; font-size: 0.6rem; display: flex; justify-content: center; align-items: center; gap: 8px; width: 45%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    <span>Envoyer rappels</span>
                 </button>
             </div>
 
@@ -233,4 +238,44 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('myline').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                    datasets: [{
+                        label: 'Documents',
+                        data: [12, 24, 18, 35, 28, 8, 5],
+
+                        // --- RÉGLAGES DE LA COURBE ---
+                        borderColor: '#36A2EB',    // Couleur de la ligne
+                        tension: 0.4,              // L'arrondi (0 = lignes droites, 0.5 = très courbe)
+                        fill: false,               // Ne pas remplir sous la ligne
+                        pointRadius: 5,            // Taille des points
+                        pointBackgroundColor: '#36A2EB'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false         // On cache la légende comme demandé avant
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,    // Commence l'axe à 0
+                            max: 100,          // --- VALEUR MAXIMALE FORCÉE ---
+                            ticks: {
+                                stepSize: 10   // Optionnel : définit l'écart entre chaque graduation
+                            }
+                        }
+                    }
+                }
+            });
+
+    </script>
 </x-admin-layout>
