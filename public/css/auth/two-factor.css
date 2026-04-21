@@ -1,4 +1,78 @@
+/* :root {
+    --auth-bg-start:   #0d1b4b;
+    --auth-bg-end:     #1a3a8f;
+    --primary:         #2563eb;
+    --primary-hover:   #1d4ed8;
+    --primary-focus:   rgba(37, 99, 235, 0.15);
+    --card-bg:         #ffffff;
+    --text-dark:       #0f172a;
+    --text-main:       #1e293b;
+    --text-muted:      #64748b;
+    --text-light:      #94a3b8;
+    --border-color:    #e2e8f0;
+    --glass-bg:        rgba(255, 255, 255, 0.08);
+    --glass-border:    rgba(255, 255, 255, 0.18);
+    --hero-accent:     #60a5fa;
+    --radius-card:     20px;
+    --radius-input:    10px;
+    --shadow-card:     0 24px 60px rgba(0, 0, 0, 0.45);
+    --transition:      0.2s ease;
+} */
 
+/* ---------- Reset & Base ---------- */
+/* *,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, var(--auth-bg-start) 0%, var(--auth-bg-end) 100%);
+    min-height: 100vh;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+} */
+
+
+/* ---------- Login Card (Right) ---------- */
+/* .auth-card-wrapper {
+    width: 100%;
+    max-width: 460px;
+    flex-shrink: 0;
+}
+
+.auth-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-card);
+    padding: 2.5rem 2.75rem;
+    box-shadow: var(--shadow-card);
+    color: var(--text-main);
+}
+
+.auth-card__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.02em;
+}
+
+.auth-card__subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+} */
+
+/* OTP CONTAINER */
 
 .otp-container {
     display: flex;

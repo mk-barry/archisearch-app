@@ -3,6 +3,7 @@
     <x-slot:breadcrumb_current>Vérification 2FA</x-slot>
 
     @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/auth/login.css') }}">
         <link rel="stylesheet" href="{{ asset('css/auth/two-factor.css') }}">
     @endpush
 
