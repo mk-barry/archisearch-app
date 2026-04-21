@@ -7,27 +7,40 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon" style="background: #eff6ff; color: #2563eb;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                    <line x1="16" x2="16" y1="2" y2="6" />
+                    <line x1="8" x2="8" y1="2" y2="6" />
+                    <line x1="3" x2="21" y1="10" y2="10" />
+                </svg>
             </div>
             <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Événements actifs</span>
             <span class="stat-value">8</span>
             <span style="color: #94a3b8; font-size: 0.8rem;">2 expirent bientôt</span>
-            <div style="margin-top: 0.75rem;"><span class="trend up">↑ +1</span> <span style="color: #94a3b8; font-size: 0.8rem;">vs. mois dernier</span></div>
+            <div style="margin-top: 0.75rem;"><span class="trend up">↑ +1</span> <span
+                    style="color: #94a3b8; font-size: 0.8rem;">vs. mois dernier</span></div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: #f0fdf4; color: #10b981;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
             </div>
             <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Documents reçus</span>
             <span class="stat-value">342</span>
             <span style="color: #94a3b8; font-size: 0.8rem;">cette semaine</span>
-            <div style="margin-top: 0.75rem;"><span class="trend up">↑ +47</span> <span style="color: #94a3b8; font-size: 0.8rem;">vs. mois dernier</span></div>
+            <div style="margin-top: 0.75rem;"><span class="trend up">↑ +47</span> <span
+                    style="color: #94a3b8; font-size: 0.8rem;">vs. mois dernier</span></div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: #fffbeb; color: #f59e0b;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
             </div>
             <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">En attente de traitement</span>
             <span class="stat-value">23</span>
@@ -36,7 +49,11 @@
 
         <div class="stat-card">
             <div class="stat-icon" style="background: #fef2f2; color: #ef4444;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
             </div>
             <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Anomalies détectées</span>
             <span class="stat-value">3</span>
@@ -59,20 +76,18 @@
                 </div> -->
                 <!-- Simulated Chart with SVG -->
                 <!-- <svg viewBox="0 0 700 200" style="width: 100%; height: 100%; overflow: visible; position: relative; z-index: 2;"> -->
-                    <!-- <path d="M0,180 Q100,160 200,170 T400,120 T600,150 T700,100" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="0" /> -->
-                    <!-- Points -->
-                    <!-- <circle cx="200" cy="170" r="4" fill="#2563eb" />
+                <!-- <path d="M0,180 Q100,160 200,170 T400,120 T600,150 T700,100" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="0" /> -->
+                <!-- Points -->
+                <!-- <circle cx="200" cy="170" r="4" fill="#2563eb" />
                     <circle cx="400" cy="120" r="4" fill="#2563eb" />
                     <circle cx="700" cy="100" r="4" fill="#2563eb" /> -->
                 <!-- </svg> -->
                 <!-- <div style="display: flex; justify-content: space-between; margin-top: 1rem; color: #94a3b8; font-size: 0.75rem;">
                     <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
                 </div> -->
-                <div style="width: 600px;">
                     <canvas id="myline">
 
-                    </canvas>   
-                </div>
+                    </canvas>
             </div>
         </div>
 
@@ -124,9 +139,10 @@
         <div class="dashboard-card">
             <div class="card-title">
                 Derniers téléversements
-                <a href="#" style="font-size: 0.8rem; font-weight: 500; color: #2563eb; text-decoration: none;">Voir tout</a>
+                <a href="#" style="font-size: 0.8rem; font-weight: 500; color: #2563eb; text-decoration: none;">Voir
+                    tout</a>
             </div>
-            
+
             <div class="file-list">
                 <div class="file-item">
                     <div class="file-icon-box bg-pdf">PDF</div>
@@ -143,7 +159,8 @@
                 <div class="file-item">
                     <div class="file-icon-box bg-pdf">PDF</div>
                     <div style="flex: 1;">
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #1e293b;">Facture_Fournisseur_12.pdf</div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: #1e293b;">Facture_Fournisseur_12.pdf
+                        </div>
                         <div style="font-size: 0.75rem; color: #94a3b8;">Finance-Q2-2026 • M. Koné</div>
                     </div>
                     <div style="text-align: right;">
@@ -181,8 +198,12 @@
         <div class="dashboard-card">
             <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-size: 0.8rem; font-weight: bold;">Invités en attente de soumission</span>
-                <button class="btn-primary" style="padding: 0.2rem 0.2rem; font-size: 0.6rem; display: flex; justify-content: center; align-items: center; gap: 8px; width: 45%;">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                <button class="btn-primary"
+                    style="padding: 0.2rem 0.2rem; font-size: 0.6rem; display: flex; justify-content: center; align-items: center; gap: 8px; width: 45%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m22 2-7 20-4-9-9-4Z" />
+                        <path d="M22 2 11 13" />
+                    </svg>
                     <span>Envoyer rappels</span>
                 </button>
             </div>
@@ -242,40 +263,42 @@
     <script>
         const ctx = document.getElementById('myline').getContext('2d');
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-                    datasets: [{
-                        label: 'Documents',
-                        data: [12, 24, 18, 35, 28, 8, 5],
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                datasets: [{
+                    label: 'Documents',
+                    data: [12, 24, 18, 35, 28, 8, 5],
 
-                        // --- RÉGLAGES DE LA COURBE ---
-                        borderColor: '#36A2EB',    // Couleur de la ligne
-                        tension: 0.4,              // L'arrondi (0 = lignes droites, 0.5 = très courbe)
-                        fill: false,               // Ne pas remplir sous la ligne
-                        pointRadius: 5,            // Taille des points
-                        pointBackgroundColor: '#36A2EB'
-                    }]
+                    // --- RÉGLAGES DE LA COURBE ---
+                    borderColor: '#36A2EB',    // Couleur de la ligne
+                    tension: 0.4,              // L'arrondi (0 = lignes droites, 0.5 = très courbe)
+                    fill: false,               // Ne pas remplir sous la ligne
+                    pointRadius: 5,            // Taille des points
+                    pointBackgroundColor: '#36A2EB'
+                }]
+            },
+            options: {
+                responsive: true, // Le graphique s'adapte à la largeur du parent
+                maintainAspectRatio: false,  // Permet au graphique de s'étirer en largeur sans forcer un ratio fixe
+                // --------------------------------------------
+                plugins: {
+                    legend: {
+                        display: false         // On cache la légende comme demandé avant
+                    }
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false         // On cache la légende comme demandé avant
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,    // Commence l'axe à 0
-                            max: 100,          // --- VALEUR MAXIMALE FORCÉE ---
-                            ticks: {
-                                stepSize: 10   // Optionnel : définit l'écart entre chaque graduation
-                            }
+                scales: {
+                    y: {
+                        beginAtZero: true,    // Commence l'axe à 0
+                        max: 100,          // --- VALEUR MAXIMALE FORCÉE ---
+                        ticks: {
+                            stepSize: 10   // Optionnel : définit l'écart entre chaque graduation
                         }
                     }
                 }
-            });
+            }
+        });
 
     </script>
 </x-admin-layout>

@@ -91,9 +91,7 @@
                     <!-- <path d="M0,150 Q100,100 200,120 T400,50 T600,130 T700,160 V200 H0 Z"
                             fill="rgba(37, 99, 235, 0.05)" /> -->
                     <!-- </svg> -->
-                    <div style="width: 600px;">
-                        <canvas id="myPointChart"></canvas>
-                    </div>
+                    <canvas id="myPointChart"></canvas>
                     <!-- <div
                         style="display: flex; justify-content: space-between; margin-top: 1rem; color: #94a3b8; font-size: 0.75rem;">
                         <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
@@ -246,7 +244,7 @@
                             tension: 0.2,           // Courbe fluide
                             fill: false
                         },
-                        
+
                         {
                             label: 'Televersement',
                             data: [42, 67, 53, 88, 74, 20, 12],
@@ -258,7 +256,9 @@
                     ]
                 },
                 options: {
-                    responsive: true,
+                    responsive: true,// Le graphique s'adapte à la largeur du parent
+                    maintainAspectRatio: false,  // Permet au graphique de s'étirer en largeur sans forcer un ratio fixe
+                    // --------------------------------------------
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -305,6 +305,8 @@
                 },
                 options: {
                     cutout: '70%', // Plus le chiffre est grand, plus la bande est fine
+                    responsive: true,// Le graphique s'adapte à la largeur du parent
+                    maintainAspectRatio: false,  // Permet au graphique de s'étirer en largeur sans forcer un ratio fixe
                     plugins: {
                         legend: {
                             display: false,
