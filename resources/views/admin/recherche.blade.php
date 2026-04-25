@@ -1,6 +1,6 @@
 <x-admin-layout active="recherche" title="Recherche de documents - ArchiSearch">
     <div class="page-header">
-        <div class="breadcrumb-small">Portail Admin > Recherche</div>
+        <!-- <div class="breadcrumb-small">Portail Admin > Recherche</div> -->
         <h1>Recherche de documents</h1>
     </div>
 

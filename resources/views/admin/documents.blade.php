@@ -1,6 +1,6 @@
 <x-admin-layout active="documents" title="Documents - ArchiSearch">
     <div class="page-header">
-        <div class="breadcrumb-small">Portail Admin > Événements > Collecte Contrats RH > Documents</div>
+        <!-- <div class="breadcrumb-small">Portail Admin > Événements > Collecte Contrats RH > Documents</div> -->
         <h1>Documents de l'événement</h1>
     </div>
 
@@ -37,12 +37,12 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 350px;">DOCUMENT</th>
+                    <th>DOCUMENT</th>
                     <th>CATÉGORIE</th>
                     <th>CONTRIBUTEUR</th>
                     <th>DATE</th>
                     <th>STATUT</th>
-                    <th style="text-align: right;">ACTIONS</th>
+                    <th>ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,10 +50,10 @@
                 <tr>
                     <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-pdf" style="width: 38px; height: 38px;">PDF</div>
-                            <div>
+                            <div class="file-icon-box bg-pdf">PDF</div>
+                            <div class="text-sizes">
                                 <div style="font-weight: 700; color: #1e293b;">CNI_Dupont_2026.pdf</div>
-                                <div style="font-size: 0.75rem; color: #94a3b8;">1.2 Mo</div>
+                                <div class="file-size">1.2 Mo</div>
                             </div>
                         </div>
                     </td>
@@ -73,10 +73,10 @@
                 <tr>
                     <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-pdf" style="width: 38px; height: 38px;">PDF</div>
-                            <div>
+                            <div class="file-icon-box bg-pdf">PDF</div>
+                            <div class="text-sizes">
                                 <div style="font-weight: 700; color: #1e293b;">Contrat_Moreau_sign.pdf</div>
-                                <div style="font-size: 0.75rem; color: #94a3b8;">2.8 Mo</div>
+                                <div class="file-size">2.8 Mo</div>
                             </div>
                         </div>
                     </td>
@@ -96,10 +96,10 @@
                 <tr>
                     <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-pdf" style="width: 38px; height: 38px;">PDF</div>
-                            <div>
+                            <div class="file-icon-box bg-pdf">PDF</div>
+                            <div class="text-sizes">
                                 <div style="font-weight: 700; color: #1e293b;">Facture_Kone_092.pdf</div>
-                                <div style="font-size: 0.75rem; color: #94a3b8;">542 Ko</div>
+                                <div class="file-size">542 Ko</div>
                             </div>
                         </div>
                     </td>
@@ -119,10 +119,10 @@
                 <tr>
                     <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-jpg" style="width: 38px; height: 38px;">JPG</div>
-                            <div>
+                            <div class="file-icon-box bg-jpg">JPG</div>
+                            <div class="text-sizes">
                                 <div style="font-weight: 700; color: #1e293b;">Photo_Pereira.jpg</div>
-                                <div style="font-size: 0.75rem; color: #94a3b8;">3.1 Mo</div>
+                                <div class="file-size">3.1 Mo</div>
                             </div>
                         </div>
                     </td>
@@ -142,10 +142,10 @@
                 <tr>
                     <td style="border-bottom: none;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-xls" style="width: 38px; height: 38px;">XLS</div>
-                            <div>
+                            <div class="file-icon-box bg-xls">XLS</div>
+                            <div class="text-sizes">
                                 <div style="font-weight: 700; color: #1e293b;">Bilan_Diallo_Q1.xlsx</div>
-                                <div style="font-size: 0.75rem; color: #94a3b8;">128 Ko</div>
+                                <div class="file-size">128 Ko</div>
                             </div>
                         </div>
                     </td>
