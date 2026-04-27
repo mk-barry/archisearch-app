@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
+Route::resource('users', UserController::class);
 
 Route::get('/', function () {
     return view('auth.login');
@@ -19,12 +22,15 @@ Route::get('/reset-password', function () {
 Route::prefix('super-admin')->name('super-admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('super-admin.dashboard'); })->name('dashboard');
-    Route::get('/administrateurs', function () {
-        return view('super-admin.administrateurs'); })->name('administrateurs');
+    Route::get('/administrateurs', [UserController::class, 'index'])->name('administrateurs');
     Route::get('/logs', function () {
         return view('super-admin.logs'); })->name('logs');
     Route::get('/settings', function () {
         return view('super-admin.settings'); })->name('settings');
+    Route::get('/creation-admin', function () {
+        return view('super-admin.creation-admin');
+    })->name('creation-admin');
+    Route::get('/administrateurs/{id}/edit', [UserController::class, 'edit'])->name('administrateurs.edit');
 });
 
 // Admin Routes

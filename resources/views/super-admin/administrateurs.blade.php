@@ -1,45 +1,58 @@
 <x-super-admin-layout active="administrateurs">
     <x-slot:title>Gestion des administrateurs - ArchiSearch</x-slot>
 
-    <div class="page-header">
-        <div class="breadcrumb-small">Super Admin > Administrateurs</div>
-        <h1>Gestion des administrateurs</h1>
-    </div>
-
-    <!-- Controls Row -->
-    <div class="controls-row">
-        <div class="search-filter-group">
-            <div class="input-wrapper" style="display: flex; width: 350px; background: white; justify-content: center; align-items: center; gap: 5px; border-radius: 10px;">
-                <svg class="input-icon" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" placeholder="Rechercher un administrateur..." style="width: 80%; padding: 0.75rem 1rem 0.75rem 1rem; border: none; outline: none;">
-            </div>
-            
-            <button class="btn-outline">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                Filtrer
-            </button>
+        <div class="page-header">
+            <div class="breadcrumb-small">Super Admin > Administrateurs</div>
+            <h1>Gestion des administrateurs</h1>
         </div>
 
-        <button class="btn-primary">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Créer un administrateur
-        </button>
-    </div>
+        <!-- Controls Row -->
+        <div class="controls-row">
+            <div class="search-filter-group">
+                <div class="input-wrapper"
+                    style="display: flex; width: 350px; background: white; justify-content: center; align-items: center; gap: 5px; border-radius: 10px;">
+                    <svg class="input-icon" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="text" placeholder="Rechercher un administrateur..."
+                        style="width: 80%; padding: 0.75rem 1rem 0.75rem 1rem; border: none; outline: none;">
+                </div>
 
-    <!-- Data Table -->
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Administrateur</th>
-                    <th>Organisation</th>
-                    <th>Statut</th>
-                    <th>Dernière connexion</th>
-                    <th>Documents</th>
-                    <th style="text-align: right;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
+                <button class="btn-outline">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                    </svg>
+                    Filtrer
+                </button>
+            </div>
+
+            <a href="{{ route('super-admin.creation-admin') }}" class="btn-primary" style="text-decoration: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Créer un administrateur
+            </a>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Administrateur</th>
+                        <!-- <th>Organisation</th> -->
+                        <th>Statut</th>
+                        <th>Dernière connexion</th>
+                        <th>Documents</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <!-- <tbody>
                 <tr>
                     <td>
                         <div class="admin-info">
@@ -136,19 +149,88 @@
                         <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
                     </td>
                 </tr>
-            </tbody>
-        </table>
-    </div>
+            </tbody> -->
+                <tbody>
+                    @foreach ($users as $user)
+                        <tr>
+                            <td>
+                                <div class="admin-info">
+                                    <div class="avatar"
+                                        style="width: 36px; height: 36px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
+                                        {{ strtoupper(substr($user->name, 0, 2)) }}
+                                    </div>
+                                    <div>
+                                        <span class="admin-name">{{ $user->name }}</span>
+                                        <span class="admin-email">{{ $user->email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <!-- <td>{{ $user->organisation ?? 'Non spécifiée' }}</td> -->
+                            <td>
+                                <span class="badge {{ $user->is_active ? 'badge-green' : 'badge-orange' }}">
+                                    {{ $user->is_active ? 'Actif' : 'Inactif' }}
+                                </span>
+                            </td>
+                            <td>{{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Jamais' }}</td>
+                            <td style="font-weight: 500;">{{ $user->documents_count ?? 0 }}</td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                {{-- Bouton Modifier --}}
+                                <a href="{{ route('users.edit', $user->id) }}" class="action-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                                    </svg>
+                                </a>
 
-    <!-- Pagination -->
-    <div class="pagination-row">
-        <span>Affichage 1-5 sur 18 administrateurs</span>
-        <div class="page-numbers">
-            <button class="page-btn">Précédent</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <button class="page-btn">Suivant</button>
+                                {{-- Bouton Supprimer --}}
+                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;"
+                                    onsubmit="return confirm('Supprimer cet admin ?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="action-btn"
+                                        style="color: red; border: none; background: none; cursor: pointer;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path
+                                                d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    </div>
+
+        <!-- Pagination -->
+        <div class="pagination-row">
+            <span>
+                Affichage {{ $users->firstItem() }}-{{ $users->lastItem() }} sur {{ $users->total() }} administrateurs
+            </span>
+        
+            <div class="page-numbers">
+                {{-- Bouton Précédent --}}
+                @if ($users->onFirstPage())
+                    <button class="page-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Précédent</button>
+                @else
+                    <a href="{{ $users->previousPageUrl() }}" class="page-btn" style="text-decoration: none;">Précédent</a>
+                @endif
+        
+                {{-- Numéros de pages --}}
+                @foreach ($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                    <a href="{{ $url }}" class="page-btn {{ ($page == $users->currentPage()) ? 'active' : '' }}"
+                        style="text-decoration: none;">
+                        {{ $page }}
+                    </a>
+                @endforeach
+        
+                {{-- Bouton Suivant --}}
+                @if ($users->hasMorePages())
+                    <a href="{{ $users->nextPageUrl() }}" class="page-btn" style="text-decoration: none;">Suivant</a>
+                @else
+                    <button class="page-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Suivant</button>
+                @endif
+            </div>
+        </div>
 </x-super-admin-layout>

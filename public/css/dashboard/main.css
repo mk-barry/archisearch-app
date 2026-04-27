@@ -295,7 +295,7 @@ td {
     justify-content: center;
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: clamp(0.4rem, 0.5rem, 0.6rem);
+    font-size: clamp(0.4rem, 0.7rem, 0.8rem);
     font-weight: 600;
 }
 
