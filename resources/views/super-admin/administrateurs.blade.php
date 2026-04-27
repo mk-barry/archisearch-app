@@ -128,7 +128,7 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination-row">
+        <div id="pagination-row" class="pagination-row">
             @fragment('pagination')
                 <span>
                     Affichage {{ $users->firstItem() }}-{{ $users->lastItem() }} sur {{ $users->total() }} administrateurs
@@ -167,26 +167,43 @@
 
                 let timeout = null;
 
+                // Fonction centrale pour mettre à jour le tableau et la pagination
+                function updateContent(url) {
+                    fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+
+                            // Mise à jour des fragments
+                            tableBody.innerHTML = doc.getElementById('table-body').innerHTML;
+                            paginationContainer.innerHTML = doc.getElementById('pagination-row').innerHTML;
+                        })
+                        .catch(error => console.error('Erreur lors du filtrage:', error));
+                }
+
+                // 1. Écouteur pour la RECHERCHE (keyup)
                 searchInput.addEventListener('keyup', function () {
                     clearTimeout(timeout);
-
                     timeout = setTimeout(() => {
-                        let query = this.value;
-
-                        fetch(`{{ route('super-admin.administrateurs') }}?search=${query}`, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        })
-                            .then(response => response.text())
-                            .then(html => {
-                                // On utilise un petit astuce : on crée un élément temporaire pour parser le HTML reçu
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
-
-                                // On remplace le contenu par les nouveaux fragments
-                                tableBody.innerHTML = doc.getElementById('table-body').innerHTML;
-                                paginationContainer.innerHTML = doc.getElementById('pagination-row').innerHTML;
-                            });
+                        const url = `{{ route('super-admin.administrateurs') }}?search=${encodeURIComponent(this.value)}`;
+                        updateContent(url);
                     }, 300);
+                });
+
+                // 2. Écouteur pour la PAGINATION (click)
+                // On utilise la délégation d'événement sur le conteneur car les boutons sont recréés à chaque fois
+                paginationContainer.addEventListener('click', function (e) {
+                    // On cherche si l'élément cliqué est un lien ou à l'intérieur d'un lien
+                    const link = e.target.closest('a');
+
+                    if (link && link.getAttribute('href')) {
+                        e.preventDefault(); // On empêche le rechargement de la page
+                        const url = link.getAttribute('href');
+                        updateContent(url);
+                    }
                 });
             });
         </script>

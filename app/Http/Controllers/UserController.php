@@ -17,7 +17,7 @@ class UserController extends Controller
                 ->orWhere('email', 'like', "%{$request->search}%");
         }
 
-        $users = $query->paginate(10)->withQueryString();
+        $users = $query->paginate(5)->withQueryString();
 
         // Si c'est de l'AJAX, Laravel peut quand même renvoyer la vue entière, 
         // mais le JS ne prendra que ce dont il a besoin.
