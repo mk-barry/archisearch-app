@@ -8,12 +8,25 @@ use Illuminate\Support\Facades\Hash; // Pour crypter le mot de passe
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // $users = User::all();
-        $users = User::latest()->paginate(5);
-        
-        return view("super-admin.administrateurs", compact("users"));
+        $query = User::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%");
+        }
+
+        $users = $query->paginate(10)->withQueryString();
+
+        // Si c'est de l'AJAX, Laravel peut quand même renvoyer la vue entière, 
+        // mais le JS ne prendra que ce dont il a besoin.
+        // OU tu peux forcer le retour du fragment pour gagner en performance :
+        if ($request->ajax()) {
+            return view('super-admin.administrateurs', compact('users'))->fragment('table-body');
+        }
+
+        return view('super-admin.administrateurs', compact('users'));
     }
 
     public function create()
