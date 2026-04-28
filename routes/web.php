@@ -3,20 +3,27 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\OtpController;
 
 Route::resource('users', UserController::class);
 
+// Authentication Routes
+
 Route::get('/', function () {
     return view('auth.login');
-});
+})->name('login');
+
+Route::post('/', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 
 Route::get('/verify-2fa', function () {
     return view('auth.two-factor');
 })->name('two-factor');
 
-Route::get('/reset-password', function () {
-    return view('auth.reset-password');
-})->name('password.reset.test');
+Route::post('/verify-2fa', [OtpController::class, 'verify'])->name('two-factor.verify');
+
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
 
 // Super Admin Routes
 Route::prefix('super-admin')->name('super-admin.')->group(function () {
@@ -68,12 +75,6 @@ Route::get('/invitation/televersement', function () {
 Route::get('/invitation/confirmation', function () {
     return view('user.confirmation');
 })->name('invitation.confirmation');
-
-// System Routes
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

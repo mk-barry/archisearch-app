@@ -83,24 +83,29 @@
                     </svg>
                     Paramètres globaux
                 </a>
-                <a href="#" class="nav-item {{ $active == 'securite' ? 'active' : '' }}">
+                <a href="{{ route('profile.edit') }}" class="nav-item {{ $active == 'profil' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
                     </svg>
-                    Sécurité
+                    Profil
                 </a>
             </div>
 
             <div class="sidebar-footer">
-                <a href="#" class="nav-item">
+                <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: none;">
+                    @csrf
+                </form>
+
+                <a href="{{ route('logout') }}" class="nav-item"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" x2="9" y1="12" y2="12" />
                     </svg>
-                    Déconnexion
+                    <span>Déconnexion</span>
                 </a>
             </div>
         </aside>

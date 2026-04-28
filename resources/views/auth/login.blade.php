@@ -56,7 +56,7 @@
                 {{-- Session errors --}}
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form action="{{ route('login') }}" method="POST" novalidate>
+                <form action="{{ route('login.post') }}" method="POST" novalidate>
                     @csrf
 
                     {{-- Email --}}
