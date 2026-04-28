@@ -30,7 +30,9 @@ Route::prefix('super-admin')->name('super-admin.')->group(function () {
     Route::get('/creation-admin', function () {
         return view('super-admin.creation-admin');
     })->name('creation-admin');
-    Route::get('/administrateurs/{id}/edit', [UserController::class, 'edit'])->name('administrateurs.edit');
+    Route::get('/administrateurs/edit/{user}', [UserController::class, 'edit'])->name('administrateurs.edit');
+    Route::patch('/administrateurs/toggle-status/{user}', [UserController::class, 'toggleStatus'])
+    ->name('toggle-status');
 });
 
 // Admin Routes

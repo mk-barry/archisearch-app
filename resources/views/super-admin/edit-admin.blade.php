@@ -34,11 +34,21 @@
                 </div>
 
                 <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Role</label>
+                    <select name="role" id="role" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                    @foreach($roles as $role)
+                        <option value="{{ $role }}" {{ $user->role === $role ? 'selected' : '' }}>
+                            {{ ucfirst(str_replace('-', ' ', $role)) }}
+                        </option>
+                    @endforeach              
+                    </select>
+                </div>
+                <!-- <div class="form-group">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500;">Mot de passe</label>
                     <input type="password" name="password" placeholder="Laisser vide pour ne pas changer"
                         style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
                     <small style="color: #64748b;">Ne remplir que pour modifier le mot de passe actuel.</small>
-                </div>
+                </div> -->
             </div>
 
             <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 20px;">
