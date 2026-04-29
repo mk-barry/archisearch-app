@@ -21,6 +21,12 @@ class OtpController extends Controller
             // 1. On reconnecte l'utilisateur
             Auth::loginUsingId(session('auth_id'), session('remember'));
             $user = Auth::user(); // On récupère l'utilisateur connecté
+            if ($user) {
+                $user->update([
+                    'last_login_at' => now(),
+                    'last_seen_at' => now()
+                ]);
+            }
 
             // 2. Nettoyage
             session()->forget(['otp_code', 'auth_id', 'otp_expires_at', 'remember']);

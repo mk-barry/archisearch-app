@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('organisation')->nullable()->after('name');
-            $table->boolean('must_change_password')->default(true)->after('is_active');
-            $table->timestamp('last_login_at')->nullable()->after('created_at');
-            $table->timestamp('last_logout_at')->nullable()->after('last_login_at');
+            $table->timestamp('last_seen_at')->nullable()->after('last_logout_at');
         });
     }
 

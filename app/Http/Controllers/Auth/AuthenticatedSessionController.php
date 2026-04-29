@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthenticatedSessionController extends Controller
 {
+    public function create(){
+        return view('auth.login');
+    }
     public function store(LoginRequest $request): RedirectResponse
     {
         // 1. Vérification email/password via Breeze
@@ -48,6 +51,14 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+        if ($user) {
+            $user->update([
+                'last_logout_at' => now(),
+                'last_seen_at' => now()->subMinutes(5)
+            ]);
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();

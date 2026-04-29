@@ -1,12 +1,6 @@
 <x-super-admin-layout active="administrateurs">
     <x-slot:title>Gestion des administrateurs - ArchiSearch</x-slot>
         <div class="page-header">
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script defer>
-                $(document).ready(function () {
-                        $('.js-example-basic-multiple').select2();
-                    });
-            </script>
             @if (session('success'))
                 <script>
                     Swal.fire({
@@ -18,18 +12,35 @@
                     });
                 </script>
                 <!-- @elseif (session('danger'))
-                    <script>
-                        Swal.fire({
-                            title: 'Succès !',
-                            text: "{{ session('danger') }}",
-                            icon: 'success',
-                            confirmButtonColor: '#0369a1', // Le bleu de ton interface
-                            confirmButtonText: 'Ok'
-                        });
-                    </script> -->
+                                <script>
+                                    Swal.fire({
+                                        title: 'Succès !',
+                                        text: "{{ session('danger') }}",
+                                        icon: 'success',
+                                        confirmButtonColor: '#0369a1', // Le bleu de ton interface
+                                        confirmButtonText: 'Ok'
+                                    });
+                                </script> -->
             @endif
-            <div class="breadcrumb-small">Super Admin > Administrateurs</div>
-            <h1>Gestion des administrateurs</h1>
+            <div class="page-info">
+                <div class="breadcrumb-small">Super Admin > Administrateurs</div>
+                <h1>Gestion des administrateurs</h1>
+            </div>
+            <div class="admin-info">
+                <div class="avatar" style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
+                        @if(Auth::user()->avatar)
+                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
+                                alt="Avatar de {{ Auth::user()->name }}">
+                        @else
+                            <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
+                            {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+                        @endif
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <span class="admin-name">{{ Auth::user()->name }}</span>
+                    <span class="admin-mail">{{ Auth::user()->role }}</span>
+                </div>
+            </div>
         </div>
 
         <!-- Controls Row -->
@@ -45,32 +56,44 @@
                     <input type="text" id="search-input" placeholder="Rechercher un administrateur..."
                         style="width: 80%; padding: 0.75rem 1rem 0.75rem 1rem; border: none; outline: none;">
                 </div>
-                <select class="js-example-basic-multiple" name="states[]" multiple="multiple" id="filtre">
+                <select class="js-basic-multiple" name="filters[]" multiple="multiple" id="filtre">
                     <optgroup label="Statut">
                         <option value="tous">Tous</option>
                         <option value="actifs">Actifs</option>
                         <option value="inactifs">Inactifs</option>
-                    </optgroup> 
-                                    
+                    </optgroup>
+
+                    <optgroup label="Activité">
+                        <option value="online">En ligne</option>
+                        <option value="recent">Vu récemment</option>
+                        <option value="never">Jamais connecté</option>
+                    </optgroup>
+
                     <optgroup label="Nombres de documents">
-                        <option value="500+">Plus de 500 documents</option>
-                        <option value="500-">Moins de 500 documents</option>
-                        <option value="100+">Plus de 100 documents</option>
-                        <option value="100-">Moins de 100 documents</option>
-                        <option value="50+">Plus de 50 documents</option>
-                        <option value="50-">Moins de 50 documents</option>
-                        <option value="10+">Plus de 10 documents</option>
-                        <option value="10-">Moins de 10 documents</option>
+                        <option value="500plus">Plus de 500 documents</option>
+                        <option value="500moins">Moins de 500 documents</option>
+                        <option value="100plus">Plus de 100 documents</option>
+                        <option value="100moins">Moins de 100 documents</option>
+                        <option value="50plus">Plus de 50 documents</option>
+                        <option value="50moins">Moins de 50 documents</option>
+                        <option value="10plus">Plus de 10 documents</option>
+                        <option value="10moins">Moins de 10 documents</option>
                     </optgroup>
 
                 </select>
-                <select class="js-example-basic-multiple" name="states[]" multiple="multiple" id="tri">
-                    <option value="default" selected>-- Trier Par --</option>
-                    <option value="new">Plus recent d'abord</option>
-                    <option value="old">Moins recent d'abord</option>
-                    <option value="az">A - Z</option>
-                    <option value="WY">Plus de 10 documents</option>
-                    <option value="WY">Moins de 10 documents</option>
+                <select class="js-basic-multiple" name="sort[]" multiple="multiple" id="tri">
+                    <optgroup label="Création">
+                        <option value="new">Plus recent d'abord</option>
+                        <option value="old">Moins recent d'abord</option>
+                    </optgroup>
+                    <optgroup label="Ordre">
+                        <option value="az">A - Z</option>
+                        <option value="za">Z - A</option>
+                    </optgroup>
+                    <optgroup label="Activité">
+                        <option value="plusdocs">Plus de documents</option>
+                        <option value="moinsdocs">Moins de documents</option>
+                    </optgroup>
                 </select>
             </div>
 
@@ -119,7 +142,10 @@
                                         {{ $user->is_active ? 'Actif' : 'Inactif' }}
                                     </span>
                                 </td>
-                                <td>{{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Jamais' }}</td>
+                                <td class="last-login-timer" data-login="{{ $user->last_login_at }}"
+                                    data-seen="{{ $user->last_seen_at }}">
+                                    {!! $user->status !!}
+                                </td>
                                 <td style="font-weight: 500;">{{ $user->documents_count ?? 0 }}</td>
                                 <td style="text-align: right; white-space: nowrap;">
                                     {{-- Bouton Modifier --}}
@@ -132,25 +158,27 @@
 
                                     {{-- Bouton Supprimer --}}
                                     <!-- <form action="{{ route('users.destroy', $user->id) }}" method="POST"
-                                                style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="action-btn btn-delete" data-name="{{ $user->name }}"
-                                                    style="color: red; border: none; background: none; cursor: pointer;"  title="supprimer">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="2">
-                                                        <path
-                                                            d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                                    </svg>
-                                                </button>
-                                            </form> -->
+                                                                        style="display:inline;">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="button" class="action-btn btn-delete" data-name="{{ $user->name }}"
+                                                                            style="color: red; border: none; background: none; cursor: pointer;"  title="supprimer">
+                                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                                stroke-width="2">
+                                                                                <path
+                                                                                    d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    </form> -->
                                     <form action="{{ route('super-admin.toggle-status', $user->id) }}" method="POST"
                                         style="display:inline;">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="action-btn btn-toggle"
                                             title="{{ $user->is_active ? 'Désactiver le compte' : 'Activer le compte' }}"
-                                            style="color: {{ $user->is_active ? '#f97316' : '#22c55e' }}; border: none; background: none; cursor: pointer;" data-name="{{$user->name}}" data-status="{{$user->is_active ? 'Désactiver le compte' : 'Activer le compte'}}">
+                                            style="color: {{ $user->is_active ? '#f97316' : '#22c55e' }}; border: none; background: none; cursor: pointer;"
+                                            data-name="{{$user->name}}"
+                                            data-status="{{$user->is_active ? 'Désactiver le compte' : 'Activer le compte'}}">
 
                                             @if($user->is_active)
                                                 {{-- Icône Silhouette + Croix (Désactiver) --}}
@@ -317,5 +345,124 @@
                     });
                 }
             });
+        </script>
+        <script>
+            // Configuration de Day.js (C'est le Carbon du JavaScript)
+            dayjs.extend(window.dayjs_plugin_relativeTime);
+            dayjs.locale('fr');
+
+            function updateTimers() {
+                document.querySelectorAll('.last-login-timer').forEach(el => {
+                    const rawTime = el.getAttribute('data-time');
+                    if (rawTime) {
+                        // On recalcule le "diffForHumans" en JS
+                        el.innerText = dayjs(rawTime).fromNow();
+                    }
+                });
+            }
+
+            // Actualise toutes les secondes
+            setInterval(updateTimers, 1000);
+        </script>
+        <!-- <script>
+            $(document).ready(function () {
+                const $select = $('#filtre', '#tri').select2({
+                    placeholder: "Filtrer",
+                    allowClear: true,
+                    // width: '100%'
+                });
+
+                $select.on('select2:select', function (e) {
+                    const selectedOption = e.params.data.element; // L'élément cliqué
+                    const $group = $(selectedOption).parent('optgroup'); // Son groupe parent
+
+                    if ($group.length) {
+                        // On récupère toutes les options du même groupe
+                        const groupOptions = $group.find('option');
+
+                        // On récupère les valeurs actuellement sélectionnées
+                        let currentValues = $select.val();
+
+                        // On retire les autres options du groupe de la sélection actuelle
+                        groupOptions.each(function () {
+                            if (this !== selectedOption) {
+                                const index = currentValues.indexOf(this.value);
+                                if (index > -1) {
+                                    currentValues.splice(index, 1);
+                                }
+                            }
+                        });
+
+                        // On met à jour le select avec la nouvelle liste (une seule par groupe)
+                        $select.val(currentValues).trigger('change.select2');
+                    }
+                });
+            });
+        </script> -->
+        <script>
+            $(document).ready(function () {
+                // Initialisation de tous les selects ayant la classe exclusive
+                const $exclusiveSelects = $('.js-basic-multiple').select2({
+                    placeholder: "Sélectionner une option",
+                    allowClear: true,
+                    width: '30%'
+                });
+
+                // On écoute l'événement de sélection
+                $exclusiveSelects.on('select2:select', function (e) {
+                    const $currentSelect = $(this); // Le select précis (Filtre ou Tri)
+                    const selectedOption = e.params.data.element; // L'élément cliqué
+                    const $group = $(selectedOption).parent('optgroup'); // Son groupe
+
+                    if ($group.length) {
+                        // 1. Trouver toutes les options qui appartiennent au même groupe
+                        const groupOptions = $group.find('option');
+
+                        // 2. Récupérer les valeurs actuellement sélectionnées dans CE select
+                        let currentValues = $currentSelect.val();
+
+                        // 3. Retirer les autres options du même groupe de la sélection
+                        groupOptions.each(function () {
+                            if (this !== selectedOption) {
+                                const index = currentValues.indexOf(this.value);
+                                if (index > -1) {
+                                    currentValues.splice(index, 1);
+                                }
+                            }
+                        });
+
+                        // 4. Mettre à jour Select2 pour ce menu précis
+                        $currentSelect.val(currentValues).trigger('change.select2');
+                    }
+                });
+            });
+        </script>
+        <script>
+            // Configuration de Day.js en français
+            dayjs.extend(window.dayjs_plugin_relativeTime);
+            dayjs.locale('fr');
+
+            function updateAllStatuses() {
+                // On cherche toutes les cellules qui ont la classe "status-cell"
+                document.querySelectorAll('.status-cell').forEach(cell => {
+                    const lastSeenRaw = cell.getAttribute('data-seen');
+
+                    if (lastSeenRaw) {
+                        const lastSeen = dayjs(lastSeenRaw);
+                        const now = dayjs();
+                        const diffMinutes = now.diff(lastSeen, 'minute');
+
+                        if (diffMinutes < 5) {
+                            cell.innerHTML = '<span class="text-success">● En ligne</span>';
+                        } else {
+                            // Sinon on affiche "Vu il y a..."
+                            cell.innerHTML = 'Vu ' + lastSeen.fromNow();
+                        }
+                    }
+                });
+            }
+
+            // On lance la vérification toutes les 30 secondes
+            setInterval(updateAllStatuses, 30000);
         </script>
 </x-super-admin-layout>
