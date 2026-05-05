@@ -16,9 +16,10 @@ class UpdateLastSeen
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check()) {
+        if (auth()->check()) {
             // On met à jour la date d'activité
-            Auth::user()->update([
+            // dd("Le middleware est actif");
+            auth()->user()->update([
                 'last_seen_at' => now()
             ]);
         }

@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
-        $middleware->append([
+        $middleware->web(append: [
             \App\Http\Middleware\UpdateLastSeen::class
         ]);
         

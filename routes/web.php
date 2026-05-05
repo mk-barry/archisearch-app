@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Note : J'ai gardé le resource user au cas où tu en as besoin pour l'API ou d'autres fonctions
 Route::resource('users', UserController::class);
+Route::post('/user/heartbeat', [UserController::class, 'heartbeat'])->name('user.heartbeat');
 
 require __DIR__ . '/auth.php';

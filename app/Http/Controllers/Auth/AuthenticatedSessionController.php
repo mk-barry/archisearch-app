@@ -55,7 +55,7 @@ class AuthenticatedSessionController extends Controller
         if ($user) {
             $user->update([
                 'last_logout_at' => now(),
-                'last_seen_at' => now()->subMinutes(5)
+                'last_seen_at' => now()
             ]);
         }
 

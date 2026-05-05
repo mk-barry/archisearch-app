@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'organisation',
         'role',
+        'documents_count',
         'last_login_at',
         'last_logout_at',
         'last_seen_at',
@@ -59,7 +60,7 @@ class User extends Authenticatable
     public function getStatusAttribute()
     {
         // 1. Est-il actif en ce moment ? (moins de 2 minutes d'inactivité)
-        if ($this->last_seen_at && $this->last_seen_at->gt(now()->subMinutes(5))) {
+        if ($this->last_seen_at && $this->last_seen_at->gt(now()->subMinutes(1))) {
             return '<span class="text-success badge-green">En ligne</span>';
         }
 

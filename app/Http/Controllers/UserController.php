@@ -11,22 +11,92 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::withCount('documents');
 
+        // Recherche
         if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%")
-                ->orWhere('email', 'like', "%{$request->search}%");
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%");
+            });
+        }
+
+        // Filtres
+        if ($request->filled('filters')) {
+            foreach ($request->filters as $filter) {
+                if ($filter == 'actifs')
+                    $query->where('is_active', true);
+                if ($filter == 'inactifs')
+                    $query->where('is_active', false);
+                if ($filter == 'recent')
+                    $query->where('last_seen_at', '<', now()->subMinutes(5));
+                if ($filter == 'online')
+                    $query->where('last_seen_at', '>=', now()->subMinutes(5));
+                if ($filter == 'never')
+                    $query->whereNull('last_login_at');
+                if ($filter == 'never')
+                    $query->whereNull('last_login_at');
+                if ($filter == 'never')
+                    $query->whereNull('last_login_at');
+                if ($filter == 'never')
+                    $query->whereNull('last_login_at');
+                if ($filter == '500plus')
+                    $query->where('documents_count', '>=', 500);
+                if ($filter == '500moins')
+                    $query->where('documents_count', '<=', 500);
+                if ($filter == '100plus')
+                    $query->where('documents_count', '>=', 100);
+                if ($filter == '100moins')
+                    $query->where('documents_count', '<=', 100);
+                if ($filter == '50plus')
+                    $query->where('documents_count', '>=', 50);
+                if ($filter == '50moins')
+                    $query->where('documents_count', '<=', 50);
+                if ($filter == '10plus')
+                    $query->where('documents_count', '>=', 10);
+                if ($filter == '10moins')
+                    $query->where('documents_count', '<=', 10);
+                // ... tes autres conditions
+            }
+        }
+
+        // --- TRI ---
+// On récupère la valeur proprement
+        $sortData = $request->input('sort');
+
+        if ($sortData) {
+            // Si c'est un tableau (Select2 multiple), on prend le dernier élément
+            $currentSort = is_array($sortData) ? end($sortData) : $sortData;
+
+            switch ($currentSort) {
+                case 'new':
+                    $query->orderByDesc('created_at');
+                    break;
+                case 'old':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                case 'az':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'za':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'plusdocs':
+                    $query->orderByDesc('documents_count');
+                        break;
+                case 'moinsdocs':
+                    $query->orderBy('documents_count', 'desc');
+                    break;
+            }
+        } else {
+            // Tri par défaut
+            $query->orderByDesc('last_seen_at')->orderByDesc('created_at');
         }
 
         $users = $query->paginate(5)->withQueryString();
 
-        // Si c'est de l'AJAX, Laravel peut quand même renvoyer la vue entière, 
-        // mais le JS ne prendra que ce dont il a besoin.
-        // OU tu peux forcer le retour du fragment pour gagner en performance :
-        if ($request->ajax()) {
-            return view('super-admin.administrateurs', compact('users'))->fragment('table-body');
-        }
-
+        // Ton script AJAX s'attend à recevoir TOUTE la page pour parser le DOM, 
+        // donc on ne retourne PAS de fragment ici si on veut garder TA logique de fetch.
         return view('super-admin.administrateurs', compact('users'));
     }
 
@@ -99,17 +169,6 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Profil mis à jour.');
     }
 
-    /**
-     * Supprime l'administrateur
-     */
-    // public function destroy(string $id)
-    // {
-    //     $user = User::findOrFail($id);
-    //     $user->delete();
-
-    //     return redirect()->route('users.index')->with('danger', 'Administrateur supprimé.');
-    // }
-
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
@@ -118,6 +177,17 @@ class UserController extends Controller
 
         $status = $user->is_active ? 'activé' : 'désactivé';
         return back()->with('success', 'Le compte a été '. $status .' avec succès.');
+    }
+
+    public function heartbeat(Request $request)
+    {
+        if (auth()->check()) {
+            auth()->user()->update([
+                'last_seen_at' => now()
+            ]);
+            return response()->json(['status' => 'online']);
+        }
+        return response()->json(['status' => 'offline'], 401);
     }
 
     // public function toggleStatus(User $user)

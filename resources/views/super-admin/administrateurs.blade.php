@@ -12,29 +12,29 @@
                     });
                 </script>
                 <!-- @elseif (session('danger'))
-                                <script>
-                                    Swal.fire({
-                                        title: 'Succès !',
-                                        text: "{{ session('danger') }}",
-                                        icon: 'success',
-                                        confirmButtonColor: '#0369a1', // Le bleu de ton interface
-                                        confirmButtonText: 'Ok'
-                                    });
-                                </script> -->
+                                        <script>
+                                            Swal.fire({
+                                                title: 'Succès !',
+                                                text: "{{ session('danger') }}",
+                                                icon: 'success',
+                                                confirmButtonColor: '#0369a1', // Le bleu de ton interface
+                                                confirmButtonText: 'Ok'
+                                            });
+                                        </script> -->
             @endif
             <div class="page-info">
                 <div class="breadcrumb-small">Super Admin > Administrateurs</div>
                 <h1>Gestion des administrateurs</h1>
             </div>
             <div class="admin-info">
-                <div class="avatar" style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                        @if(Auth::user()->avatar)
-                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
-                                alt="Avatar de {{ Auth::user()->name }}">
-                        @else
-                            <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
-                            {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
-                        @endif
+                <div class="avatar"
+                    style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
+                    @if(Auth::user()->avatar)
+                        <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar de {{ Auth::user()->name }}">
+                    @else
+                        <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
+                        {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+                    @endif
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: flex-start;">
                     <span class="admin-name">{{ Auth::user()->name }}</span>
@@ -70,14 +70,14 @@
                     </optgroup>
 
                     <optgroup label="Nombres de documents">
-                        <option value="500plus">Plus de 500 documents</option>
-                        <option value="500moins">Moins de 500 documents</option>
-                        <option value="100plus">Plus de 100 documents</option>
-                        <option value="100moins">Moins de 100 documents</option>
-                        <option value="50plus">Plus de 50 documents</option>
-                        <option value="50moins">Moins de 50 documents</option>
-                        <option value="10plus">Plus de 10 documents</option>
-                        <option value="10moins">Moins de 10 documents</option>
+                        <option value="500plus">500 documents ou plus</option>
+                        <option value="500moins">500 documents ou moins</option>
+                        <option value="100plus">100 documents ou plus</option>
+                        <option value="100moins">100 documents ou moins</option>
+                        <option value="50plus">50 documents ou plus</option>
+                        <option value="50moins">50 documents ou moins</option>
+                        <option value="10plus">10 documents ou plus</option>
+                        <option value="10moins">10 documents ou moins</option>
                     </optgroup>
 
                 </select>
@@ -142,7 +142,7 @@
                                         {{ $user->is_active ? 'Actif' : 'Inactif' }}
                                     </span>
                                 </td>
-                                <td class="last-login-timer" data-login="{{ $user->last_login_at }}"
+                                <td class="statut-cell" data-login="{{ $user->last_login_at }}"
                                     data-seen="{{ $user->last_seen_at }}">
                                     {!! $user->status !!}
                                 </td>
@@ -156,20 +156,6 @@
                                         </svg>
                                     </a>
 
-                                    {{-- Bouton Supprimer --}}
-                                    <!-- <form action="{{ route('users.destroy', $user->id) }}" method="POST"
-                                                                        style="display:inline;">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="button" class="action-btn btn-delete" data-name="{{ $user->name }}"
-                                                                            style="color: red; border: none; background: none; cursor: pointer;"  title="supprimer">
-                                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                                                stroke-width="2">
-                                                                                <path
-                                                                                    d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                                                            </svg>
-                                                                        </button>
-                                                                    </form> -->
                                     <form action="{{ route('super-admin.toggle-status', $user->id) }}" method="POST"
                                         style="display:inline;">
                                         @csrf
@@ -243,17 +229,34 @@
         </div>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // 1. Définition des sélecteurs (IDs de ton code Blade)
                 const searchInput = document.getElementById('search-input');
                 const tableBody = document.getElementById('table-body');
                 const paginationContainer = document.getElementById('pagination-row');
-
+                const filterSelect = document.getElementById('filtre');
+                const sortSelect = document.getElementById('tri');
                 let timeout = null;
 
-                /**
-                 * FONCTION UNIFIÉE DE MISE À JOUR (AJAX)
-                 * Utilisée pour la recherche et pour la pagination
-                 */
+                // --- FONCTION POUR CONSTRUIRE L'URL ---
+                function getFullUrl(baseUrl, page = null) {
+                    const url = new URL(baseUrl);
+
+                    // 1. Recherche
+                    if (searchInput.value) url.searchParams.set('search', searchInput.value);
+
+                    // 2. Page
+                    if (page) url.searchParams.set('page', page);
+
+                    // 3. Filtres (on utilise jQuery car Select2 modifie le DOM)
+                    const filters = $(filterSelect).val() || [];
+                    filters.forEach(f => url.searchParams.append('filters[]', f));
+
+                    // 4. Tris
+                    const sorts = $(sortSelect).val() || [];
+                    sorts.forEach(s => url.searchParams.append('sort[]', s));
+
+                    return url.href;
+                }
+
                 function updateContent(url) {
                     fetch(url, {
                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -263,70 +266,69 @@
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(html, 'text/html');
 
-                            // Mise à jour des fragments HTML
                             if (tableBody && doc.getElementById('table-body')) {
                                 tableBody.innerHTML = doc.getElementById('table-body').innerHTML;
                             }
                             if (paginationContainer && doc.getElementById('pagination-row')) {
                                 paginationContainer.innerHTML = doc.getElementById('pagination-row').innerHTML;
                             }
+
+                            // Mise à jour de l'URL réelle pour le confort
+                            window.history.pushState(null, '', url);
                         })
-                        .catch(error => {
-                            console.error('Erreur lors du chargement des données:', error);
-                        });
+                        .catch(error => console.error('Erreur:', error));
                 }
 
-                /**
-                 * GESTION DE LA RECHERCHE (KEYUP)
-                 */
+                // --- ÉVÉNEMENTS ---
+
+                // Recherche
                 if (searchInput) {
                     searchInput.addEventListener('keyup', function () {
                         clearTimeout(timeout);
                         timeout = setTimeout(() => {
-                            // On construit l'URL de recherche proprement
-                            const query = encodeURIComponent(this.value);
-                            const url = `{{ route('super-admin.administrateurs') }}?search=${query}`;
-                            updateContent(url);
-                        }, 300); // Délai de 300ms pour ne pas harceler le serveur
+                            updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                        }, 300);
                     });
                 }
 
-                /**
-                 * GESTION DE LA PAGINATION (CLIC SUR LES LIENS)
-                 * Utilisation de la délégation d'événement car les boutons changent
-                 */
+                // Filtres & Tris (Select2)
+                $(filterSelect).on('change', function () {
+                    updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                });
+
+                $(sortSelect).on('change', function () {
+                    updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                });
+
+                // Pagination
                 if (paginationContainer) {
                     paginationContainer.addEventListener('click', function (e) {
                         const link = e.target.closest('a');
                         if (link && link.getAttribute('href')) {
                             e.preventDefault();
-                            const url = link.getAttribute('href');
-                            updateContent(url);
-                            // Remonter en haut de la liste pour le confort utilisateur
+                            // On extrait juste le numéro de page du lien cliqué
+                            const pageUrl = new URL(link.getAttribute('href'));
+                            const page = pageUrl.searchParams.get('page');
+                            // On reconstruit l'URL avec TOUS les filtres + la page
+                            updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}", page));
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                     });
                 }
 
-                /**
- * GESTION DE LA SUPPRESSION (SWEETALERT2)
- */
+                // --- TA GESTION SWEETALERT (Gardée à l'identique) ---
                 if (tableBody) {
                     tableBody.addEventListener('click', function (e) {
-                        // On cherche le bouton
                         const toggleBtn = e.target.closest('.btn-toggle');
-
                         if (toggleBtn) {
-                            e.preventDefault(); // On empêche toute action automatique
-
+                            e.preventDefault();
                             const adminName = toggleBtn.getAttribute('data-name');
-                            // On récupère le formulaire parent du bouton cliqué
                             const form = toggleBtn.parentElement;
-                            const status = toggleBtn.getAttribute('data-status');
+                            const actionUrl = form.getAttribute('action'); // On récupère l'URL de la route
 
                             Swal.fire({
                                 title: 'Êtes-vous sûr ?',
-                                text: `Vous allez ${status} le compte de ${adminName}.`,
+                                text: `Vous allez modifier le statut du compte de ${adminName}.`,
                                 icon: 'warning',
                                 showCancelButton: true,
                                 confirmButtonColor: '#d33',
@@ -336,69 +338,92 @@
                                 reverseButtons: true
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    // Au lieu de form.submit(), on utilise la méthode HTML originale 
-                                    // pour éviter les conflits avec d'autres scripts
-                                    HTMLFormElement.prototype.submit.call(form);
+                                    // --- ACTION AJAX AU LIEU DE SUBMIT ---
+                                    fetch(actionUrl, {
+                                        method: 'POST',
+                                        body: new FormData(form), // Envoie les données du formulaire (CSRF inclus)
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                    })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            // On affiche un petit message de succès discret
+                                            Swal.fire('Succès !', 'Le statut a été mis à jour.', 'success');
+                                            // ON RECHARGE LE TABLEAU SANS RECHARGER LA PAGE
+                                            updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                                        }
+                                    })
+                                    .catch(error => console.error('Erreur:', error));
                                 }
                             });
                         }
                     });
                 }
+
+                // -        -- TON AUTO-REFRESH ---
+                setInterval(function () {
+                    const searchInput = document.getElementById('search-input');
+                    if (document.activeElement !== searchInput && searchInput.value === "") {
+                        updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                    }
+                }, 15000);
             });
         </script>
         <script>
-            // Configuration de Day.js (C'est le Carbon du JavaScript)
+            // Configuration Day.js
             dayjs.extend(window.dayjs_plugin_relativeTime);
             dayjs.locale('fr');
 
-            function updateTimers() {
-                document.querySelectorAll('.last-login-timer').forEach(el => {
-                    const rawTime = el.getAttribute('data-time');
-                    if (rawTime) {
-                        // On recalcule le "diffForHumans" en JS
-                        el.innerText = dayjs(rawTime).fromNow();
+            function refreshUserStatuses() {
+                document.querySelectorAll('.status-cell').forEach(cell => {
+                    const lastSeenRaw = cell.getAttribute('data-seen');
+
+                    if (lastSeenRaw) {
+                        const lastSeen = dayjs(lastSeenRaw);
+                        const now = dayjs();
+                        const diffSeconds = now.diff(lastSeen, 'second');
+
+                        // Logique "En ligne" si actif il y a moins de 60 secondes
+                        if (diffSeconds < 60) {
+                            cell.innerHTML = '<span style="color: #22c55e; font-weight: 600;">● En ligne</span>';
+                        } else {
+                            cell.innerHTML = '<span style="color: #64748b;">Vu ' + lastSeen.fromNow() + '</span>';
+                        }
+                    } else {
+                        cell.innerHTML = '<span style="color: #94a3b8;">Jamais connecté</span>';
                     }
                 });
             }
 
-            // Actualise toutes les secondes
-            setInterval(updateTimers, 1000);
-        </script>
-        <!-- <script>
-            $(document).ready(function () {
-                const $select = $('#filtre', '#tri').select2({
-                    placeholder: "Filtrer",
-                    allowClear: true,
-                    // width: '100%'
-                });
+            // 1. Mettre à jour l'affichage toutes les 10 secondes (plus précis que 30s)
+            setInterval(refreshUserStatuses, 10000);
+            refreshUserStatuses(); // Lancement immédiat au chargement
 
-                $select.on('select2:select', function (e) {
-                    const selectedOption = e.params.data.element; // L'élément cliqué
-                    const $group = $(selectedOption).parent('optgroup'); // Son groupe parent
-
-                    if ($group.length) {
-                        // On récupère toutes les options du même groupe
-                        const groupOptions = $group.find('option');
-
-                        // On récupère les valeurs actuellement sélectionnées
-                        let currentValues = $select.val();
-
-                        // On retire les autres options du groupe de la sélection actuelle
-                        groupOptions.each(function () {
-                            if (this !== selectedOption) {
-                                const index = currentValues.indexOf(this.value);
-                                if (index > -1) {
-                                    currentValues.splice(index, 1);
-                                }
-                            }
-                        });
-
-                        // On met à jour le select avec la nouvelle liste (une seule par groupe)
-                        $select.val(currentValues).trigger('change.select2');
-                    }
-                });
+            // 2. HEARTBEAT : Signaler ta propre présence au serveur sans recharger
+            // On capte les interactions pour savoir si tu es vraiment actif
+            let isUserActive = false;
+            ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(type => {
+                window.addEventListener(type, () => { isUserActive = true; }, { passive: true });
             });
-        </script> -->
+
+            setInterval(function () {
+                if (isUserActive) {
+                    fetch("{{ route('user.heartbeat') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).then(() => {
+                        // Après avoir prévenu le serveur, on met à jour notre propre data-seen 
+                        // pour se voir "En ligne" immédiatement
+                        const myId = "{{ auth()->id() }}"; // Nécessite que tu puisses identifier ta ligne
+                        // Optionnel : updateContent(getFullUrl()); // Pour rafraîchir tout le tableau via ton AJAX précédent
+                    });
+                    isUserActive = false; // Reset pour le prochain cycle
+                }
+            }, 30000); // Signal toutes les 30 secondes
+        </script>
         <script>
             $(document).ready(function () {
                 // Initialisation de tous les selects ayant la classe exclusive
@@ -436,33 +461,5 @@
                     }
                 });
             });
-        </script>
-        <script>
-            // Configuration de Day.js en français
-            dayjs.extend(window.dayjs_plugin_relativeTime);
-            dayjs.locale('fr');
-
-            function updateAllStatuses() {
-                // On cherche toutes les cellules qui ont la classe "status-cell"
-                document.querySelectorAll('.status-cell').forEach(cell => {
-                    const lastSeenRaw = cell.getAttribute('data-seen');
-
-                    if (lastSeenRaw) {
-                        const lastSeen = dayjs(lastSeenRaw);
-                        const now = dayjs();
-                        const diffMinutes = now.diff(lastSeen, 'minute');
-
-                        if (diffMinutes < 5) {
-                            cell.innerHTML = '<span class="text-success">● En ligne</span>';
-                        } else {
-                            // Sinon on affiche "Vu il y a..."
-                            cell.innerHTML = 'Vu ' + lastSeen.fromNow();
-                        }
-                    }
-                });
-            }
-
-            // On lance la vérification toutes les 30 secondes
-            setInterval(updateAllStatuses, 30000);
         </script>
 </x-super-admin-layout>
