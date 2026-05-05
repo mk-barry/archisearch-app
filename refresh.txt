@@ -1,0 +1,8 @@
+// -        -- TON AUTO-REFRESH ---
+                setInterval(function () {
+                    const searchInput = document.getElementById('search-input');
+                    if (document.activeElement !== searchInput && searchInput.value === "") {
+                        updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                    }
+                }, 15000);
+            });
