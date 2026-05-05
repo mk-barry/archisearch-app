@@ -26,7 +26,7 @@
         <div class="form-container"
             style="max-width: 800px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
 
-            <form action="{{ route('users.update', $user->id) }}" method="POST">
+            <form id="editAdminForm" action="{{ route('users.update', $user->id) }}" method="POST">
                 @csrf
                 @method('PUT') {{-- CRUCIAL : HTML ne supporte pas PUT, Laravel le simule ici --}}
 
@@ -90,4 +90,42 @@
                 </div>
             </form>
         </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+
+                const form = document.getElementById("editAdminForm");
+
+                form.addEventListener("submit", function (e) {
+
+                    e.preventDefault();
+
+                    const formData = new FormData(form);
+
+                    // 🔥 TRÈS IMPORTANT
+                    formData.append('_method', 'PUT');
+
+                    fetch(form.action, {
+                        method: "POST", // ← Laravel attend POST spoofé
+                        headers: {
+                            "X-CSRF-TOKEN":
+                                document.querySelector('meta[name="csrf-token"]').content,
+                            "Accept": "application/json"
+                        },
+                        body: formData
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+
+                            if (data.success) {
+                                window.location.href = data.redirect;
+                            }
+
+                        })
+                        .catch(err => console.error(err));
+
+                });
+
+            });
+        </script>
 </x-super-admin-layout>

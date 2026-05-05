@@ -149,7 +149,7 @@
                                 <td style="font-weight: 500;">{{ $user->documents_count ?? 0 }}</td>
                                 <td style="text-align: right; white-space: nowrap;">
                                     {{-- Bouton Modifier --}}
-                                    <a href="{{ route('users.edit', $user->id) }}" class="action-btn" title="editer">
+                                    <a href="{{ route('users.edit', $user->id) }}" class="action-btn no-ajax" title="editer">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2">
                                             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
@@ -228,6 +228,209 @@
             @endfragment
         </div>
         <script>
+            function initAdministrateursPage() {
+
+                initPresenceSystem();
+                refreshUserStatuses();
+
+            }
+            document.addEventListener('DOMContentLoaded', function () {
+
+                const searchInput = document.getElementById('search-input');
+                const tableBody = document.getElementById('table-body');
+                const paginationContainer = document.getElementById('pagination-row');
+                const filterSelect = document.getElementById('filtre');
+                const sortSelect = document.getElementById('tri');
+
+                let timeout = null;
+
+                /* ===============================
+                   CONSTRUCTION URL
+                =============================== */
+                function getFullUrl(baseUrl, page = null) {
+
+                    const url = new URL(baseUrl);
+
+                    if (searchInput?.value)
+                        url.searchParams.set('search', searchInput.value);
+
+                    if (page)
+                        url.searchParams.set('page', page);
+
+                    const filters = $(filterSelect).val() || [];
+                    filters.forEach(f => url.searchParams.append('filters[]', f));
+
+                    const sorts = $(sortSelect).val() || [];
+                    sorts.forEach(s => url.searchParams.append('sort[]', s));
+
+                    return url.href;
+                }
+
+                /* ===============================
+                   AJAX UPDATE
+                =============================== */
+                function updateContent(url, push = true) {
+
+                    fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                        .then(r => r.text())
+                        .then(html => {
+
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+
+                            const newTable = doc.getElementById('table-body');
+                            const newPagination = doc.getElementById('pagination-row');
+
+                            if (newTable && tableBody)
+                                tableBody.innerHTML = newTable.innerHTML;
+
+                            if (newPagination && paginationContainer)
+                                paginationContainer.innerHTML = newPagination.innerHTML;
+
+                            if (push)
+                                history.pushState({ url }, '', url);
+                            initAdministrateursPage();
+                        })
+                        .catch(err => console.error(err));
+                }
+
+                /* ===============================
+                   RECHERCHE
+                =============================== */
+                if (searchInput) {
+                    searchInput.addEventListener('keyup', function () {
+
+                        clearTimeout(timeout);
+
+                        timeout = setTimeout(() => {
+                            updateContent(
+                                getFullUrl("{{ route('super-admin.administrateurs') }}")
+                            );
+                        }, 300);
+                    });
+                }
+
+                /* ===============================
+                   FILTRES
+                =============================== */
+                $(filterSelect).on('change', function () {
+                    updateContent(
+                        getFullUrl("{{ route('super-admin.administrateurs') }}")
+                    );
+                });
+
+                /* ===============================
+                   TRI
+                =============================== */
+                $(sortSelect).on('change', function () {
+                    updateContent(
+                        getFullUrl("{{ route('super-admin.administrateurs') }}")
+                    );
+                });
+
+                /* ===============================
+                   PAGINATION AJAX
+                =============================== */
+                paginationContainer?.addEventListener('click', function (e) {
+
+                    const link = e.target.closest('a');
+
+                    if (!link) return;
+
+                    e.preventDefault();
+
+                    const pageUrl = new URL(link.href);
+                    const page = pageUrl.searchParams.get('page');
+
+                    updateContent(
+                        getFullUrl(
+                            "{{ route('super-admin.administrateurs') }}",
+                            page
+                        )
+                    );
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+
+                /* ===============================
+                   ⭐ CORRECTION PRINCIPALE
+                   BOUTON RETOUR NAVIGATEUR
+                =============================== */
+                window.addEventListener('popstate', function (event) {
+
+                    if (event.state?.url) {
+                        updateContent(event.state.url, false);
+                    } else {
+                        updateContent(window.location.href, false);
+                    }
+                });
+
+                /* ===============================
+                   SWEETALERT TOGGLE STATUS
+                =============================== */
+                tableBody?.addEventListener('click', function (e) {
+
+                    const toggleBtn = e.target.closest('.btn-toggle');
+                    if (!toggleBtn) return;
+
+                    e.preventDefault();
+
+                    const form = toggleBtn.closest('form');
+                    const actionUrl = form.getAttribute('action');
+                    const adminName = toggleBtn.dataset.name;
+
+                    Swal.fire({
+                        title: 'Êtes-vous sûr ?',
+                        text: `Modifier le statut de ${adminName} ?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui',
+                        cancelButtonText: 'Annuler'
+                    })
+                        .then(result => {
+
+                            if (!result.isConfirmed) return;
+
+                            fetch(actionUrl, {
+                                method: 'POST',
+                                body: new FormData(form),
+                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                            })
+                                .then(r => {
+                                    if (r.ok) {
+                                        Swal.fire('Succès', 'Statut modifié.', 'success');
+
+                                        updateContent(
+                                            getFullUrl("{{ route('super-admin.administrateurs') }}"),
+                                            false
+                                        );
+                                    }
+                                });
+                        });
+                });
+                // -        -- TON AUTO-REFRESH ---
+                setInterval(function () {
+
+                    const searchInput = document.getElementById('search-input');
+
+                    if (!searchInput) return;
+
+                    if (document.activeElement !== searchInput && searchInput.value === "") {
+
+                        const currentUrl = new URL(window.location.href);
+
+                        updateContent(currentUrl.toString(), false);
+                    }
+
+                }, 15000);
+
+            });
+
+            initAdministrateursPage();
+        </script>
+        <!-- <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const searchInput = document.getElementById('search-input');
                 const tableBody = document.getElementById('table-body');
@@ -304,13 +507,21 @@
                 if (paginationContainer) {
                     paginationContainer.addEventListener('click', function (e) {
                         const link = e.target.closest('a');
-                        if (link && link.getAttribute('href')) {
+
+                        if (!link || link.classList.contains('no-ajax')) {
+                            return;
+                        }
+
+                        if (link.getAttribute('href')) {
                             e.preventDefault();
-                            // On extrait juste le numéro de page du lien cliqué
+
                             const pageUrl = new URL(link.getAttribute('href'));
                             const page = pageUrl.searchParams.get('page');
-                            // On reconstruit l'URL avec TOUS les filtres + la page
-                            updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}", page));
+
+                            updateContent(
+                                getFullUrl("{{ route('super-admin.administrateurs') }}", page)
+                            );
+
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                     });
@@ -363,66 +574,86 @@
                 setInterval(function () {
                     const searchInput = document.getElementById('search-input');
                     if (document.activeElement !== searchInput && searchInput.value === "") {
-                        updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                        let url = new URL(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                        url.searchParams.set("page", page);
+                        updateContent(url.toString());
                     }
                 }, 15000);
             });
-        </script>
+        </script> -->
         <script>
             // Configuration Day.js
             dayjs.extend(window.dayjs_plugin_relativeTime);
             dayjs.locale('fr');
 
-            function refreshUserStatuses() {
-                document.querySelectorAll('.status-cell').forEach(cell => {
-                    const lastSeenRaw = cell.getAttribute('data-seen');
+            let presenceInterval = null;
+            let heartbeatInterval = null;
 
-                    if (lastSeenRaw) {
-                        const lastSeen = dayjs(lastSeenRaw);
-                        const now = dayjs();
-                        const diffSeconds = now.diff(lastSeen, 'second');
+                function initPresenceSystem() {
 
-                        // Logique "En ligne" si actif il y a moins de 60 secondes
-                        if (diffSeconds < 60) {
-                            cell.innerHTML = '<span style="color: #22c55e; font-weight: 600;">● En ligne</span>';
-                        } else {
-                            cell.innerHTML = '<span style="color: #64748b;">Vu ' + lastSeen.fromNow() + '</span>';
-                        }
-                    } else {
-                        cell.innerHTML = '<span style="color: #94a3b8;">Jamais connecté</span>';
+                    // éviter les doublons après AJAX
+                    if (presenceInterval) clearInterval(presenceInterval);
+                    if (heartbeatInterval) clearInterval(heartbeatInterval);
+
+                    /* ===============================
+                       UPDATE VISUEL STATUTS
+                    =============================== */
+                    function refreshUserStatuses() {
+
+                        document.querySelectorAll('.status-cell').forEach(cell => {
+
+                            const lastSeenRaw = cell.dataset.seen;
+
+                            if (!lastSeenRaw) {
+                                cell.innerHTML =
+                                    '<span style="color:#94a3b8;">Jamais connecté</span>';
+                                return;
+                            }
+
+                            const lastSeen = dayjs(lastSeenRaw);
+                            const diffSeconds = dayjs().diff(lastSeen, 'second');
+
+                            if (diffSeconds < 60) {
+                                cell.innerHTML =
+                                    '<span style="color:#22c55e;font-weight:600;">● En ligne</span>';
+                            } else {
+                                cell.innerHTML =
+                                    '<span style="color:#64748b;">Vu ' +
+                                    lastSeen.fromNow() + '</span>';
+                            }
+                        });
                     }
-                });
-            }
 
-            // 1. Mettre à jour l'affichage toutes les 10 secondes (plus précis que 30s)
-            setInterval(refreshUserStatuses, 10000);
-            refreshUserStatuses(); // Lancement immédiat au chargement
+                    presenceInterval = setInterval(refreshUserStatuses, 10000);
+                    refreshUserStatuses();
 
-            // 2. HEARTBEAT : Signaler ta propre présence au serveur sans recharger
-            // On capte les interactions pour savoir si tu es vraiment actif
-            let isUserActive = false;
-            ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(type => {
-                window.addEventListener(type, () => { isUserActive = true; }, { passive: true });
-            });
+                    /* ===============================
+                       HEARTBEAT USER ACTIF
+                    =============================== */
+                    let isUserActive = false;
 
-            setInterval(function () {
-                if (isUserActive) {
-                    fetch("{{ route('user.heartbeat') }}", {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    }).then(() => {
-                        // Après avoir prévenu le serveur, on met à jour notre propre data-seen 
-                        // pour se voir "En ligne" immédiatement
-                        const myId = "{{ auth()->id() }}"; // Nécessite que tu puisses identifier ta ligne
-                        // Optionnel : updateContent(getFullUrl()); // Pour rafraîchir tout le tableau via ton AJAX précédent
-                    });
-                    isUserActive = false; // Reset pour le prochain cycle
+                    ['mousedown', 'keydown', 'scroll', 'touchstart']
+                        .forEach(e =>
+                            window.addEventListener(e, () => isUserActive = true, { passive: true })
+                        );
+
+                    heartbeatInterval = setInterval(() => {
+
+                        if (!isUserActive) return;
+
+                        fetch("{{ route('user.heartbeat') }}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        isUserActive = false;
+
+                    }, 30000);
                 }
-            }, 30000); // Signal toutes les 30 secondes
         </script>
         <script>
             $(document).ready(function () {

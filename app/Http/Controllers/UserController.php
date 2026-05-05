@@ -123,8 +123,12 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
             'organisation' => $request->organisation,
         ]);
-        // 
-        return redirect()->route('users.index')->with('success', 'Administrateur créé avec succès.');
+        
+        return response()->json([
+            'success' => true,
+            'message' => "L'administrateur a bien été créé.",
+            'redirect' => route('users.index')
+        ]);
     }
     public function edit(string $id)
     {
@@ -166,12 +170,48 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('users.index')->with('success', 'Profil mis à jour.');
+        return response()->json([
+            'success' => true,
+            'message' => "Les modifications ont bien été enregistrées.",
+            'redirect' => route('users.index')
+        ]);
+    }
+
+    public function resetPassword(User $user)
+    {
+        // Générer un mot de passe aléatoire de 10 caractères
+        $newPassword = Str::random(10);
+
+        $user->update([
+            'password' => Hash::make($newPassword),
+            'must_change_password' => true, // On force le changement au prochain login
+        ]);
+
+        // On renvoie le mot de passe dans le message pour que le Super-Admin puisse le copier
+        return back()->with('success', "Mot de passe réinitialisé ! Nouveau pass : {$newPassword}");
     }
 
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
+
+        $me = auth()->user();
+
+            // 1. Interdire de s'auto-modifier
+            if ($me->id === $user->id) {
+                return back()->with('danger', "Action impossible : vous ne pouvez pas modifier votre propre statut.");
+            }
+
+            // 2. Le PREMIER Super-Admin (ID = 1) est intouchable
+            if ($user->id === 1) {
+                return back()->with('danger', "Action interdite : cet administrateur est le propriétaire racine du système.");
+            }
+
+            // 3. Empêcher de modifier quelqu'un de même rang (Super-Admin vs Super-Admin)
+            if ($me->role === $user->role) {
+                return back()->with('danger', "Action refusée : vous ne pouvez pas modifier un administrateur de même rang.");
+            }
+
         $user->is_active = !$user->is_active;
         $user->save();
 

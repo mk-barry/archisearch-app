@@ -26,7 +26,7 @@
 
     <div class="form-container" style="max-width: 800px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         
-        <form action="{{ route('users.store') }}" method="POST">
+        <form action="{{ route('users.store') }}" method="POST" id="createAdminForm">
             @csrf
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -69,4 +69,57 @@
             </div>
         </form>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const form = document.getElementById("createAdminForm");
+
+            form.addEventListener("submit", function (e) {
+
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json"
+                    },
+                    body: formData
+                })
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (data.success) {
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Succès",
+                                text: data.message,
+                                confirmButtonColor: "#2563eb"
+                            }).then(() => {
+
+                                window.location.href = data.redirect;
+
+                            });
+
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erreur",
+                            text: "Une erreur est survenue."
+                        });
+                    });
+
+            });
+
+        });
+    </script>
 </x-super-admin-layout>
