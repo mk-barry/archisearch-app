@@ -55,7 +55,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('users', UserController::class);
-Route::post('/user/heartbeat', [UserController::class, 'heartbeat'])->name('user.heartbeat');
+// --- Routes Publiques (mais nécessitant d'être connecté) ---
+Route::post('/user/heartbeat', [UserController::class, 'heartbeat'])->name('user.heartbeat')->middleware('auth');
+
+// --- Routes de Gestion des Utilisateurs (Accès complet par design) ---
+// Elles sont définies en dehors du groupe 'auth' pour que le SuperAdmin puisse les appeler directement.
+Route::resource('users', UserController::class)->except(['show']);
 
 require __DIR__ . '/auth.php';

@@ -228,12 +228,6 @@
             @endfragment
         </div>
         <script>
-            function initAdministrateursPage() {
-
-                initPresenceSystem();
-                refreshUserStatuses();
-
-            }
             document.addEventListener('DOMContentLoaded', function () {
 
                 const searchInput = document.getElementById('search-input');
@@ -286,12 +280,13 @@
                             if (newTable && tableBody)
                                 tableBody.innerHTML = newTable.innerHTML;
 
+                            refreshUserStatuses();
+
                             if (newPagination && paginationContainer)
                                 paginationContainer.innerHTML = newPagination.innerHTML;
 
                             if (push)
                                 history.pushState({ url }, '', url);
-                            initAdministrateursPage();
                         })
                         .catch(err => console.error(err));
                 }
@@ -427,233 +422,74 @@
                 }, 15000);
 
             });
-
-            initAdministrateursPage();
         </script>
-        <!-- <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const searchInput = document.getElementById('search-input');
-                const tableBody = document.getElementById('table-body');
-                const paginationContainer = document.getElementById('pagination-row');
-                const filterSelect = document.getElementById('filtre');
-                const sortSelect = document.getElementById('tri');
-                let timeout = null;
-
-                // --- FONCTION POUR CONSTRUIRE L'URL ---
-                function getFullUrl(baseUrl, page = null) {
-                    const url = new URL(baseUrl);
-
-                    // 1. Recherche
-                    if (searchInput.value) url.searchParams.set('search', searchInput.value);
-
-                    // 2. Page
-                    if (page) url.searchParams.set('page', page);
-
-                    // 3. Filtres (on utilise jQuery car Select2 modifie le DOM)
-                    const filters = $(filterSelect).val() || [];
-                    filters.forEach(f => url.searchParams.append('filters[]', f));
-
-                    // 4. Tris
-                    const sorts = $(sortSelect).val() || [];
-                    sorts.forEach(s => url.searchParams.append('sort[]', s));
-
-                    return url.href;
-                }
-
-                function updateContent(url) {
-                    fetch(url, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    })
-                        .then(response => response.text())
-                        .then(html => {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-
-                            if (tableBody && doc.getElementById('table-body')) {
-                                tableBody.innerHTML = doc.getElementById('table-body').innerHTML;
-                            }
-                            if (paginationContainer && doc.getElementById('pagination-row')) {
-                                paginationContainer.innerHTML = doc.getElementById('pagination-row').innerHTML;
-                            }
-
-                            // Mise à jour de l'URL réelle pour le confort
-                            window.history.pushState(null, '', url);
-                        })
-                        .catch(error => console.error('Erreur:', error));
-                }
-
-                // --- ÉVÉNEMENTS ---
-
-                // Recherche
-                if (searchInput) {
-                    searchInput.addEventListener('keyup', function () {
-                        clearTimeout(timeout);
-                        timeout = setTimeout(() => {
-                            updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
-                        }, 300);
-                    });
-                }
-
-                // Filtres & Tris (Select2)
-                $(filterSelect).on('change', function () {
-                    updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
-                });
-
-                $(sortSelect).on('change', function () {
-                    updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
-                });
-
-                // Pagination
-                if (paginationContainer) {
-                    paginationContainer.addEventListener('click', function (e) {
-                        const link = e.target.closest('a');
-
-                        if (!link || link.classList.contains('no-ajax')) {
-                            return;
-                        }
-
-                        if (link.getAttribute('href')) {
-                            e.preventDefault();
-
-                            const pageUrl = new URL(link.getAttribute('href'));
-                            const page = pageUrl.searchParams.get('page');
-
-                            updateContent(
-                                getFullUrl("{{ route('super-admin.administrateurs') }}", page)
-                            );
-
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                    });
-                }
-
-                // --- TA GESTION SWEETALERT (Gardée à l'identique) ---
-                if (tableBody) {
-                    tableBody.addEventListener('click', function (e) {
-                        const toggleBtn = e.target.closest('.btn-toggle');
-                        if (toggleBtn) {
-                            e.preventDefault();
-                            const adminName = toggleBtn.getAttribute('data-name');
-                            const form = toggleBtn.parentElement;
-                            const actionUrl = form.getAttribute('action'); // On récupère l'URL de la route
-
-                            Swal.fire({
-                                title: 'Êtes-vous sûr ?',
-                                text: `Vous allez modifier le statut du compte de ${adminName}.`,
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#d33',
-                                cancelButtonColor: '#3085d6',
-                                confirmButtonText: 'Oui, confirmer',
-                                cancelButtonText: 'Annuler',
-                                reverseButtons: true
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // --- ACTION AJAX AU LIEU DE SUBMIT ---
-                                    fetch(actionUrl, {
-                                        method: 'POST',
-                                        body: new FormData(form), // Envoie les données du formulaire (CSRF inclus)
-                                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                                    })
-                                    .then(response => {
-                                        if (response.ok) {
-                                            // On affiche un petit message de succès discret
-                                            Swal.fire('Succès !', 'Le statut a été mis à jour.', 'success');
-                                            // ON RECHARGE LE TABLEAU SANS RECHARGER LA PAGE
-                                            updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
-                                        }
-                                    })
-                                    .catch(error => console.error('Erreur:', error));
-                                }
-                            });
-                        }
-                    });
-                }
-
-                // -        -- TON AUTO-REFRESH ---
-                setInterval(function () {
-                    const searchInput = document.getElementById('search-input');
-                    if (document.activeElement !== searchInput && searchInput.value === "") {
-                        let url = new URL(getFullUrl("{{ route('super-admin.administrateurs') }}"));
-                        url.searchParams.set("page", page);
-                        updateContent(url.toString());
-                    }
-                }, 15000);
-            });
-        </script> -->
         <script>
-            // Configuration Day.js
             dayjs.extend(window.dayjs_plugin_relativeTime);
             dayjs.locale('fr');
 
-            let presenceInterval = null;
-            let heartbeatInterval = null;
+            /* ===============================
+               AFFICHAGE ONLINE / OFFLINE
+            =================================*/
+            function refreshUserStatuses() {
 
-                function initPresenceSystem() {
+                document.querySelectorAll('.status-cell').forEach(cell => {
 
-                    // éviter les doublons après AJAX
-                    if (presenceInterval) clearInterval(presenceInterval);
-                    if (heartbeatInterval) clearInterval(heartbeatInterval);
+                    const lastSeenRaw = cell.dataset.seen;
 
-                    /* ===============================
-                       UPDATE VISUEL STATUTS
-                    =============================== */
-                    function refreshUserStatuses() {
-
-                        document.querySelectorAll('.status-cell').forEach(cell => {
-
-                            const lastSeenRaw = cell.dataset.seen;
-
-                            if (!lastSeenRaw) {
-                                cell.innerHTML =
-                                    '<span style="color:#94a3b8;">Jamais connecté</span>';
-                                return;
-                            }
-
-                            const lastSeen = dayjs(lastSeenRaw);
-                            const diffSeconds = dayjs().diff(lastSeen, 'second');
-
-                            if (diffSeconds < 60) {
-                                cell.innerHTML =
-                                    '<span style="color:#22c55e;font-weight:600;">● En ligne</span>';
-                            } else {
-                                cell.innerHTML =
-                                    '<span style="color:#64748b;">Vu ' +
-                                    lastSeen.fromNow() + '</span>';
-                            }
-                        });
+                    if (!lastSeenRaw) {
+                        cell.innerHTML =
+                            '<span style="color:#94a3b8;">Jamais connecté</span>';
+                        return;
                     }
 
-                    presenceInterval = setInterval(refreshUserStatuses, 10000);
-                    refreshUserStatuses();
+                    const diffSeconds =
+                        dayjs().diff(dayjs(lastSeenRaw), 'second');
 
-                    /* ===============================
-                       HEARTBEAT USER ACTIF
-                    =============================== */
-                    let isUserActive = false;
+                    if (diffSeconds < 60) {
+                        cell.innerHTML =
+                            '<span style="color:#22c55e;font-weight:600;">● En ligne</span>';
+                    } else {
+                        cell.innerHTML =
+                            '<span style="color:#64748b;">Vu ' +
+                            dayjs(lastSeenRaw).fromNow() + '</span>';
+                    }
+                });
+            }
 
-                    ['mousedown', 'keydown', 'scroll', 'touchstart']
-                        .forEach(e =>
-                            window.addEventListener(e, () => isUserActive = true, { passive: true })
-                        );
+            setInterval(refreshUserStatuses, 10000);
+            refreshUserStatuses();
 
-                    heartbeatInterval = setInterval(() => {
 
-                        if (!isUserActive) return;
 
-                        fetch("{{ route('user.heartbeat') }}", {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Content-Type': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
+            /* ===============================
+               HEARTBEAT (PAGE OUVERTE = ONLINE)
+            =================================*/
+            setInterval(function () {
+
+                fetch("{{ route('user.heartbeat') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+
+                        if (data.status === 'online') {
+
+                            const myId = "{{ auth()->id() }}";
+                            const myCell =
+                                document.querySelector(`.status-cell[data-user-id="${myId}"]`);
+
+                            if (myCell) {
+                                myCell.dataset.seen = dayjs().toISOString();
+                                refreshUserStatuses();
                             }
-                        });
+                        }
+                    });
 
-                        isUserActive = false;
-
-                    }, 30000);
-                }
+            }, 20000); // toutes les 20s
         </script>
         <script>
             $(document).ready(function () {

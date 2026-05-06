@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User; // Ne pas oublier !
+use Illuminate\Support\Facades\Auth;   
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; // Pour crypter le mot de passe
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str; 
 
 class UserController extends Controller
 {
@@ -219,15 +221,22 @@ class UserController extends Controller
         return back()->with('success', 'Le compte a été '. $status .' avec succès.');
     }
 
-    public function heartbeat(Request $request)
+    public function heartbeat()
     {
-        if (auth()->check()) {
-            auth()->user()->update([
-                'last_seen_at' => now()
-            ]);
-            return response()->json(['status' => 'online']);
-        }
-        return response()->json(['status' => 'offline'], 401);
+        // if (auth()->check()) {
+        //     auth()->user()->update([
+        //         'last_seen_at' => now()
+        //     ]);
+        //     return response()->json(['status' => 'online']);
+        // }
+        $user = Auth::user();
+        dd(Auth::user());
+        $user->update([
+            'last_seen_at' => now()
+        ]);
+        
+        return response()->json(['status' => 'online']);
+        // return response()->json(['status' => 'offline'], 401);
     }
 
     // public function toggleStatus(User $user)
