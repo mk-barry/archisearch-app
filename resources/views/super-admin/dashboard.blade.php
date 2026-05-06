@@ -103,19 +103,19 @@
                 Activité récente
                 <a href="{{ route('super-admin.logs') }}" style="font-size: 0.8rem; font-weight: 500; color: #2563eb; text-decoration: none;">Voir tous les journaux</a>
             </div>
-            <!-- <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
                 @foreach($recentActivities as $log)
                     <div style="display: flex; gap: 1rem; align-items: center; padding: 0.75rem; border-radius: 12px; background: #f8fafc;">
                         <div class="stat-icon icon-blue" style="width: 36px; height: 36px; margin-bottom: 0;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                         </div>
                         <div style="flex: 1;">
-                            <div style="font-size: 0.9rem; font-weight: 600;">{{ $log->description }}</div>
-                            <div style="font-size: 0.75rem; color: #94a3b8;">{{ $log->created_at->diffForHumans() }} par {{ $log->user->name }}</div>
+                            <div style="font-size: 0.9rem; font-weight: 600;">{{ $log->message }}</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8;">{{ $log->created_at->diffForHumans() }} par {{ $log->user->name ?? 'Systeme' }}</div>
                         </div>
                     </div>
                 @endforeach
-            </div> -->
+            </div>
         </div>
 
         <div class="dashboard-card">

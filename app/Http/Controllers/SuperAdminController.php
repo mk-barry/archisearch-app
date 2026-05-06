@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Documents;
-use App\Models\AuditsLogs;
+use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -45,7 +45,7 @@ class SuperAdminController extends Controller
         ];
 
         // --- ACTIVITÉ RÉCENTE ---
-        $recentActivities = AuditsLogs::with('user')->latest()->take(3)->get();
+        $recentActivities = AuditLog::with('user')->latest()->take(3)->get();
 
         // --- UTILISATEURS EN LIGNE ---
         $onlineUsers = User::where('last_seen_at', '>=', now()->subMinutes(1))->take(5)->get();

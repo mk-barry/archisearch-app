@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str; 
+use App\Models\AuditLog;
+use App\Models\ActionDescription;
 
 class UserController extends Controller
 {
@@ -193,32 +195,77 @@ class UserController extends Controller
         return back()->with('success', "Mot de passe réinitialisé ! Nouveau pass : {$newPassword}");
     }
 
+    // public function toggleStatus(string $id)
+    // {
+    //     $user = User::findOrFail($id);
+
+    //     $me = auth()->user();
+
+    //         // 1. Interdire de s'auto-modifier
+    //         if ($me->id === $user->id) {
+    //             return back()->with('danger', "Action impossible : vous ne pouvez pas modifier votre propre statut.");
+    //         }
+
+    //         // 2. Le PREMIER Super-Admin (ID = 1) est intouchable
+    //         if ($user->id === 1) {
+    //             return back()->with('danger', "Action interdite : cet administrateur est le propriétaire racine du système.");
+    //         }
+
+    //         // 3. Empêcher de modifier quelqu'un de même rang (Super-Admin vs Super-Admin)
+    //         if ($me->role === $user->role) {
+    //             return back()->with('danger', "Action refusée : vous ne pouvez pas modifier un administrateur de même rang.");
+    //         }
+
+    //     $user->is_active = !$user->is_active;
+    //     $user->save();
+
+    //     $status = $user->is_active ? 'activé' : 'désactivé';
+    //     return back()->with('success', 'Le compte a été '. $status .' avec succès.');
+    // }
+
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
 
         $me = auth()->user();
 
-            // 1. Interdire de s'auto-modifier
-            if ($me->id === $user->id) {
-                return back()->with('danger', "Action impossible : vous ne pouvez pas modifier votre propre statut.");
-            }
+        if ($me->id === $user->id) {
+            return back()->with(
+                'danger',
+                "Action impossible : vous ne pouvez pas modifier votre propre statut."
+            );
+        }
 
-            // 2. Le PREMIER Super-Admin (ID = 1) est intouchable
-            if ($user->id === 1) {
-                return back()->with('danger', "Action interdite : cet administrateur est le propriétaire racine du système.");
-            }
+        if ($user->id === 1) {
+            return back()->with(
+                'danger',
+                "Action interdite : cet administrateur est le propriétaire racine du système."
+            );
+        }
 
-            // 3. Empêcher de modifier quelqu'un de même rang (Super-Admin vs Super-Admin)
-            if ($me->role === $user->role) {
-                return back()->with('danger', "Action refusée : vous ne pouvez pas modifier un administrateur de même rang.");
-            }
+        if ($me->role === $user->role) {
+            return back()->with(
+                'danger',
+                "Action refusée : vous ne pouvez pas modifier un administrateur de même rang."
+            );
+        }
 
         $user->is_active = !$user->is_active;
         $user->save();
 
+        AuditLog::log(
+            $user->is_active ? 'user_activated' : 'user_desactivated',
+            [
+                'name' => $user->name
+            ]
+        );
+
         $status = $user->is_active ? 'activé' : 'désactivé';
-        return back()->with('success', 'Le compte a été '. $status .' avec succès.');
+
+        return back()->with(
+            'success',
+            'Le compte a été ' . $status . ' avec succès.'
+        );
     }
 
     public function heartbeat()

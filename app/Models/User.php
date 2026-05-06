@@ -78,7 +78,7 @@ class User extends Authenticatable
     }
     
     public function logs() {
-        return $this->hasMany(AuditsLogs::class);
+        return $this->hasMany(AuditLog::class);
     }
 
     public function documents()

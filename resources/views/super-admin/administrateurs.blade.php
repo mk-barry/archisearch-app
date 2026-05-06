@@ -11,16 +11,16 @@
                         confirmButtonText: 'Génial'
                     });
                 </script>
-                <!-- @elseif (session('danger'))
+                @elseif (session('danger'))
                                         <script>
                                             Swal.fire({
-                                                title: 'Succès !',
+                                                title: 'Oups !',
                                                 text: "{{ session('danger') }}",
                                                 icon: 'success',
                                                 confirmButtonColor: '#0369a1', // Le bleu de ton interface
                                                 confirmButtonText: 'Ok'
                                             });
-                                        </script> -->
+                                        </script>
             @endif
             <div class="page-info">
                 <div class="breadcrumb-small">Super Admin > Administrateurs</div>

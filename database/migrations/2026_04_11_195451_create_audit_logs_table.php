@@ -11,28 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Table des modèles d'actions
         Schema::create('action_descriptions', function (Blueprint $table) {
             $table->id();
-            $table->string('title'); // ex: "Création d'événement"
-            $table->text('description'); // ex: "L'utilisateur a initialisé une nouvelle collecte de documents."
+            $table->string('slug')->unique(); // ex: 'user_disabled'
+            $table->string('title');          // ex: 'Désactivation'
+            $table->text('template');         // ex: 'Le compte de :name a été désactivé.'
             $table->timestamps();
         });
-        
+
+        // Table des logs réels
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
-            
-            // Rendu nullable pour les actions des étudiants/candidats
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            
-            // Relation optionnelle vers tes descriptions d'actions
-            $table->foreignId('action_description_id')->nullable()->constrained('action_descriptions');
-        
-            $table->enum('action', ['delete', 'create', 'search', 'close', 'open', 'activate', 'disable', 'upload', 'modify']);
-            
-            $table->string('target_name'); // ex: "Nom du fichier" ou "ID de l'event"
-            $table->text('details'); // Pour les infos spécifiques à l'instant T (ex: "IP: 192.168.1.1")
-            
-            $table->timestamps(); 
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // L'auteur
+            $table->foreignId('action_description_id')->constrained();      // Le modèle
+            $table->json('dynamic_data')->nullable(); // Les variables (ex: {"name": "Jean"})
+            $table->ipAddress('ip_address');
+            $table->timestamps();
         });
     }
 

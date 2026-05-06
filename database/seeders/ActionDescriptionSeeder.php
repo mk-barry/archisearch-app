@@ -20,7 +20,7 @@ class ActionDescriptionSeeder extends Seeder
                 'template' => "L'administrateur :admin a activé le compte de :target."
             ],
             [
-                'slug' => 'user_deactivated',
+                'slug' => 'user_desactivated',
                 'title' => 'Désactivation de compte',
                 'template' => "L'administrateur :admin a désactivé le compte de :target."
             ],
