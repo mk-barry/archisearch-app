@@ -12,6 +12,10 @@ class AdminController extends Controller
     {
         return view('admin.evenements');
     }
+    public function creationEvent()
+    {
+        return view('admin.creation-events');
+    }
     public function documents()
     {
         return view('admin.documents');

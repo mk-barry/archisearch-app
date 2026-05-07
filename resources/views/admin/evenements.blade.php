@@ -35,10 +35,14 @@
             </div>
         </div>
 
-        <button class="btn-primary" style="padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 10px;">
+        <!-- <button class="btn-primary" style="padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 10px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Créer un événement
-        </button>
+        </button> -->
+        <a href="{{ route('admin.creation-events') }}" class="btn-primary" style="text-decoration: none; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 10px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Créer un événement
+        </a>
     </div>
 
     <!-- Events Grid -->

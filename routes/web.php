@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/evenements', [AdminController::class, 'evenements'])->name('evenements');
+        Route::get('/creation-events', [AdminController::class, 'creationEvent'])->name('creation-events');
         Route::get('/documents', [AdminController::class, 'documents'])->name('documents');
         Route::get('/recherche', [AdminController::class, 'recherche'])->name('recherche');
         Route::get('/archives', [AdminController::class, 'archives'])->name('archives');
@@ -42,7 +43,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/administrateurs', [UserController::class, 'index'])->name('administrateurs');
         Route::get('/logs', [SuperAdminController::class, 'logs'])->name('logs');
-        Route::get('/logs/refresh', [SuperAdminController::class, 'refreshLogs'])->name('logs.refresh');
         Route::get('/settings', [SuperAdminController::class, 'settings'])->name('settings');
         Route::get('/creation-admin', [SuperAdminController::class, 'creationAdmin'])->name('creation-admin');
 

@@ -25,157 +25,76 @@
 
         <!-- Controls Row -->
         <div class="controls-row">
-            <div class="search-filter-group" style="flex: 2;">
-                <form method="GET" class="input-wrapper"
-                    style="width: 300px; display: flex; align-items: center;  border: 1px solid #e2e8f0; border-radius: 10px; background: white; justify-content: center">
-                    <svg class="input-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.3-4.3" />
-                    </svg>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Filtrer par action, utilisateur..."
-                        style="width: 80%; padding: 0.75rem 1rem 0.75rem 0.75rem; outline: none; border: none;">
-                </form>
-
-                <!-- <div class="btn-outline" style="background: white;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                        <line x1="16" x2="16" y1="2" y2="6" />
-                        <line x1="8" x2="8" y1="2" y2="6" />
-                        <line x1="3" x2="21" y1="10" y2="10" />
-                    </svg>
-                    04 Avr 2026
-                </div> -->
-
-                <div class="log-tabs">
-                    <a href="{{ route('super-admin.logs') }}" class="log-tab {{ !request('level') ? 'active' : '' }}">
-                        Tous
-                    </a>
-                    <a href="{{ route('super-admin.logs', ['level' => 'info']) }}"
-                        class="log-tab {{ request('level') == 'info' ? 'active' : '' }}">
-                        INFO
-                    </a>
-                    <a href="{{ route('super-admin.logs', ['level' => 'alerte']) }}"
-                        class="log-tab {{ request('level') == 'warning' ? 'active' : '' }}">
-                        WARNING
-                    </a>
-                    <a href="{{ route('super-admin.logs', ['level' => 'erreur']) }}"
-                        class="log-tab {{ request('level') == 'error' ? 'active' : '' }}">
-                        ERROR
-                    </a>
-                </div>
+        <div class="search-filter-group" style="flex: 2;">
+            <div class="input-wrapper" style="width: 300px; display: flex; align-items: center; border: 1px solid #e2e8f0; border-radius: 10px; background: white;">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 10px; color: #94a3b8;"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                <input type="text" id="log-search" placeholder="Filtrer..." style="width: 100%; padding: 0.75rem; outline: none; border: none; background: transparent;">
             </div>
 
-            <div style="display: flex; gap: 1rem;">
-                <!-- <button class="btn-outline">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 6h18" />
-                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                        <line x1="10" x2="10" y1="11" y2="17" />
-                        <line x1="14" x2="14" y1="11" y2="17" />
-                    </svg>
-                    Purger les logs
-                </button> -->
-                <button class="btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" x2="12" y1="15" y2="3" />
-                    </svg>
-                    Exporter
-                </button>
+            <div class="log-tabs" id="level-filters">
+                <button data-level="" value="" class="log-tab active">Tous</button>
+                <button data-level="info" value="info" class="log-tab">INFO</button>
+                <button data-level="alerte" value="alerte" class="log-tab">WARNING</button>
+                <button data-level="erreur" value="erreur" class="log-tab">ERROR</button>
             </div>
         </div>
+        </div>
 
-        <!-- Data Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Horodatage</th>
-                        <th>Utilisateur</th>
-                        <th>Action</th>
-                        <th>Cible</th>
-                        <th>Adresse IP</th>
-                        <th>Niveau</th>
-                    </tr>
-                </thead>
-                <tbody id="logsTable">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Horodatage</th>
+                    <th>Utilisateur</th>
+                    <th>Action</th>
+                    <th>Cible</th>
+                    <th>Adresse IP</th>
+                    <th>Niveau</th>
+                </tr>
+            </thead>
+            <tbody id="logsTable">
+                @fragment('logs-table')
                     @foreach ($recentActivities as $log)
                         <tr>
-                            <td style="color: #94a3b8;">{{ $log->created_at }}</td>
-                            <td style="font-weight: 600;">
-                                {{ $log->user->role ?? 'User' }}.{{ $log->user->name ?? 'Systeme' }}</td>
-                            <td style="text-transform: uppercase;"><span
-                                    class="action-text">{{ $log->actionDescription->slug }}</span></td>
+                            <td style="color: #94a3b8;">{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
+                            <td style="font-weight: 600;">{{ $log->user->role ?? 'System' }}.{{ $log->user->name ?? '' }}</td>
+                            <td><span class="action-text">{{ $log->actionDescription->slug ?? 'ACTION' }}</span></td>
                             <td>{{ $log->target }}</td>
                             <td>{{ $log->ip_address }}</td>
-                            <td style="text-align: right; text-transform: uppercase;">
-                                <span class="badge
-                                    @if ($log->actionDescription->badge === 'info')
-                                        badge-blue
-                                    @elseif($log->actionDescription->badge === 'alerte')
-                                        badge-orange
-                                    @elseif($log->actionDescription->badge === 'erreur')
-                                        badge-red
-                                    @endif
-                                ">
-                                    {{ $log->actionDescription->badge }}
+                            <td style="text-align: right;">
+                                <span class="badge 
+                                    @if(($log->actionDescription->badge ?? '') === 'info') badge-blue 
+                                    @elseif(($log->actionDescription->badge ?? '') === 'alerte') badge-orange 
+                                    @else badge-red @endif">
+                                    {{ strtoupper($log->actionDescription->badge ?? 'INFO') }}
                                 </span>
                             </td>
                         </tr>
                     @endforeach
-                </tbody>
-            </table>
-        </div>
+                @endfragment
+            </tbody>
+        </table>
+    </div>
 
-        <script>
-            async function refreshLogs() {
+    <div id="pagination-row" class="pagination-row" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+        @fragment('pagination')
+            <span style="color: #64748b; font-size: 0.9rem;">
+                Affichage {{ $recentActivities->firstItem() ?? 0 }}-{{ $recentActivities->lastItem() ?? 0 }} sur {{ $recentActivities->total() }} logs
+            </span>
 
-                const response = await fetch("{{ route('super-admin.logs.refresh') }}");
+            <div class="page-numbers" style="display: flex; gap: 5px;">
+                @if (!$recentActivities->onFirstPage())
+                    <a href="{{ $recentActivities->previousPageUrl() }}" class="page-btn">Précédent</a>
+                @endif
 
-                const logs = await response.json();
+                @foreach ($recentActivities->getUrlRange(1, $recentActivities->lastPage()) as $page => $url)
+                    <a href="{{ $url }}" class="page-btn {{ ($page == $recentActivities->currentPage()) ? 'active' : '' }}">{{ $page }}</a>
+                @endforeach
 
-                let html = '';
-
-                logs.forEach(log => {
-
-                    let badgeClass = '';
-
-                    if (log.action_description.badge === 'info')
-                        badgeClass = 'badge-blue';
-                    else if (log.action_description.badge === 'alerte')
-                        badgeClass = 'badge-orange';
-                    else if (log.action_description.badge === 'erreur')
-                        badgeClass = 'badge-red';
-
-                    html += `
-        <tr>
-            <td>${log.created_at}</td>
-            <td>${log.user?.role ?? 'System'}.${log.user?.name ?? ''}</td>
-            <td>${log.action_description.slug}</td>
-            <td>${log.dynamic_data?.name ?? dynamic_data?.target ?? ''}</td>
-            <td>${log.ip_address ?? '-'}</td>
-            <td style="text-align:right">
-                <span class="badge ${badgeClass}">
-                    ${log.action_description.badge}
-                </span>
-            </td>
-        </tr>`;
-                });
-
-                document.getElementById('logsTable').innerHTML = html;
-            }
-
-            /* refresh toutes les 5 secondes */
-            setInterval(refreshLogs, 5000);
-
-            /* premier chargement */
-            refreshLogs();
-        </script>
+                @if ($recentActivities->hasMorePages())
+                    <a href="{{ $recentActivities->nextPageUrl() }}" class="page-btn">Suivant</a>
+                @endif
+            </div>
+        @endfragment
+    </div>
 </x-super-admin-layout>
