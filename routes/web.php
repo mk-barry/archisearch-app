@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/administrateurs', [UserController::class, 'index'])->name('administrateurs');
         Route::get('/logs', [SuperAdminController::class, 'logs'])->name('logs');
+        Route::get('/logs/refresh', [SuperAdminController::class, 'refreshLogs'])->name('logs.refresh');
         Route::get('/settings', [SuperAdminController::class, 'settings'])->name('settings');
         Route::get('/creation-admin', [SuperAdminController::class, 'creationAdmin'])->name('creation-admin');
 

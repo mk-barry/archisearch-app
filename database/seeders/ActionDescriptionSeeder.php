@@ -15,36 +15,56 @@ class ActionDescriptionSeeder extends Seeder
         $actions = [
             // Gestion des comptes
             [
+                'slug' => 'user_created',
+                'title' => 'Création de compte',
+                'template' => "Le :role :admin a créé le compte de :target.",
+            ],
+            [
+                'slug' => 'user_updated',
+                'title' => 'Modification de compte',
+                'template' => "Le :role :admin a modifié le compte de :target.",
+            ],
+            [
                 'slug' => 'user_activated',
                 'title' => 'Activation de compte',
-                'template' => "L'administrateur :admin a activé le compte de :target."
+                'template' => "Le :role :admin a activé le compte de :target.",
+                'badge' => 'alerte'
             ],
             [
                 'slug' => 'user_desactivated',
                 'title' => 'Désactivation de compte',
-                'template' => "L'administrateur :admin a désactivé le compte de :target."
+                'template' => "Le :role :admin a désactivé le compte de :target.",
+                'badge' => 'alerte'
             ],
             // Gestion des documents (Cœur d'ArchiSearch)
             [
                 'slug' => 'doc_archived',
-                'title' => 'Archivage de diplôme',
-                'template' => "Le diplôme n°:num (:owner) a été archivé avec succès."
+                'title' => 'Archivage de document',
+                'template' => "Le document n°:num (:owner) a été archivé avec succès.",
             ],
             [
                 'slug' => 'doc_verified',
                 'title' => 'Vérification de document',
-                'template' => "Authenticité vérifiée pour le document :doc."
+                'template' => "Authenticité vérifiée pour le document :doc.",
+                'badge' => 'alerte'
             ],
             // Sécurité
             [
                 'slug' => 'login_success',
                 'title' => 'Connexion réussie',
-                'template' => ":admin s'est connecté au système."
+                'template' => ":admin s'est connecté au système.",
+                 
             ],
             [
                 'slug' => 'login_failed',
                 'title' => 'Échec de connexion',
-                'template' => "Tentative de connexion échouée avec l'identifiant :login."
+                'template' => "Tentative de connexion échouée avec l'identifiant :login.",
+                'badge' => 'erreur'
+            ],
+            [
+                'slug' => 'logout',
+                'title' => 'Déconnexion',
+                'template' => ":admin s'est déconnecté du système.",
             ],
         ];
 

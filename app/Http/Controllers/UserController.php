@@ -195,34 +195,6 @@ class UserController extends Controller
         return back()->with('success', "Mot de passe réinitialisé ! Nouveau pass : {$newPassword}");
     }
 
-    // public function toggleStatus(string $id)
-    // {
-    //     $user = User::findOrFail($id);
-
-    //     $me = auth()->user();
-
-    //         // 1. Interdire de s'auto-modifier
-    //         if ($me->id === $user->id) {
-    //             return back()->with('danger', "Action impossible : vous ne pouvez pas modifier votre propre statut.");
-    //         }
-
-    //         // 2. Le PREMIER Super-Admin (ID = 1) est intouchable
-    //         if ($user->id === 1) {
-    //             return back()->with('danger', "Action interdite : cet administrateur est le propriétaire racine du système.");
-    //         }
-
-    //         // 3. Empêcher de modifier quelqu'un de même rang (Super-Admin vs Super-Admin)
-    //         if ($me->role === $user->role) {
-    //             return back()->with('danger', "Action refusée : vous ne pouvez pas modifier un administrateur de même rang.");
-    //         }
-
-    //     $user->is_active = !$user->is_active;
-    //     $user->save();
-
-    //     $status = $user->is_active ? 'activé' : 'désactivé';
-    //     return back()->with('success', 'Le compte a été '. $status .' avec succès.');
-    // }
-
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
@@ -256,7 +228,9 @@ class UserController extends Controller
         AuditLog::log(
             $user->is_active ? 'user_activated' : 'user_desactivated',
             [
-                'name' => $user->name
+                'admin' => auth()->user()->name,
+                'target' => $user->name,
+                'role' => auth()->user()->role
             ]
         );
 
@@ -285,43 +259,4 @@ class UserController extends Controller
         return response()->json(['status' => 'online']);
         // return response()->json(['status' => 'offline'], 401);
     }
-
-    // public function toggleStatus(User $user)
-    // {
-    //     $me = auth()->user();
-
-    //     // 1. Interdire de s'auto-modifier
-    //     if ($me->id === $user->id) {
-    //         return back()->with('danger', "Action impossible : vous ne pouvez pas modifier votre propre statut.");
-    //     }
-
-    //     // 2. Le PREMIER Super-Admin (ID = 1) est intouchable
-    //     if ($user->id === 1) {
-    //         return back()->with('danger', "Action interdite : cet administrateur est le propriétaire racine du système.");
-    //     }
-
-    //     // 3. Empêcher de modifier quelqu'un de même rang (Super-Admin vs Super-Admin)
-    //     if ($me->role === $user->role) {
-    //         return back()->with('danger', "Action refusée : vous ne pouvez pas modifier un administrateur de même rang.");
-    //     }
-
-    //     $user->update(['is_active' => !$user->is_active]);
-    //     $status = $user->is_active ? 'activé' : 'désactivé';
-
-    //     return back()->with('success', "Le compte de {$user->name} a été {$status}.");
-    // }
-
-    // public function resetPassword(User $user)
-    // {
-    //     // Générer un mot de passe aléatoire de 10 caractères
-    //     $newPassword = Str::random(10);
-
-    //     $user->update([
-    //         'password' => Hash::make($newPassword),
-    //         'must_change_password' => true, // On force le changement au prochain login
-    //     ]);
-
-    //     // On renvoie le mot de passe dans le message pour que le Super-Admin puisse le copier
-    //     return back()->with('success', "Mot de passe réinitialisé ! Nouveau pass : {$newPassword}");
-    // }
 }

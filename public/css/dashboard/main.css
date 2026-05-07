@@ -406,6 +406,7 @@ td {
     border: none;
     color: var(--text-muted);
     background: #f1f5f9;
+    text-decoration: none;
     transition: all 0.2s;
 }
 

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Documents;
 use App\Models\AuditLog;
+use Illuminate\Http\Request;
+// use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -12,7 +14,7 @@ class SuperAdminController extends Controller
 {
     public function index()
     {
-        
+
     }
 
     public function dashboard()
@@ -64,10 +66,79 @@ class SuperAdminController extends Controller
             'onlineUsers'
         ));
     }
-    public function logs()
+    public function logs(Request $request)
     {
-        return view('super-admin.logs');
+        $query = AuditLog::with(['user', 'actionDescription']);
+
+        /*
+        |------------------------------
+        | RECHERCHE TEXTE
+        |------------------------------
+        */
+        if ($request->search) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // utilisateur
+                $q->whereHas('user', function ($u) use ($search) {
+                    $u->where('name', 'like', "%$search%");
+                });
+
+                // action
+                $q->orWhereHas('actionDescription', function ($a) use ($search) {
+                    $a->where('slug', 'like', "%$search%");
+                });
+
+                // cible
+                $q->orWhereJsonContains('dynamic_data->name', $search);
+            });
+        }
+
+        /*
+        |------------------------------
+        | FILTRE NIVEAU (badge)
+        |------------------------------
+        */
+        if ($request->level) {
+            $query->whereHas('actionDescription', function ($q) use ($request) {
+                $q->where('badge', $request->level);
+            });
+        }
+
+        /*
+        |------------------------------
+        | FILTRE DATE
+        |------------------------------
+        */
+        if ($request->date) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        /*
+        |------------------------------
+        | TRI
+        |------------------------------
+        */
+        $sort = $request->sort ?? 'desc';
+
+        $query->orderBy('created_at', $sort);
+
+        $recentActivities = $query->paginate(15)->withQueryString();
+
+        return view('super-admin.logs', compact('recentActivities'));
     }
+
+    public function refreshLogs()
+    {
+        $logs = AuditLog::with(['user', 'actionDescription'])
+            ->latest()
+            ->take(20)
+            ->get();
+
+        return response()->json($logs);
+    }
+
     public function settings()
     {
         return view('super-admin.settings');

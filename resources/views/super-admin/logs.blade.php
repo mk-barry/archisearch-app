@@ -26,17 +26,19 @@
         <!-- Controls Row -->
         <div class="controls-row">
             <div class="search-filter-group" style="flex: 2;">
-                <div class="input-wrapper" style="width: 300px; display: flex; align-items: center;  border: 1px solid #e2e8f0; border-radius: 10px; background: white; justify-content: center">
+                <form method="GET" class="input-wrapper"
+                    style="width: 300px; display: flex; align-items: center;  border: 1px solid #e2e8f0; border-radius: 10px; background: white; justify-content: center">
                     <svg class="input-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="text" placeholder="Filtrer par action, utilisateur..."
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Filtrer par action, utilisateur..."
                         style="width: 80%; padding: 0.75rem 1rem 0.75rem 0.75rem; outline: none; border: none;">
-                </div>
+                </form>
 
-                <div class="btn-outline" style="background: white;">
+                <!-- <div class="btn-outline" style="background: white;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
@@ -45,13 +47,24 @@
                         <line x1="3" x2="21" y1="10" y2="10" />
                     </svg>
                     04 Avr 2026
-                </div>
+                </div> -->
 
                 <div class="log-tabs">
-                    <button class="log-tab active">Tous</button>
-                    <button class="log-tab">INFO</button>
-                    <button class="log-tab">WARNING</button>
-                    <button class="log-tab">ERROR</button>
+                    <a href="{{ route('super-admin.logs') }}" class="log-tab {{ !request('level') ? 'active' : '' }}">
+                        Tous
+                    </a>
+                    <a href="{{ route('super-admin.logs', ['level' => 'info']) }}"
+                        class="log-tab {{ request('level') == 'info' ? 'active' : '' }}">
+                        INFO
+                    </a>
+                    <a href="{{ route('super-admin.logs', ['level' => 'alerte']) }}"
+                        class="log-tab {{ request('level') == 'warning' ? 'active' : '' }}">
+                        WARNING
+                    </a>
+                    <a href="{{ route('super-admin.logs', ['level' => 'erreur']) }}"
+                        class="log-tab {{ request('level') == 'error' ? 'active' : '' }}">
+                        ERROR
+                    </a>
                 </div>
             </div>
 
@@ -87,70 +100,82 @@
                         <th>Horodatage</th>
                         <th>Utilisateur</th>
                         <th>Action</th>
-                        <th>Ressource</th>
+                        <th>Cible</th>
                         <th>Adresse IP</th>
-                        <th style="text-align: right;">Niveau</th>
+                        <th>Niveau</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td style="color: #94a3b8;">2026-04-04 11:42:03</td>
-                        <td style="font-weight: 600;">admin.dupont</td>
-                        <td><span class="action-text">AUTH_LOGIN</span></td>
-                        <td>Session #9843</td>
-                        <td>192.168.1.42</td>
-                        <td style="text-align: right;"><span class="badge badge-blue">INFO</span></td>
-                    </tr>
-                    <tr>
-                        <td style="color: #94a3b8;">2026-04-04 11:38:17</td>
-                        <td style="font-weight: 600;">admin.kone</td>
-                        <td><span class="action-text">DOC_ARCHIVE</span></td>
-                        <td>Doc #4821</td>
-                        <td>10.0.0.14</td>
-                        <td style="text-align: right;"><span class="badge badge-blue">INFO</span></td>
-                    </tr>
-                    <tr>
-                        <td style="color: #94a3b8;">2026-04-04 11:22:45</td>
-                        <td style="font-weight: 600;">system</td>
-                        <td><span class="action-text">ANOMALY_DETECTED</span></td>
-                        <td>Doc #4872</td>
-                        <td>—</td>
-                        <td style="text-align: right;"><span class="badge badge-orange">WARNING</span></td>
-                    </tr>
-                    <tr>
-                        <td style="color: #94a3b8;">2026-04-04 10:50:11</td>
-                        <td style="font-weight: 600;">admin.bertrand</td>
-                        <td><span class="action-text">AUTH_FAILED</span></td>
-                        <td>Tentative #3/5</td>
-                        <td>172.16.0.8</td>
-                        <td style="text-align: right;"><span class="badge badge-red">ERROR</span></td>
-                    </tr>
-                    <tr>
-                        <td style="color: #94a3b8;">2026-04-04 10:44:42</td>
-                        <td style="font-weight: 600;">admin.mbatswe</td>
-                        <td><span class="action-text">EVENT_CREATE</span></td>
-                        <td>Événement #52</td>
-                        <td>192.168.2.1</td>
-                        <td style="text-align: right;"><span class="badge badge-blue">INFO</span></td>
-                    </tr>
-                    <tr>
-                        <td style="color: #94a3b8;">2026-04-04 10:30:00</td>
-                        <td style="font-weight: 600;">system</td>
-                        <td><span class="action-text">BACKUP_SUCCESS</span></td>
-                        <td>MinIO backup #212</td>
-                        <td>—</td>
-                        <td style="text-align: right;"><span class="badge badge-blue">INFO</span></td>
-                    </tr>
-                    <tr>
-                        <td style="border-bottom: none; color: #94a3b8;">2026-04-04 09:15:44</td>
-                        <td style="border-bottom: none; font-weight: 600;">superadmin</td>
-                        <td style="border-bottom: none;"><span class="action-text">SETTINGS_UPDATE</span></td>
-                        <td style="border-bottom: none;">Quota: 20Mo→25Mo</td>
-                        <td style="border-bottom: none;">192.168.1.1</td>
-                        <td style="text-align: right; border-bottom: none;"><span
-                                class="badge badge-orange">WARNING</span></td>
-                    </tr>
+                <tbody id="logsTable">
+                    @foreach ($recentActivities as $log)
+                        <tr>
+                            <td style="color: #94a3b8;">{{ $log->created_at }}</td>
+                            <td style="font-weight: 600;">
+                                {{ $log->user->role ?? 'User' }}.{{ $log->user->name ?? 'Systeme' }}</td>
+                            <td style="text-transform: uppercase;"><span
+                                    class="action-text">{{ $log->actionDescription->slug }}</span></td>
+                            <td>{{ $log->target }}</td>
+                            <td>{{ $log->ip_address }}</td>
+                            <td style="text-align: right; text-transform: uppercase;">
+                                <span class="badge
+                                    @if ($log->actionDescription->badge === 'info')
+                                        badge-blue
+                                    @elseif($log->actionDescription->badge === 'alerte')
+                                        badge-orange
+                                    @elseif($log->actionDescription->badge === 'erreur')
+                                        badge-red
+                                    @endif
+                                ">
+                                    {{ $log->actionDescription->badge }}
+                                </span>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
+
+        <script>
+            async function refreshLogs() {
+
+                const response = await fetch("{{ route('super-admin.logs.refresh') }}");
+
+                const logs = await response.json();
+
+                let html = '';
+
+                logs.forEach(log => {
+
+                    let badgeClass = '';
+
+                    if (log.action_description.badge === 'info')
+                        badgeClass = 'badge-blue';
+                    else if (log.action_description.badge === 'alerte')
+                        badgeClass = 'badge-orange';
+                    else if (log.action_description.badge === 'erreur')
+                        badgeClass = 'badge-red';
+
+                    html += `
+        <tr>
+            <td>${log.created_at}</td>
+            <td>${log.user?.role ?? 'System'}.${log.user?.name ?? ''}</td>
+            <td>${log.action_description.slug}</td>
+            <td>${log.dynamic_data?.name ?? dynamic_data?.target ?? ''}</td>
+            <td>${log.ip_address ?? '-'}</td>
+            <td style="text-align:right">
+                <span class="badge ${badgeClass}">
+                    ${log.action_description.badge}
+                </span>
+            </td>
+        </tr>`;
+                });
+
+                document.getElementById('logsTable').innerHTML = html;
+            }
+
+            /* refresh toutes les 5 secondes */
+            setInterval(refreshLogs, 5000);
+
+            /* premier chargement */
+            refreshLogs();
+        </script>
 </x-super-admin-layout>

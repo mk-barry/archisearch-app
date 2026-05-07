@@ -31,7 +31,7 @@ class AuditLog extends Model
         return $this->belongsTo(ActionDescription::class);
     }
 
-    public static function log($slug, $data = [])
+    public static function log(string $slug, array $data = [])
     {
         $action = ActionDescription::where('slug', $slug)->first();
 
@@ -39,7 +39,7 @@ class AuditLog extends Model
             return;
         }
 
-        AuditLog::create([
+        self::create([
             'user_id' => auth()->id(),
             'action_description_id' => $action->id,
             'dynamic_data' => $data,
@@ -63,5 +63,10 @@ class AuditLog extends Model
         }
 
         return $message;
+    }
+
+    public function getTargetAttribute()
+    {
+        return $this->dynamic_data['target'] ?? $this->dynamic_data['name'] ?? null;
     }
 }
