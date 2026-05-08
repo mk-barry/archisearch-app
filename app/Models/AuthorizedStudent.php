@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AuthorizedStudents extends Model
+class AuthorizedStudent extends Model
 {
     protected $fillable = ['matricule', 'full_name', 'email', 'class_level'];
 

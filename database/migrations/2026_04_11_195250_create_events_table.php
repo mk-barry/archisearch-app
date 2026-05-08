@@ -19,16 +19,19 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
 
+            $table->date('start_date');
+            $table->date('end_date');
+
             // Le jeton unique pour l'URL (ex: /depot/550e8400-e29b...)
             $table->uuid('uuid')->unique();
 
             // Le coeur de ta logique : Strict (école) ou Open (concours)
-            $table->enum('mode', ['strict', 'open'])->default('strict');
-            $table->json('required_documents')->nullable();
+            $table->enum('invite_type', ['tous', 'particuliers'])->default('tous');
+            $table->text('required_docs'); // Liste des docs séparés par des virgules
             $table->integer('max_file_size')->default(2048);
 
             // Gestion de l'état du lien
-            $table->enum('status', ['opened', 'closed'])->default('opened');
+            $table->enum('status', ['brouillon', 'actif', 'cloture', 'archive'])->default('actif');
             $table->timestamp('expires_at')->nullable();
 
             // Génère automatiquement created_at et updated_at

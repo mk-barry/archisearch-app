@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('authorized_students', function (Blueprint $table) {
+        Schema::create('document_types_', function (Blueprint $table) {
             $table->id();
-            $table->string('matricule')->unique();
-            $table->string('name');
-            $table->string('email')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('authorized_students');
+        Schema::dropIfExists('document_types_');
     }
 };

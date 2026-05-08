@@ -31,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/evenements', [AdminController::class, 'evenements'])->name('evenements');
+        Route::post('/evenements/store', [AdminController::class, 'storeEvent'])->name('events.store');
+        // On ajoute une route de visualisation rapide
+        Route::get('/evenements/{uuid}', [AdminController::class, 'showEvent'])->name('events.show');
         Route::get('/creation-events', [AdminController::class, 'creationEvent'])->name('creation-events');
         Route::get('/documents', [AdminController::class, 'documents'])->name('documents');
         Route::get('/recherche', [AdminController::class, 'recherche'])->name('recherche');
