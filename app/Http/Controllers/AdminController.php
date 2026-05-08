@@ -15,19 +15,34 @@ class AdminController extends Controller
     {
         $query = Events::query();
 
-        // Recherche par Titre
-        if ($request->filled('search')) {
-            $query->where('title', 'like', "%{$request->search}%");
+        // Filtre Recherche
+        if ($request->search) {
+            $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // Filtre par Statut (Onglets)
-        if ($request->filled('status')) {
+        // Filtre Statut
+        if ($request->status) {
             $query->where('status', $request->status);
         }
 
-        $events = $query->latest()->paginate(6)->withQueryString();
+        $events = $query->latest()->paginate(6); // 9 par page pour une grille 3x3
+
+        // Si c'est de l'AJAX, on peut renvoyer juste la vue
+        if ($request->ajax()) {
+            return view('admin.evenements', compact('events'));
+        }
 
         return view('admin.evenements', compact('events'));
+    }
+
+    public function cloturePrematuree(Events $event)
+    {
+        $event->update([
+            'status' => 'cloture',
+            'end_date' => now(),
+        ]);
+
+        return back()->with('success', "L'événement a été clôturé avec succès.");
     }
 
     public function storeEvent(Request $request)
