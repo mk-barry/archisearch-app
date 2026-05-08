@@ -61,16 +61,16 @@
                             <p class="event-subtitle">{{ Str::limit($event->description, 45) }}</p>
                         </div>
                         <span
-                            class="badge {{ $event->status == 'actif' ? 'badge-blue' : ($event->status == 'cloture' ? 'badge-green' : 'badge-orange') }}">
+                            class="badge {{ $event->status == 'actif' ? 'badge-blue' : ($event->status == 'cloture' ? 'badge-orange' : 'badge-green') }}">
                             {{ ucfirst($event->status) }}
                         </span>
                     </div>
 
                     <div class="event-progress-section">
                         @php
-                            $percentage = $event->total_expected > 0
-                                ? ($event->submissions_count / $event->total_expected) * 100
-                                : 0;
+    $percentage = $event->total_expected > 0
+        ? ($event->submissions_count / $event->total_expected) * 100
+        : 0;
                         @endphp
                         <div class="compact-progress-bg" style="height: 10px; background: #f1f5f9;">
                             <!-- <div class="compact-progress-fill" style="width: {{ $percentage }}%; background: #2563eb;"></div> -->
@@ -105,7 +105,7 @@
                         </div>
                         <div class="event-actions">
                             {{-- Bouton Voir --}}
-                            <button class="action-btn">
+                            <button class="action-btn" title="Voir l'événement">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -114,10 +114,21 @@
                             </button>
 
                             {{-- Bouton Éditer --}}
-                            <button class="action-btn">
+                            <button class="action-btn" title="Modifier l'événement">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                                </svg>
+                            </button>
+
+                            {{-- Bouton Copier le Lien --}}
+                            <button class="action-btn"
+                                onclick="copyEventLink('{{ $event->uuid }}')"
+                                title="Copier le lien d'invitation" style="color: #6366f1;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                                 </svg>
                             </button>
 
@@ -189,6 +200,20 @@
             @endfragment
         </div>
     </div>
+    <script>
+        function copyEventLink(uuid) {
+            // On prend la base du site (http://127.0.0.1:8000) 
+            // et on lui colle proprement le chemin de la landing page
+            const cleanUrl = window.location.origin + "/invitation/" + uuid;
+
+            navigator.clipboard.writeText(cleanUrl).then(() => {
+                // Un petit toast ou une alerte pour confirmer
+                alert("Lien d'invitation copié avec succès !");
+            }).catch(err => {
+                console.error('Erreur lors de la copie :', err);
+            });
+        }
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('event-search');

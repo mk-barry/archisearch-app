@@ -31,6 +31,6 @@ class Documents extends Model
     // Relation optionnelle vers l'étudiant autorisé (en mode strict)
     public function student()
     {
-        return $this->belongsTo(AuthorizedStudents::class, 'identifier', 'matricule');
+        return $this->belongsTo(AuthorizedStudent::class, 'identifier', 'matricule');
     }
 }

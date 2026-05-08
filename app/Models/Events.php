@@ -70,7 +70,7 @@ class Events extends Model
 
     public function documents(): HasMany
     {
-        return $this->hasMany(Documents::class);
+        return $this->hasMany(Documents::class, 'event_id');
     }
 
     public function invitations(): HasMany

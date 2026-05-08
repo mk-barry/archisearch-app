@@ -18,10 +18,20 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 // --- Routes d'Invitation (Visiteurs/Candidats) ---
 Route::controller(GuestController::class)->prefix('invitation')->name('invitation.')->group(function () {
-    Route::get('/', 'invitation')->name('home');
-    Route::get('/identification', 'identification')->name('identification');
-    Route::get('/televersement', 'upload')->name('upload');
-    Route::get('/confirmation', 'confirmation')->name('confirmation');
+
+    // 1. Routes Libres : L'étudiant arrive ici pour s'identifier
+    Route::get('/{uuid}', 'invitation')->name('home');
+    Route::get('/identification/{uuid}', 'identification')->name('identification');
+    Route::post('/verify', 'verifyIdentification')->name('verify'); // La route qui crée la session
+
+    // 2. Routes Protégées : L'étudiant doit être identifié (Middleware student.auth)
+    Route::middleware(['student.auth'])->group(function () {
+        Route::get('/televersement/{uuid}', 'upload')->name('upload');
+        Route::post('/televersement/{uuid}/store', 'storeDocument')->name('store.document');
+        Route::get('/confirmation', 'confirmation')->name('confirmation');
+        Route::get('/historique', 'history')->name('history');
+        Route::post('/logout', 'logout')->name('logout');
+    });
 });
 
 // --- Routes Protégées (Auth & Role Middleware) ---
