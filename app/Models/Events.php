@@ -55,7 +55,7 @@ class Events extends Model
         }
 
         // Nombre d'étudiants spécifiques liés via la table pivot
-        return $this->authorizedStudents()->count();
+        return $this->authorizedStudent()->count();
     }
 
     public function user(): BelongsTo
@@ -63,7 +63,7 @@ class Events extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function AuthorizedStudents()
+    public function AuthorizedStudent()
     {
         return $this->belongsToMany(AuthorizedStudent::class, 'event_authorized_student', 'event_id', 'authorized_student_id');
     }
@@ -71,6 +71,14 @@ class Events extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(Documents::class, 'event_id');
+    }
+
+    public function documentTypes()
+    {
+        return $this->belongsToMany(
+            DocumentType::class,
+            'event_document_type'
+        )->withPivot('required')->withTimestamps();
     }
 
     public function invitations(): HasMany

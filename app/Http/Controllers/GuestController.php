@@ -7,6 +7,7 @@ use App\Models\AuthorizedStudent;
 use Illuminate\Support\Facades\DB;
 use App\Models\Documents;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class GuestController extends Controller
 {
@@ -58,42 +59,62 @@ class GuestController extends Controller
         return view('user.televersement', compact('event', 'userDocuments', 'isClosed'));
     }
 
-    public function storeDocument(Request $request, $uuid)
+    public function storeDocument(Request $request)
     {
-        $event = Events::where('uuid', $uuid)->firstOrFail();
+        $event = Events::findOrFail($request->event_id);
 
-        // Vérification de sécurité
-        if (now()->gt($event->end_date) || $event->status === 'cloturé') {
-            return back()->with('error', 'Événement clôturé.');
-        }
-
-        // Validation du fichier
+        // 1. Validation stricte selon tes colonnes
         $request->validate([
-            'document' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:' . $event->max_file_size * 1024, // Converti Mo en Ko
-            'document_type' => 'required|string'
+            'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:' . ($event->max_file_size * 1024),
+            'document_type' => 'required|string' // Correspond à ta 'category'
         ]);
 
         $file = $request->file('document');
-        $originalName = $file->getClientOriginalName();
-        $fileSize = $file->getSize();
-        $path = $file->store('documents/' . session('student_matricule'));
 
-        // Sauvegarde en base
+        // 2. Préparation des données techniques
+        $matricule = session('student_matricule');
+        $extension = $file->getClientOriginalExtension();
+        $sizeInKb = round($file->getSize() / 1024);
+
+        // Génération d'un tracking_code unique pour ce dépôt (ex: AS-5X82ZP)
+        $trackingCode = 'AS-' . strtoupper(Str::random(6));
+
+        // 3. Stockage physique
+        $path = $file->store('documents/' . $matricule);
+
+        // 4. Insertion en BD alignée sur ta migration
         Documents::create([
             'event_id' => $event->id,
-            'identifier' => session('student_matricule'),
-            'original_name' => $originalName,
-            'file_size' => $fileSize,
-            'path' => $path,
-            'type_document' => $request->document_type
+            'identifier' => $matricule,
+            'tracking_code' => $trackingCode,
+            'file_path' => $path,
+            'file_type' => $extension,
+            'file_size' => $sizeInKb,
+            'category' => $request->document_type, // Ex: "CNI", "Contrat"
+            'status' => 'submitted', // On l'initie en 'submitted' (soumis)
+            'metadata' => [
+                'original_name' => $file->getClientOriginalName(),
+                'upload_ip' => $request->ip()
+            ]
         ]);
 
-        return back()->with('success', 'Document bien enregistré.');
+        // 5. Redirection vers la confirmation avec le code de suivi
+        // return redirect()->route('invitation.confirmation')
+        //     ->with('tracking_code', $trackingCode);
+        return redirect()->route('invitation.upload', ['uuid' => $event->uuid])
+            ->with('success', 'Document ajouté !');
     }
-    // public function confirmation()
-    // {
-    //     return view('user.confirmation');
-    // }
+    public function confirmation()
+    {
+        $matricule = session('student_matricule');
+
+        // On récupère les documents pour l'affichage dynamique
+        $documents = Documents::where('identifier', $matricule)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('user.confirmation', compact('documents'));
+    }
     public function verifyIdentification(Request $request)
     {
         // On valide que les données arrivent bien
@@ -109,13 +130,13 @@ class GuestController extends Controller
             return back()->with('error', 'Matricule non reconnu.');
         }
 
-        // // On stocke en session (attention à bien utiliser fullname ici)
-        // session([
-        //     'student_id' => $student->id,
-        //     'student_name' => $request->fullname,
-        //     'student_matricule' => $student->matricule,
-        //     'current_event_id' => $request->event_id // Stocké pour le téléversement
-        // ]);
+        // On stocke en session (attention à bien utiliser fullname ici)
+        session([
+            'student_id' => $student->id,
+            'student_name' => $request->fullname,
+            'student_matricule' => $student->matricule,
+            'current_event_id' => $request->event_id // Stocké pour le téléversement
+        ]);
 
         // On récupère l'UUID depuis un champ caché du formulaire ou la session
         $event = Events::findOrFail($request->event_id);
@@ -148,26 +169,7 @@ class GuestController extends Controller
 
         return view('invitation.upload', compact('event'));
     }
-    // public function confirmation()
-    // {
-    //     // Vérifie si l'utilisateur est connecté
-    //     if (!Auth::check()) {
-    //         // Redirige vers la page de connexion en spécifiant la route de destination
-    //         return redirect()->route('login')->with('error', 'Veuillez vous connecter pour accéder à cette page.');
-    //     }
-
-    //     // On récupère l'utilisateur connecté
-    //     $user = Auth::user();
-
-    //     // On récupère les événements en attente de l'utilisateur connecté
-    //     $pendingEvents = Events::where('user_id', $user->id)
-    //         ->where('status', 'en_attente')
-    //         ->get();
-
-    //     // On injecte les données dans la vue
-    //     return view('user.confirmation', compact('pendingEvents'));
-    // }
-
+    
     public function history()
     {
         $matricule = session('student_matricule');

@@ -56,9 +56,12 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('role:super-admin')->prefix('super-admin')->name('super-admin.')->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/administrateurs', [UserController::class, 'index'])->name('administrateurs');
+        Route::get('/students', [SuperAdminController::class, 'indexStudents'])->name('students');
         Route::get('/logs', [SuperAdminController::class, 'logs'])->name('logs');
         Route::get('/settings', [SuperAdminController::class, 'settings'])->name('settings');
         Route::get('/creation-admin', [SuperAdminController::class, 'creationAdmin'])->name('creation-admin');
+        Route::get('/creation-student', [SuperAdminController::class, 'createStudent'])->name('students.create');
+        Route::post('/store-student', [SuperAdminController::class, 'storeStudent'])->name('students.store');
 
         Route::get('/administrateurs/edit/{user}', [UserController::class, 'edit'])->name('administrateurs.edit');
         Route::patch('/administrateurs/toggle-status/{user}', [UserController::class, 'toggleStatus'])->name('toggle-status');

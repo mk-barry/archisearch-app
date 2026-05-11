@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AuthorizedStudent extends Model
 {
-    protected $fillable = ['matricule', 'full_name', 'email', 'class_level'];
+    protected $fillable = ['matricule', 'name', 'email'];
 
     // Un étudiant peut avoir plusieurs documents déposés (si l'événement le permet)
     public function documents()

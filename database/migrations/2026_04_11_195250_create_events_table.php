@@ -32,7 +32,7 @@ return new class extends Migration
 
             // Gestion de l'état du lien
             $table->enum('status', ['brouillon', 'actif', 'cloture', 'archive'])->default('actif');
-            $table->timestamp('expires_at')->nullable();
+            // $table->timestamp('expires_at')->nullable();
 
             // Génère automatiquement created_at et updated_at
             $table->timestamps();

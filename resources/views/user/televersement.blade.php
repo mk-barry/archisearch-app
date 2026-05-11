@@ -60,14 +60,15 @@
                         </p>
                     </div>
                     @php
-// On calcule la différence entre maintenant et la date de fin
-$now = now();
-$daysRemaining = $now->diffInDays($event->end_date, false);
+                        // On calcule la différence entre maintenant et la date de fin
+                        $now = now();
+                        $daysRemaining = $now->diffInDays($event->end_date, false);
                     @endphp
                     @if($event->status === 'cloturé' || $now->gt($event->end_date))
                         <div class="badge-red"
                             style="background: #fef2f2; color: #dc2626; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
                                 <circle cx="12" cy="12" r="10" />
                                 <line x1="15" y1="9" x2="9" y2="15" />
                                 <line x1="9" y1="9" x2="15" y2="15" />
@@ -75,21 +76,21 @@ $daysRemaining = $now->diffInDays($event->end_date, false);
                             Clôturé
                         </div>
                     @else
-                    @if($daysRemaining > 0)
-                        <div class="badge-yellow">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                style="margin-right: 4px; vertical-align: middle;">
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                            Expire dans {{ ceil($daysRemaining) }}j
-                        </div>
-                    @else
-                        <div class="badge-red"
-                            style="background: #fef2f2; color: #dc2626; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
-                            Terminé
-                        </div>
-                    @endif
+                        @if($daysRemaining > 0)
+                            <div class="badge-yellow">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" style="margin-right: 4px; vertical-align: middle;">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                                Expire dans {{ ceil($daysRemaining) }}j
+                            </div>
+                        @else
+                            <div class="badge-red"
+                                style="background: #fef2f2; color: #dc2626; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+                                Terminé
+                            </div>
+                        @endif
                     @endif
                 </div>
 
@@ -97,11 +98,11 @@ $daysRemaining = $now->diffInDays($event->end_date, false);
                 <div class="document-list" style="margin-bottom: 1.5rem;">
                     @foreach($event->required_docs as $docName)
                         @php
-    // On cherche si le document existe déjà pour cet étudiant et cet event
-    $uploadedFile = $event->documents
-        ->where('identifier', session('student_matricule'))
-        ->where('type_document', $docName)
-        ->first();
+                            // On cherche si le document existe déjà pour cet étudiant et cet event
+                            $uploadedFile = $event->documents
+                                ->where('identifier', session('student_matricule'))
+                                ->where('type_document', $docName)
+                                ->first();
                         @endphp
 
                         @if($uploadedFile)
@@ -178,14 +179,15 @@ $daysRemaining = $now->diffInDays($event->end_date, false);
                 <div class="sub-text">ou cliquez pour sélectionner depuis votre appareil</div>
             </div>
             <!-- Final Action -->
-            <form id="uploadForm" action="{{ route('invitation.store.document', ['uuid' => $event->uuid]) }}" method="POST"
-                enctype="multipart/form-data">
+            <form id="uploadForm" action="{{ route('invitation.store.document', ['uuid' => $event->uuid]) }}"
+                method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
                 <input type="hidden" name="document_type" id="currentDocType">
                 <input type="file" name="document" id="fileInput" style="display: none;" onchange="submitUpload()">
                 @if($isClosed)
-                    <div style="text-align: center; background: #f8fafc; padding: 2rem; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                    <div
+                        style="text-align: center; background: #f8fafc; padding: 2rem; border-radius: 12px; border: 1px dashed #cbd5e1;">
                         <p style="color: #64748b; margin-bottom: 1.5rem;">Cet événement est clôturé. Vous pouvez consulter
                             vos dépôts dans votre historique.</p>
                         <a href="{{ route('invitation.history') }}" class="btn-primary"
@@ -198,12 +200,16 @@ $daysRemaining = $now->diffInDays($event->end_date, false);
                         </a>
                     </div>
                 @else
-                    <button type="submit" class="btn-start" style="text-decoration: none; text-align: center; padding: 0.75rem 1.5rem; width: 100%;">Soumettre tous les documents</button>
+                    <a href="{{ route('invitation.confirmation', ['uuid' => $event->uuid]) }}" class="btn-start"
+                        style="text-decoration: none; text-align: center; display: block;">
+                        Terminer et voir la confirmation
+                    </a>
                 @endif
             </form>
 
 
-            <p style="font-size: 0.75rem; color: #94a3b8; margin: 0.75rem 0; text-align: center;">Vous pourrez remplacer un fichier
+            <p style="font-size: 0.75rem; color: #94a3b8; margin: 0.75rem 0; text-align: center;">Vous pourrez remplacer
+                un fichier
                 avant la clôture de l'événement.</p>
         </div>
     </div>
@@ -219,8 +225,30 @@ $daysRemaining = $now->diffInDays($event->end_date, false);
         }
 
         function submitUpload() {
-            // Vous pouvez ici afficher un loader sur la carte correspondante
-            document.getElementById('uploadForm').submit();
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
+            const docType = document.getElementById('currentDocType').value;
+
+            // Optionnel : Afficher un loader ici
+            console.log("Upload en cours pour : " + docType);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Recharger la page ou mettre à jour la carte en JS
+                        window.location.reload();
+                    } else {
+                        alert("Erreur lors du téléversement");
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
         }
     </script>
 </body>

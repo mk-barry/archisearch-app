@@ -72,7 +72,7 @@ class AdminController extends Controller
         // 2. Si mode particuliers, on remplit la table pivot
         if ($request->invite_type === 'particuliers' && $request->has('invited_students')) {
             // Utilise le nom de la relation définie dans ton modèle Events
-            $event->authorizedStudents()->attach($request->invited_students);
+            $event->authorizedStudent()->attach($request->invited_students);
         }
 
         return response()->json(['success' => true]);

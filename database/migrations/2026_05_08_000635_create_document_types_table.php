@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('document_types_', function (Blueprint $table) {
+        Schema::create('document_types', function (Blueprint $table) {
             $table->id();
+            $table->string('slug')->unique();
+            $table->string('label')->unique();
+            
+            $table->integer('max-size')->default(2048)->nullable();
             $table->timestamps();
         });
     }

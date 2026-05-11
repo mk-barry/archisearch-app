@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Models\Documents;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
+use App\Models\AuthorizedStudent;
 // use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class SuperAdminController extends Controller
 {
@@ -84,6 +86,88 @@ class SuperAdminController extends Controller
         }
 
         return view('super-admin.logs', compact('recentActivities'));
+    }
+
+    public function indexStudents(Request $request)
+    {
+        $query = AuthorizedStudent::withCount('documents');
+
+        // --- RECHERCHE ---
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('matricule', 'like', "%{$request->search}%");
+            });
+        }
+
+        // --- FILTRES ---
+        if ($request->filled('filters')) {
+            foreach ($request->filters as $filter) {
+                if ($filter == 'has_uploads')
+                    $query->has('documents');
+                if ($filter == 'no_uploads')
+                    $query->doesntHave('documents');
+            }
+        }
+
+        // --- TRI ---
+        $sortData = $request->input('sort');
+        if ($sortData) {
+            $currentSort = is_array($sortData) ? end($sortData) : $sortData;
+            switch ($currentSort) {
+                case 'az':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'za':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'plusdocs':
+                    $query->orderByDesc('documents_count');
+                    break;
+                case 'moinsdocs':
+                    $query->orderBy('documents_count', 'asc');
+                    break;
+                default:
+                    $query->latest();
+            }
+        } else {
+            $query->latest();
+        }
+
+        // Utilise paginate(5) comme pour tes admins pour tester la pagination
+        $students = $query->paginate(5)->withQueryString();
+
+        return view('super-admin.students', compact('students'));
+    }
+    public function createStudent()
+    {
+        return view("super-admin.create-students");
+    }
+
+    /**
+     * Enregistre un nouvel étudiant dans la table authorized_students
+     */
+    public function storeStudent(Request $request)
+    {
+        $validated = $request->validate([
+            'matricule' => 'required|string|max:50|unique:authorized_students,matricule',
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+        ], [
+            'matricule.unique' => 'Ce matricule est déjà enregistré.',
+        ]);
+
+        AuthorizedStudent::create([
+            'matricule' => $validated['matricule'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "L'étudiant a été autorisé avec succès.",
+            'redirect' => route('super-admin.students') // Ou la route de ton choix
+        ]);
     }
 
     public function settings()

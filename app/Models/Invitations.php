@@ -12,6 +12,6 @@ class Invitations extends Model
 
     public function event()
     {
-        return $this->belongsTo(Events::class);
+        return $this->belongsTo(Events::class, 'event_id');
     }
 }
