@@ -1,14 +1,15 @@
 <x-admin-layout active="recherche" title="Recherche de documents - ArchiSearch">
     <div class="page-header">
-        <div class="breadcrumb-small">Portail Admin > Recherche</div>
-        <h1>Recherche de documents</h1>
+        <div class="page-info">
+            <div class="breadcrumb-small">Portail Admin > Recherche</div>
+            <h1>Recherche de documents</h1>
+        </div>
         <div class="admin-info">
                 <div class="avatar" style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
                         @if(Auth::user()->avatar)
                             <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
                                 alt="Avatar de {{ Auth::user()->name }}">
                         @else
-                            <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
                             {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
                         @endif
                 </div>

@@ -1,6 +1,9 @@
 <x-admin-layout active="evenements" title="Gestion des événements - ArchiSearch">
     <div class="page-header">
-        <h1>Gestion des événements</h1>
+        <div class="page-info">
+            <div class="breadcrumb-small">Admin > Evenements</div>
+            <h1>Gestion des événements</h1>
+        </div>
         <div class="admin-info">
             <div class="avatar"
                 style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
@@ -54,114 +57,117 @@
     <div id="events-ajax-container">
         <div class="event-grid">
             @forelse($events as $event)
-                <div class="event-card">
-                    <div class="event-header">
-                        <div>
-                            <h3 class="event-title">{{ $event->title }}</h3>
-                            <p class="event-subtitle">{{ Str::limit($event->description, 45) }}</p>
-                        </div>
-                        <span
-                            class="badge {{ $event->status == 'actif' ? 'badge-blue' : ($event->status == 'cloture' ? 'badge-orange' : 'badge-green') }}">
-                            {{ ucfirst($event->status) }}
-                        </span>
-                    </div>
+                            <div class="event-card">
+                                <div class="event-header">
+                                    <div>
+                                        <h3 class="event-title">{{ $event->title }}</h3>
+                                        <p class="event-subtitle">{{ Str::limit($event->description, 45) }}</p>
+                                    </div>
+                                    <span
+                                        class="badge {{ $event->status == 'actif' ? 'badge-blue' : ($event->status == 'cloture' ? 'badge-orange' : ($event->status == 'archive' ? 'badge-green' : 'badge-red')) }}">
+                                        {{ ucfirst($event->status) }}
+                                    </span>
+                                </div>
 
-                    <div class="event-progress-section">
-                        @php
-    $percentage = $event->total_expected > 0
-        ? ($event->submissions_count / $event->total_expected) * 100
-        : 0;
-                        @endphp
-                        <div class="compact-progress-bg" style="height: 10px; background: #f1f5f9;">
-                            <!-- <div class="compact-progress-fill" style="width: {{ $percentage }}%; background: #2563eb;"></div> -->
-                            <div class="compass-progress-fill"
-                                style="width: {{ $percentage }}%; background: #2563eb; height: 100%; border-radius: 4px;">
+                                <div class="event-progress-section">
+                                    @php
+                $percentage = $event->total_expected > 0
+                    ? ($event->submissions_count / $event->total_expected) * 100
+                    : 0;
+                                    @endphp
+                                    <div class="compact-progress-bg" style="height: 10px; background: #f1f5f9;">
+                                        <!-- <div class="compact-progress-fill" style="width: {{ $percentage }}%; background: #2563eb;"></div> -->
+                                        <div class="compass-progress-fill"
+                                            style="width: {{ $percentage }}%; background: #2563eb; height: 100%; border-radius: 4px;">
+                                        </div>
+                                    </div>
+                                    <div class="event-stats">
+                                        <!-- <span>0/0 soumissions</span> -->
+                                        <div class="submission-stats">
+                                            <span class="count">{{ $event->submissions_count ?? 0 }}</span>
+                                            <span class="separator">/</span>
+                                            <span class="total">{{ $event->total_expected > 0 ? $event->total_expected : '--' }}</span>
+                                            <span class="label">soumissions</span>
+                                        </div>
+                                        <span style="display: flex; align-items: center; gap: 6px;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                                                <line x1="16" x2="16" y1="2" y2="6" />
+                                                <line x1="8" x2="8" y1="2" y2="6" />
+                                                <line x1="3" x2="21" y1="10" y2="10" />
+                                            </svg>
+                                            {{ $event->end_date->format('d M Y') }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="event-footer">
+                                    <div class="event-meta">
+                                        {{-- On compte les relations chargées depuis la table pivot --}}
+                                        {{ $event->documentTypes->count() }} {{ Str::plural('type', $event->documentTypes->count()) }} requis
+                                    </div>
+                                    <div class="event-actions">
+                                        {{--Bouton Voir --}}
+                                        <a href="{{ route('admin.voir-events', $event->uuid) }}" class="action-btn"
+                                            title="Voir l'événement"
+                                            style="display: inline-flex; align-items: center; justify-content: center;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                        </a>
+
+                                        {{-- Bouton Éditer --}}
+                                        <a href="{{ route('admin.edit-events', $event->uuid) }}" class="action-btn"
+                                            title="Modifier l'événement">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                                            </svg>
+                                        </a>
+
+                                        {{-- Bouton Copier le Lien --}}
+                                        <button class="action-btn" onclick="copyEventLink('{{ $event->uuid }}')"
+                                            title="Copier le lien d'invitation" style="color: #6366f1;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                            </svg>
+                                        </button>
+
+                                        {{-- Bouton Clôture (Remplace les trois points) --}}
+                                        @if($event->status === 'actif')
+                                            <form action="{{ route('admin.evenements.cloture-prematuree', $event->id) }}" method="POST"
+                                                style="display: inline;">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="action-btn" title="Clôturer prématurément"
+                                                    onclick="return confirm('Clôturer cet événement maintenant ?')"
+                                                    style="color: #ef4444; border-color: transparent;">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
+                                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                        <line x1="10" y1="16" x2="14" y2="16"></line>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @else
+                                            {{-- Optionnel : une icône grisée si déjà clôturé --}}
+                                            <button class="action-btn" disabled style="opacity: 0.3; cursor: not-allowed;">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
+                                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="event-stats">
-                            <!-- <span>0/0 soumissions</span> -->
-                            <div class="submission-stats">
-                                <span class="count">{{ $event->submissions_count }}</span>
-                                <span class="separator">/</span>
-                                <span class="total">{{ $event->total_expected }}</span>
-                                <span class="label">soumissions</span>
-                            </div>
-                            <span style="display: flex; align-items: center; gap: 6px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                                    <line x1="16" x2="16" y1="2" y2="6" />
-                                    <line x1="8" x2="8" y1="2" y2="6" />
-                                    <line x1="3" x2="21" y1="10" y2="10" />
-                                </svg>
-                                {{ $event->end_date->format('d M Y') }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="event-footer">
-                        <div class="event-meta">
-                            {{ is_array($event->required_docs) ? count($event->required_docs) : 0 }} types requis
-                        </div>
-                        <div class="event-actions">
-                            {{-- Bouton Voir --}}
-                            <button class="action-btn" title="Voir l'événement">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                </svg>
-                            </button>
-
-                            {{-- Bouton Éditer --}}
-                            <button class="action-btn" title="Modifier l'événement">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                                </svg>
-                            </button>
-
-                            {{-- Bouton Copier le Lien --}}
-                            <button class="action-btn"
-                                onclick="copyEventLink('{{ $event->uuid }}')"
-                                title="Copier le lien d'invitation" style="color: #6366f1;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                                </svg>
-                            </button>
-
-                            {{-- Bouton Clôture (Remplace les trois points) --}}
-                            @if($event->status === 'actif')
-                                <form action="{{ route('admin.evenements.cloture-prematuree', $event->id) }}" method="POST"
-                                    style="display: inline;">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="action-btn" title="Clôturer prématurément"
-                                        onclick="return confirm('Clôturer cet événement maintenant ?')"
-                                        style="color: #ef4444; border-color: transparent;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
-                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                            <line x1="10" y1="16" x2="14" y2="16"></line>
-                                        </svg>
-                                    </button>
-                                </form>
-                            @else
-                                {{-- Optionnel : une icône grisée si déjà clôturé --}}
-                                <button class="action-btn" disabled style="opacity: 0.3; cursor: not-allowed;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                    </svg>
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                </div>
             @empty
                 <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #64748b;">
                     Aucun événement trouvé.

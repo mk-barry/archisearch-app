@@ -6,14 +6,54 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Events;
 use App\Models\AuthorizedStudent;
+use App\Models\DocumentType;
+use App\Models\FileExtension;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class EventsTestSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Créer un Admin pour tester
+        // --- 1. CONFIGURATION DES FORMATS (La Nomenclature) ---
+        $extensions = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png'
+        ];
+
+        $extModels = [];
+        foreach ($extensions as $name => $mime) {
+            $extModels[$name] = FileExtension::updateOrCreate(
+                ['name' => $name],
+                ['mime_type' => $mime]
+            );
+        }
+
+        // --- 2. CRÉATION DES TYPES DE DOCUMENTS PROFESSIONNELS ---
+        // On crée la CNI
+        $cni = DocumentType::updateOrCreate(
+            ['code' => 'CNI'],
+            [
+                'label' => 'Carte Nationale d\'Identité',
+                'max_size_kb' => 2048, // 2MB
+            ]
+        );
+        $cni->allowedExtensions()->sync([$extModels['pdf']->id, $extModels['jpg']->id, $extModels['png']->id]);
+
+        // On crée le Diplôme
+        $diplome = DocumentType::updateOrCreate(
+            ['code' => 'BACC'],
+            [
+                'label' => 'Baccalauréat ou Équivalent',
+                'max_size_kb' => 5120, // 5MB
+            ]
+        );
+        $diplome->allowedExtensions()->sync([$extModels['pdf']->id]);
+
+        // --- 3. UTILISATEURS & ÉTUDIANTS ---
         $admin = User::updateOrCreate(
             ['email' => 'admin@archisearch.com'],
             [
@@ -24,7 +64,6 @@ class EventsTestSeeder extends Seeder
             ]
         );
 
-        // 2. Créer une liste d'étudiants autorisés
         $studentsData = [
             ['matricule' => '24G001', 'name' => 'Jean Dupont'],
             ['matricule' => '24G002', 'name' => 'Marie Songo'],
@@ -34,44 +73,44 @@ class EventsTestSeeder extends Seeder
 
         $studentIds = [];
         foreach ($studentsData as $data) {
-            $student = AuthorizedStudent::updateOrCreate(
+            $s = AuthorizedStudent::updateOrCreate(
                 ['matricule' => $data['matricule']],
                 [
                     'name' => $data['name'],
                     'email' => strtolower(str_replace(' ', '.', $data['name'])) . '@student.com',
                 ]
             );
-            $studentIds[] = $student->id;
+            $studentIds[] = $s->id;
         }
 
-        // 3. Créer un événement en mode "TOUS"
-        Events::create([
+        // --- 4. ÉVÉNEMENT "TOUS" ---
+        $eventTous = Events::create([
             'user_id' => $admin->id,
             'title' => 'Session de rattrapage DUT2',
-            'description' => 'Dépôt des dossiers pour le rattrapage du semestre 1.',
+            'description' => 'Dépôt ouvert à tous les étudiants.',
             'start_date' => now(),
             'end_date' => now()->addDays(14),
             'uuid' => (string) Str::uuid(),
             'invite_type' => 'tous',
-            'required_docs' => ['CNI', 'Relevé de notes'],
             'status' => 'actif',
         ]);
+        // On lie les types de documents nécessaires à cet événement
+        $eventTous->documentTypes()->attach([$cni->id, $diplome->id]);
 
-        // 4. Créer un événement en mode "PARTICULIERS" (seulement Jean et Marie)
+        // --- 5. ÉVÉNEMENT "PARTICULIERS" ---
         $eventP = Events::create([
             'user_id' => $admin->id,
             'title' => 'Concours Spécifique Master',
-            'description' => 'Événement réservé aux étudiants sélectionnés.',
+            'description' => 'Seulement pour Jean et Marie.',
             'start_date' => now(),
             'end_date' => now()->addDays(7),
             'uuid' => (string) Str::uuid(),
             'invite_type' => 'particuliers',
-            'required_docs' => ['Passeport', 'Diplôme Licence'],
             'status' => 'actif',
         ]);
+        $eventP->documentTypes()->attach([$cni->id]);
 
-        // Lier les étudiants spécifiques via la table pivot
-        // Assure-toi que la relation "AuthorizedStudent" est définie dans ton modèle Events
-        $eventP->AuthorizedStudent()->attach([$studentIds[0], $studentIds[1]]);
+        // Liaison des étudiants autorisés
+        $eventP->authorizedStudent()->attach($studentIds);
     }
 }

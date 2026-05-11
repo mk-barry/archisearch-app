@@ -12,14 +12,12 @@
                 @if(Auth::user()->avatar)
                     <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar de {{ Auth::user()->name }}">
                     @else
-                        <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
                         {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
                     @endif
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                    <span class="admin-name">{{ Auth::user()->name }}</span>
-                    <span class="admin-mail">{{ Auth::user()->role }}</span>
-                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <span class="admin-name">{{ Auth::user()->name }}</span>
+                <span class="admin-mail">{{ Auth::user()->role }}</span>
             </div>
         </div>
     </div>

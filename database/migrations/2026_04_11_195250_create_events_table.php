@@ -27,7 +27,6 @@ return new class extends Migration
 
             // Le coeur de ta logique : Strict (école) ou Open (concours)
             $table->enum('invite_type', ['tous', 'particuliers'])->default('tous');
-            $table->text('required_docs'); // Liste des docs séparés par des virgules
             $table->integer('max_file_size')->default(2048);
 
             // Gestion de l'état du lien

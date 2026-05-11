@@ -69,7 +69,6 @@
                     <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
             </div>
-            <a href="archives" target="_blank" rel="noopener noreferrer">tape ici</a>
             <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Anomalies détectées</span>
             <span class="stat-value">3</span>
             <span style="color: #94a3b8; font-size: 0.8rem;">à vérifier</span>

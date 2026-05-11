@@ -44,8 +44,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/evenements/store', [AdminController::class, 'storeEvent'])->name('events.store');
         Route::patch('/admin/evenements/{event}/cloture-prematuree', [AdminController::class, 'cloturePrematuree'])->name('evenements.cloture-prematuree');
         // On ajoute une route de visualisation rapide
-        Route::get('/evenements/{uuid}', [AdminController::class, 'showEvent'])->name('events.show');
+        Route::get('/evenements/{uuid}', [AdminController::class, 'showEvent'])->name('voir-events');
         Route::get('/creation-events', [AdminController::class, 'creationEvent'])->name('creation-events');
+        Route::get('/evenements/{uuid}/edit', [AdminController::class, 'editEvent'])->name('edit-events');
+        Route::put('/evenements/{uuid}/update', [AdminController::class, 'update'])->name('evenements.update');
         Route::get('/documents', [AdminController::class, 'documents'])->name('documents');
         Route::get('/recherche', [AdminController::class, 'recherche'])->name('recherche');
         Route::get('/archives', [AdminController::class, 'archives'])->name('archives');

@@ -13,11 +13,18 @@ return new class extends Migration
     {
         Schema::create('document_types', function (Blueprint $table) {
             $table->id();
-            $table->string('slug')->unique();
-            $table->string('label')->unique();
-            
-            $table->integer('max-size')->default(2048)->nullable();
+            $table->string('code')->unique(); // Ex: CNI, BACC
+            $table->string('label');           // Ex: Carte Nationale d'Identité
+            $table->integer('max_size_kb');    // Ex: 2048
             $table->timestamps();
+        });
+
+        Schema::create('document_type_extension', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('document_type_id')->constrained();
+            $table->foreignId('file_extension_id')->constrained();
+            $table->timestamps();
+
         });
     }
 
@@ -26,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('document_types_');
+        Schema::dropIfExists('document_types');
     }
 };

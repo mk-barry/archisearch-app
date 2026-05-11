@@ -50,11 +50,10 @@ class Events extends Model
     public function getTotalExpectedAttribute()
     {
         if ($this->invite_type === 'tous') {
-            // Nombre total d'étudiants dans ton référentiel
-            return \App\Models\AuthorizedStudent::count();
+            return AuthorizedStudent::count();
         }
 
-        // Nombre d'étudiants spécifiques liés via la table pivot
+        // On utilise la relation corrigée
         return $this->authorizedStudent()->count();
     }
 
@@ -63,9 +62,14 @@ class Events extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function AuthorizedStudent()
+    public function authorizedStudent() // Pluriel et camelCase
     {
-        return $this->belongsToMany(AuthorizedStudent::class, 'event_authorized_student', 'event_id', 'authorized_student_id');
+        return $this->belongsToMany(
+            AuthorizedStudent::class,
+            'event_authorized_student', // Ta table pivot
+            'event_id',
+            'authorized_student_id' // Vérifie bien que c'est ce nom en BD
+        );
     }
 
     public function documents(): HasMany
@@ -77,8 +81,10 @@ class Events extends Model
     {
         return $this->belongsToMany(
             DocumentType::class,
-            'event_document_type'
-        )->withPivot('required')->withTimestamps();
+            'event_document_type',
+            'event_id',
+            'document_type_id'
+        );
     }
 
     public function invitations(): HasMany

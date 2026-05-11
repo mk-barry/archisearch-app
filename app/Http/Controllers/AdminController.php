@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Events;
+use App\Models\DocumentType;
 use App\Models\AuthorizedStudent;
 use Illuminate\Http\Request;
 
@@ -47,44 +48,103 @@ class AdminController extends Controller
 
     public function storeEvent(Request $request)
     {
+        // 1. Validation stricte
         $validated = $request->validate([
-            'title' => 'required',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'invite_type' => 'required|in:tous,particuliers',
+            'document_types' => 'required|array|min:1', // On valide le nouveau nom du champ
             'invited_students' => 'required_if:invite_type,particuliers|array',
-            // ... tes autres validations
         ]);
 
-        // 1. Création de l'événement
+        // 2. Création de l'événement
         $event = Events::create([
             'user_id' => auth()->id(),
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
             'title' => $request->title,
             'description' => $request->description,
             'invite_type' => $request->invite_type,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
-            // On prend directement le tableau envoyé par Select2
-            'required_docs' => $request->required_docs,
             'status' => 'actif',
-            // N'oublie pas l'UUID si ton modèle ne le génère pas seul
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            // 'required_docs' est retiré ici car on utilise la table pivot
         ]);
 
-        // 2. Si mode particuliers, on remplit la table pivot
+        // 3. Liaison des types de documents (Table pivot event_document_type)
+        $event->documentTypes()->sync($request->document_types);
+
+        // Liaison des étudiants (CORRIGÉ ICI)
         if ($request->invite_type === 'particuliers' && $request->has('invited_students')) {
-            // Utilise le nom de la relation définie dans ton modèle Events
-            $event->authorizedStudent()->attach($request->invited_students);
+            // sync est préférable à attach pour éviter les doublons
+            $event->authorizedStudent()->sync($request->invited_students);
         }
 
-        return response()->json(['success' => true]);
+        // 5. Retour JSON avec succès et redirection pour ton script JS
+        return response()->json([
+            'success' => true,
+            'redirect' => route('admin.evenements'),
+            'message' => 'Événement créé avec succès !'
+        ]);
     }
     public function creationEvent()
     {
-        // On récupère tous les étudiants pour pouvoir les afficher dans le Select2
-        $AuthorizedStudent = AuthorizedStudent::all();
+        $documentTypes = DocumentType::all(); // On récupère les types de docs
+        $authorizedStudents = AuthorizedStudent::all(); // On récupère les étudiants
 
         // On injecte la variable dans la vue
-        return view('admin.creation-events', compact('AuthorizedStudent'));
+        return view('admin.creation-events', compact('authorizedStudents', 'documentTypes'));
     }
+
+    public function editEvent($uuid)
+    {
+        // 1. On récupère l'événement avec ses relations
+        $event = Events::with('documentTypes')->where('uuid', $uuid)->firstOrFail();
+
+        // 2. On récupère tous les types de documents disponibles en BD 
+        // pour pouvoir les afficher sous forme de checkboxes dans le formulaire
+        $documentTypes = DocumentType::all();
+
+        // 3. On retourne la VUE (le fichier .blade.php) et on lui passe les données
+        return view('admin.edit-event', compact('event', 'documentTypes'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $event = Events::where('uuid', $uuid)->firstOrFail();
+
+        // Validation
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'invite_type' => 'required|in:tous,particuliers',
+            'status' => 'required|in:actif,cloture,archive,brouillon',
+        ]);
+
+        // Update
+        $event->update($validated);
+
+        // RÉPONSE CRUCIALE POUR LE FETCH
+        return response()->json([
+            'success' => true,
+            'message' => 'Événement mis à jour',
+            'redirect' => route('admin.evenements')
+        ]);
+    }
+
+    public function showEvent($uuid)
+    {
+        // On récupère l'événement avec ses types de docs et les étudiants liés
+        $event = Events::with(['documentTypes', 'authorizedStudent'])
+                       ->where('uuid', $uuid)
+                       ->firstOrFail();
+
+        return view('admin.voir-event', compact('event'));
+    }
+
     public function documents()
     {
         return view('admin.documents');
