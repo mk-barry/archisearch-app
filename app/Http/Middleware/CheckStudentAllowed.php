@@ -16,22 +16,34 @@ class CheckStudentAllowed
      */
     public function handle($request, Closure $next)
     {
-        $event = Events::where('uuid', $request->uuid)->firstOrFail();
+        $uuid = $request->route('uuid') ?? $request->query('uuid');
 
-        if ($event->status !== 'actif') {
-            abort(403, 'Événement fermé.');
+        if (!$uuid) {
+            dd("Le middleware ne trouve pas d'UUID. La route est : " . $request->url());
+        }
+        // dd($uuid);
+        $event = Events::where('uuid', $uuid)->firstOrFail();
+
+        if (!$event) {
+            dd("L'UUID existe ($uuid), mais aucun événement ne correspond en base de données.");
         }
 
-        if ($event->invite_type === 'particuliers') {
+        // Si l'événement est clos, on ne bloque pas l'accès (car il peut voir son historique)
+        // mais on bloquera uniquement l'action POST de stockage.
 
+        if ($event->invite_type === 'particuliers') {
             $matricule = session('student_matricule');
+
+            if (!$matricule) {
+                return redirect()->route('invitation.identification', $uuid);
+            }
 
             $authorized = $event->authorizedStudent()
                 ->where('matricule', $matricule)
                 ->exists();
 
             if (!$authorized) {
-                abort(403, 'Non autorisé.');
+                abort(403, 'Vous n\'êtes pas autorisé pour cet événement.');
             }
         }
 

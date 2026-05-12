@@ -308,7 +308,7 @@ class GuestController extends Controller
             ->where('identifier', session('student_matricule'))
             ->get();
 
-        return view('user.interface-depot', compact('event', 'isClosed', 'submissions'));
+        return view('user.televersement', compact('event', 'isClosed', 'submissions'));
     }
 
     /**
@@ -367,6 +367,58 @@ class GuestController extends Controller
             'message' => 'Document téléversé et indexé.',
             'doc' => $document
         ]);
+    }
+
+    public function confirmation(Request $request, $uuid)
+    {
+        // 1. Récupérer les identifiants de base
+        $matricule = session('student_matricule');
+        // $uuid = $request->query('uuid');
+        // dd($uuid);
+
+        // 2. Trouver l'événement correspondant à l'UUID
+        // On récupère l'événement en premier pour avoir accès à son "id"
+        $event = Events::where('uuid', $uuid)->first();
+        // dd($event);
+
+        // Sécurité : Si l'événement n'existe pas, on redirige ou on affiche une erreur
+        if (!$event) {
+            return redirect()->back()->with('error', 'Événement introuvable.');
+        }
+
+        // 3. Récupérer les documents avec le double filtre :
+        // - Appartenant à l'étudiant (identifier)
+        // - Appartenant à cet événement précis (event_id)
+        $documents = Documents::where('identifier', $matricule)
+            ->where('event_id', $event->id) // Utilisation de l'ID numérique
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // 4. Envoyer les données à la vue
+        return view('user.confirmation', compact('documents', 'uuid', 'event'));
+    }
+
+    public function history()
+    {
+        // On vérifie que l'étudiant est bien identifié en session
+        $matricule = session('student_matricule');
+
+        if (!$matricule) {
+            return redirect()->route('invitation.home', ['uuid' => 'index']) // Ou une page de login
+                ->with('error', 'Veuillez vous identifier pour accéder à votre historique.');
+        }
+
+        // On récupère les événements où l'étudiant a au moins un document
+        // avec le compte des documents par événement
+        $events = Events::whereHas('documents', function ($query) use ($matricule) {
+            $query->where('identifier', $matricule);
+        })->withCount([
+                    'documents' => function ($query) use ($matricule) {
+                        $query->where('identifier', $matricule);
+                    }
+                ])->latest()->get();
+
+        return view('user.history', compact('events'));
     }
 
     /**

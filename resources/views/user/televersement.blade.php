@@ -55,14 +55,14 @@
                         <h1 class="invitation-title" style="margin-bottom: 0.25rem;">Dépôt de documents</h1>
                         <p class="desc-text" style="margin-bottom: 0;">
                             Bonjour <strong>{{ session('student_name') }}</strong> —
-                            {{ $event->documents->where('identifier', session('student_matricule'))->count() }}/{{ count($event->required_docs) }}
+                            {{ $event->documents->where('identifier', session('student_matricule'))->count() }} / {{ $event->documentTypes->count() }}
                             documents soumis
                         </p>
                     </div>
                     @php
-                        // On calcule la différence entre maintenant et la date de fin
-                        $now = now();
-                        $daysRemaining = $now->diffInDays($event->end_date, false);
+// On calcule la différence entre maintenant et la date de fin
+$now = now();
+$daysRemaining = $now->diffInDays($event->end_date, false);
                     @endphp
                     @if($event->status === 'cloturé' || $now->gt($event->end_date))
                         <div class="badge-red"
@@ -96,52 +96,19 @@
 
                 <!-- Document List -->
                 <div class="document-list" style="margin-bottom: 1.5rem;">
-                    @foreach($event->required_docs as $docName)
+                    @foreach($event->documentTypes as $type) {{-- Utilise la relation documentTypes --}}
                         @php
-                            // On cherche si le document existe déjà pour cet étudiant et cet event
-                            $uploadedFile = $event->documents
-                                ->where('identifier', session('student_matricule'))
-                                ->where('type_document', $docName)
-                                ->first();
+    $uploadedFile = $submissions->where('category', $type->label)->first();
+    // Récupération des extensions depuis la BD (ex: ["pdf", "jpg"])
+    $extensions = is_array($type->allowed_extensions)
+        ? implode(', ', array_map('strtoupper', $type->allowed_extensions))
+        : 'PDF, JPG, PNG';
                         @endphp
 
                         @if($uploadedFile)
-                            <div class="upload-card success">
-                                <div class="card-icon">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="3">
-                                        <polyline points="20 6 9 17 4 12" />
-                                    </svg>
-                                </div>
-                                <div class="card-info">
-                                    <div class="card-title">{{ $docName }}</div>
-                                    <div class="card-sub">{{ $uploadedFile->original_name }} ·
-                                        {{ round($uploadedFile->file_size / 1024, 2) }} Ko
-                                    </div>
-                                </div>
-                                <div class="card-actions">
-                                    <a href="{{ asset('storage/' . $uploadedFile->path) }}" target="_blank" class="action-btn">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2">
-                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                            <circle cx="12" cy="12" r="3" />
-                                        </svg>
-                                    </a>
-                                    <form action="{{ route('document.destroy', $uploadedFile->id) }}" method="POST"
-                                        onsubmit="return confirm('Supprimer ce document ?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="action-btn red">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2">
-                                                <path d="M18 6 6 18" />
-                                                <path d="m6 6 12 12" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
                         @else
-                            <div class="upload-card empty" onclick="triggerUpload('{{ $docName }}')">
+                            {{-- On passe l'ID du type de document à la fonction JS --}}
+                            <div class="upload-card empty" onclick="triggerUpload({{ $type->id }}, '{{ $extensions }}')">
                                 <div class="card-icon">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2.5">
@@ -151,8 +118,11 @@
                                     </svg>
                                 </div>
                                 <div class="card-info">
-                                    <div class="card-title">{{ $docName }}</div>
-                                    <div class="card-sub">Format PDF, JPG ou PNG</div>
+                                    <div class="card-title">{{ $type->label }}</div>
+                                    {{-- Statistiques dynamiques --}}
+                                    <div class="card-sub">Formats : {{ $extensions }} · Max
+                                        {{ round(($type->max_size_kb ?? 2048) / 1024) }} Mo
+                                    </div>
                                 </div>
                                 <div class="card-actions">
                                     <div class="action-btn" style="background: #2563eb; color: white;">
@@ -179,33 +149,33 @@
                 <div class="sub-text">ou cliquez pour sélectionner depuis votre appareil</div>
             </div>
             <!-- Final Action -->
-            <form id="uploadForm" action="{{ route('invitation.store.document', ['uuid' => $event->uuid]) }}"
-                method="POST" enctype="multipart/form-data">
+            <form id="uploadForm" action="{{ route('invitation.store.document', ['uuid' => $event->uuid]) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
-                <input type="hidden" name="document_type" id="currentDocType">
+                <input type="hidden" name="document_type_id" id="currentDocType"> {{-- ID injecté ici --}}
                 <input type="file" name="document" id="fileInput" style="display: none;" onchange="submitUpload()">
-                @if($isClosed)
-                    <div
-                        style="text-align: center; background: #f8fafc; padding: 2rem; border-radius: 12px; border: 1px dashed #cbd5e1;">
-                        <p style="color: #64748b; margin-bottom: 1.5rem;">Cet événement est clôturé. Vous pouvez consulter
-                            vos dépôts dans votre historique.</p>
-                        <a href="{{ route('invitation.history') }}" class="btn-primary"
-                            style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Voir mes événements
-                        </a>
-                    </div>
-                @else
+            </form>
+            @if($isClosed)
+                <div
+                    style="text-align: center; background: #f8fafc; padding: 2rem; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                    <p style="color: #64748b; margin-bottom: 1.5rem;">Cet événement est clôturé. Vous pouvez consulter
+                        vos dépôts dans votre historique.</p>
+                    <a href="{{ route('invitation.history') }}" class="btn-start"
+                        style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; width: 60%;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Voir mes événements
+                    </a>
+                </div>
+            @else
                     <a href="{{ route('invitation.confirmation', ['uuid' => $event->uuid]) }}" class="btn-start"
-                        style="text-decoration: none; text-align: center; display: block;">
+                        style="text-decoration: none; text-align: center; display: block; width: 60%;">
                         Terminer et voir la confirmation
                     </a>
                 @endif
-            </form>
 
 
             <p style="font-size: 0.75rem; color: #94a3b8; margin: 0.75rem 0; text-align: center;">Vous pourrez remplacer
@@ -219,18 +189,29 @@
         © 2026 ArchiSearch · Plateforme de gestion documentaire
     </footer>
     <script>
-        function triggerUpload(docType) {
-            document.getElementById('currentDocType').value = docType;
+        function triggerUpload(typeId, extensions) {
+            // On met l'ID du type de document dans le champ caché
+            document.getElementById('currentDocType').value = typeId;
+
+            // Optionnel : On peut restreindre les fichiers dans la fenêtre de sélection
+            if (extensions) {
+                const accept = extensions.split(', ').map(ext => '.' + ext.toLowerCase()).join(',');
+                document.getElementById('fileInput').setAttribute('accept', accept);
+            }
+
             document.getElementById('fileInput').click();
         }
 
         function submitUpload() {
             const form = document.getElementById('uploadForm');
             const formData = new FormData(form);
-            const docType = document.getElementById('currentDocType').value;
 
-            // Optionnel : Afficher un loader ici
-            console.log("Upload en cours pour : " + docType);
+            // On récupère l'ID qu'on a stocké juste avant
+            const typeId = document.getElementById('currentDocType').value;
+            formData.append('document_type_id', typeId);
+
+            // Loader visuel (optionnel mais recommandé)
+            console.log("Envoi du document type ID: " + typeId);
 
             fetch(form.action, {
                 method: 'POST',
@@ -240,15 +221,18 @@
                     'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                 }
             })
-                .then(response => {
-                    if (response.ok) {
-                        // Recharger la page ou mettre à jour la carte en JS
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
                         window.location.reload();
                     } else {
-                        alert("Erreur lors du téléversement");
+                        alert(data.message || "Erreur lors du téléversement");
                     }
                 })
-                .catch(error => console.error('Erreur:', error));
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert("Une erreur est survenue lors de la connexion au serveur.");
+                });
         }
     </script>
 </body>

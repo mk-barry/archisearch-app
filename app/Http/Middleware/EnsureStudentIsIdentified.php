@@ -15,9 +15,11 @@ class EnsureStudentIsIdentified
      */
     public function handle(Request $request, Closure $next)
     {
+        $uuid = $request->route('uuid') ?? $request->query('uuid');
+
         // Si l'étudiant n'a pas son ID ou son Matricule en session, on le renvoie à l'accueil
         if (!session()->has('student_id') || !session()->has('student_matricule')) {
-            return redirect()->route('invitation.identification')
+            return redirect()->route('invitation.identification', $uuid)
                 ->with('error', 'Veuillez vous identifier pour accéder au dépôt.');
         }
 

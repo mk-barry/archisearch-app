@@ -87,10 +87,10 @@
                         {{ session('error') }}
                     </div>
                 @endif
-                <form action="{{ route('invitation.verify') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="event_uuid" value="{{ $event->uuid }}">
-                    <input type="hidden" name="event_id" value="{{ $event->id }}">
+                <form action="{{ route('invitation.verify', ['uuid' => $event->uuid]) }}" method="POST">
+                @csrf
+                <input type="hidden" name="event_uuid" value="{{ $event->uuid }}">
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
                     <div class="form-group">
                         <label class="form-label">Matricule / Identifiant Étudiant *</label>
                         <div class="input-with-icon">
@@ -127,9 +127,17 @@
                         une
                         confirmation de dépôt.</p>
 
-                    <button type="submit" class="btn-start" style="margin-bottom: 0;">
-                        Continuer vers le dépôt
-                    </button>
+                        @php
+$isClosed = ($event->status !== 'actif' || \Carbon\Carbon::now()->gt($event->end_date));
+                        @endphp
+                        
+                        <button type="submit" class="btn-start">
+                            @if($isClosed)
+                                Consulter l'historique de téléversement
+                            @else
+                                Continuer vers le dépôt
+                            @endif
+                        </button>
                 </form>
             </div>
         </div>

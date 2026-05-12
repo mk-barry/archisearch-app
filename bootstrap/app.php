@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias( [
             'role' =>\App\Http\Middleware\RoleMiddleware::class,
             'student.auth' => \App\Http\Middleware\EnsureStudentIsIdentified::class,
+            'student.allowed' => \App\Http\Middleware\CheckStudentAllowed::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
