@@ -1,27 +1,6 @@
 <x-super-admin-layout active="administrateurs">
     <x-slot:title>Gestion des administrateurs - ArchiSearch</x-slot>
         <div class="page-header">
-            @if (session('success'))
-                <script>
-                    Swal.fire({
-                        title: 'Succès !',
-                        text: "{{ session('success') }}",
-                        icon: 'success',
-                        confirmButtonColor: '#0369a1', // Le bleu de ton interface
-                        confirmButtonText: 'Génial'
-                    });
-                </script>
-                @elseif (session('danger'))
-                                        <script>
-                                            Swal.fire({
-                                                title: 'Oups !',
-                                                text: "{{ session('danger') }}",
-                                                icon: 'success',
-                                                confirmButtonColor: '#0369a1', // Le bleu de ton interface
-                                                confirmButtonText: 'Ok'
-                                            });
-                                        </script>
-            @endif
             <div class="page-info">
                 <div class="breadcrumb-small">Super Admin > Administrateurs</div>
                 <h1>Gestion des administrateurs</h1>
@@ -362,48 +341,43 @@
                     }
                 });
 
-                /* ===============================
-                   SWEETALERT TOGGLE STATUS
-                =============================== */
+                /* =======================================
+                    SWEETALERT TOGGLE STATUS (Optimisé)
+                ======================================= */
                 tableBody?.addEventListener('click', function (e) {
-
                     const toggleBtn = e.target.closest('.btn-toggle');
                     if (!toggleBtn) return;
 
                     e.preventDefault();
 
                     const form = toggleBtn.closest('form');
-                    const actionUrl = form.getAttribute('action');
                     const adminName = toggleBtn.dataset.name;
+                    const actionText = toggleBtn.dataset.status; // "Activer" ou "Désactiver"
 
-                    Swal.fire({
-                        title: 'Êtes-vous sûr ?',
-                        text: `Modifier le statut de ${adminName} ?`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Oui',
-                        cancelButtonText: 'Annuler'
-                    })
-                        .then(result => {
+                    // On utilise notre objet ASAlerts défini dans alerts.js
+                    ASAlerts.confirmAction(
+                        `Confirmer la modification ?`,
+                        `Voulez-vous vraiment ${actionText.toLowerCase()} le compte de ${adminName} ?`,
+                        () => {
+                            // Action à exécuter si l'utilisateur clique sur "Oui"
+                            ASAlerts.showLoading('Mise à jour du statut...');
 
-                            if (!result.isConfirmed) return;
-
-                            fetch(actionUrl, {
+                            fetch(form.action, {
                                 method: 'POST',
                                 body: new FormData(form),
                                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
                             })
                                 .then(r => {
                                     if (r.ok) {
-                                        Swal.fire('Succès', 'Statut modifié.', 'success');
-
-                                        updateContent(
-                                            getFullUrl("{{ route('super-admin.administrateurs') }}"),
-                                            false
-                                        );
+                                        ASAlerts.success('Statut mis à jour !');
+                                        // On rafraîchit le tableau sans recharger la page complète
+                                        updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
+                                    } else {
+                                        ASAlerts.error('Erreur', 'Impossible de modifier le statut.');
                                     }
                                 });
-                        });
+                        }
+                    );
                 });
                 // -        -- TON AUTO-REFRESH ---
                 setInterval(function () {

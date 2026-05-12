@@ -1,6 +1,43 @@
-/* User Upload Step Styles */
+.televersement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    text-align: left;
+    gap: 1rem;
+}
+
+.televersement-header .desc-text { margin-bottom: 0; text-align: left; }
+
+.badge-red {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-yellow {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fde68a;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.document-list { margin-bottom: 1.5rem; }
+
 .upload-card {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 0.85rem 1.25rem;
     display: flex;
@@ -12,9 +49,7 @@
     transition: all 0.2s;
 }
 
-.upload-card.success { border-color: #10b981; background: #f0fdf4; }
-.upload-card.uploading { border-color: #2563eb; background: #eff6ff; }
-.upload-card.empty { border-style: dashed; background: #fafafa; }
+.upload-card.empty { border-style: dashed; background: #fafafa; cursor: pointer; }
 
 .card-icon {
     width: 32px;
@@ -25,29 +60,21 @@
     justify-content: center;
     flex-shrink: 0;
 }
-
-.success .card-icon { background: #10b981; color: white; }
-.uploading .card-icon { background: #2563eb; color: white; }
 .empty .card-icon { background: #f1f5f9; color: #94a3b8; }
 
 .card-info { flex: 1; }
-.card-title { font-weight: 700; font-size: 0.85rem; color: #1e293b; margin-bottom: 0.15rem; }
-.card-sub { font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 8px; }
-
-.progress-container {
-    height: 6px;
-    background: #dbeafe;
-    border-radius: 3px;
-    flex: 0.4;
-    overflow: hidden;
-}
-
-.progress-fill { height: 100%; background: #2563eb; width: 45%; }
+.card-title { font-weight: 700; font-size: 0.85rem; color: var(--text-main); margin-bottom: 0.15rem; }
+.card-sub { font-size: 0.75rem; color: #64748b; }
 
 .card-actions { display: flex; align-items: center; gap: 12px; }
-.action-btn { color: #94a3b8; cursor: pointer; transition: color 0.2s; }
-.action-btn:hover { color: #1e293b; }
-.action-btn.red:hover { color: #ef4444; }
+.action-btn-blue {
+    background: #2563eb;
+    color: white;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
 
 .upload-zone-large {
     border: 1.5px dashed #bfdbfe;
@@ -60,18 +87,26 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    color: #2563eb;
+    color: var(--primary-blue);
+    width: 100%;
+    cursor: pointer;
 }
 
-.upload-zone-large .main-text { font-weight: 700; font-size: 0.9rem; }
-.upload-zone-large .sub-text { font-size: 0.75rem; color: #60a5fa; }
+.upload-zone-large .main-text { font-weight: 700; font-size: 0.9rem; text-align: center; }
+.upload-zone-large .sub-text { font-size: 0.75rem; color: #60a5fa; text-align: center; }
 
-.badge-yellow {
-    background: #fffbeb;
-    color: #d97706;
-    border: 1px solid #fde68a;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
+.closed-state-box {
+    text-align: center;
+    background: #f8fafc;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+}
+.closed-state-text { color: #64748b; margin-bottom: 1.5rem; }
+.footer-hint { font-size: 0.75rem; color: #94a3b8; margin: 0.75rem 0; text-align: center; }
+
+@media (max-width: 768px) {
+    .televersement-header { flex-direction: column; }
+    .upload-card { flex-direction: column; text-align: center; }
+    .card-actions { width: 100%; justify-content: center; }
 }

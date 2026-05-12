@@ -394,6 +394,12 @@ class GuestController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        if ($documents->isEmpty()) {
+            // On le renvoie vers la page de téléversement avec un message d'erreur
+            return redirect()->route('invitation.upload', ['uuid' => $uuid])
+                             ->with('error', 'Vous devez téléverser au moins un document avant d\'accéder à la confirmation.');
+        }
+
         // 4. Envoyer les données à la vue
         return view('user.confirmation', compact('documents', 'uuid', 'event'));
     }

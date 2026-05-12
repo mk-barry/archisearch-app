@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documents soumis avec succès - ArchiSearch</title>
-    <link rel="stylesheet" href="{{ asset('css/user/invitation.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user/common.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user/confirmation.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,11 +15,10 @@
 <body>
     <nav class="nav-simple">
         <div class="logo-brand">
-            <div class="logo-square" style="background: #2563eb; color: white; padding: 5px 8px; border-radius: 6px;">AS
-            </div>
+            <div class="logo-square">AS</div>
             ArchiSearch
         </div>
-        <div style="color: #94a3b8; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+        <div class="nav-secure-text">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
@@ -26,11 +26,10 @@
         </div>
     </nav>
 
-    <div class="invitation-container" style="max-width: 520px;">
+    <div class="invitation-container">
         <div class="invitation-header">
             <div class="header-accent success-accent"></div>
             <div class="card-body">
-                <!-- Stepper -->
                 <div class="stepper">
                     <div class="step finished">
                         <div class="step-num">✓</div>
@@ -54,37 +53,31 @@
                     </svg>
                 </div>
 
-                <h1 class="invitation-title" style="margin-bottom: 0.5rem;">Documents soumis avec succès !</h1>
-                <p class="desc-text" style="text-align: center; margin-bottom: 2rem;">
+                <h1 class="invitation-title">Documents soumis avec succès !</h1>
+                <p class="desc-text">
                     Merci <strong>{{ session('student_name') }}</strong>. Vos documents ont bien été reçus.
                 </p>
 
-                <div style="text-align: left; margin-bottom: 1.5rem;">
-                    <h2 class="checklist-title" style="font-size: 0.9rem; margin-bottom: 1rem; color: #64748b;">
+                <div>
+                    <h2 class="checklist-title muted">
                         Statut de vos documents ({{ $documents->count() }}) :
                     </h2>
 
                     @foreach($documents as $doc)
-                        <div class="doc-info-bar"
-                            style="display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px;">
-                            {{-- Badge Extension Dynamique --}}
-                            <div class="ext-badge ext-{{ strtolower($doc->file_type) }}"
-                                style="padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; background: #e2e8f0;">
+                        <div class="doc-info-bar">
+                            <div class="ext-badge ext-{{ strtolower($doc->file_type) }}">
                                 {{ strtoupper($doc->file_type) }}
                             </div>
 
-                            <div
-                                style="flex: 1; font-weight: 600; font-size: 0.85rem; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                {{ $doc->category }} {{-- Affiche "CNI", "Contrat", etc. --}}
+                            <div class="doc-name">
+                                {{ $doc->category }}
                             </div>
 
-                            {{-- Badge Statut Dynamique --}}
-                            <div class="status-badge {{ $doc->status }}"
-                                style="font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 600;">
+                            <div class="status-badge {{ $doc->status }}">
                                 @if($doc->status == 'submitted') Soumis
                                 @elseif($doc->status == 'pending') En cours
                                 @elseif($doc->status == 'validated') Accepté
-                                @elseif($doc->status == 'rejected') Accepté
+                                @elseif($doc->status == 'rejected') Rejeté
                                 @else {{ $doc->status }} @endif
                             </div>
                         </div>
@@ -106,9 +99,8 @@
                     </div>
                 @endif
 
-                <div
-                    style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin-top: 1.5rem; font-size: 0.8rem; color: #94a3b8; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
+                <div class="confirmation-actions">
+                    <div class="event-closed-meta">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
@@ -118,16 +110,14 @@
                         </svg>
                         Événement clôturé le <strong>{{ $event->end_date->format('d M Y') }}</strong>
                     </div>
-                    <a href="{{ route('invitation.upload', $event->uuid) }}"
-                        style="text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                    <a href="{{ route('invitation.upload', $event->uuid) }}" class="action-link">
                         Ajouter un fichier
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                     </a>
-                    <a href="#"
-                        style="color: #2563eb; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                    <a href="#" class="action-link primary">
                         Remplacer un fichier
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5">
@@ -137,12 +127,10 @@
                 </div>
             </div>
 
-            <p style="margin-top: 2rem; font-size: 0.75rem; color: #94a3b8; text-align: center;">
-                Vous pouvez fermer
-                cette fenêtre en toute sécurité.
+            <p class="desc-text" style="margin-top: 2rem;">
+                Vous pouvez fermer cette fenêtre en toute sécurité.
             </p>
         </div>
-    </div>
     </div>
 
     <footer class="main-footer">

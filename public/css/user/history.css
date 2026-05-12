@@ -1,0 +1,86 @@
+.nav-profile-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.profile-text { text-align: right; }
+.profile-name { font-weight: 700; font-size: 0.85rem; color: #1e293b; }
+.profile-matricule { font-size: 0.75rem; color: #64748b; }
+.logout-btn { color: #ef4444; text-decoration: none; }
+
+.history-header {
+    margin-bottom: 2rem;
+    text-align: left;
+}
+.history-title { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem; }
+.history-subtitle { color: #64748b; }
+
+.history-card {
+    margin-bottom: 1rem;
+    cursor: default;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: box-shadow 0.2s;
+}
+.history-card:hover { box-shadow: var(--card-shadow); }
+
+.history-card-info {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+.history-icon {
+    width: 50px;
+    height: 50px;
+    background: #eff6ff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+.history-event-title { font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; }
+.history-meta { font-size: 0.8rem; color: #64748b; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.history-doc-count { color: #2563eb; font-weight: 600; }
+
+.history-card-actions { display: flex; gap: 10px; }
+.btn-manage {
+    background: var(--primary-blue);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.status-ended {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.history-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e2e8f0;
+}
+.empty-icon { color: #cbd5e1; margin-bottom: 1rem; }
+.empty-text { color: #64748b; font-weight: 500; }
+
+.footer-margin { margin-top: 4rem; }
+
+@media (max-width: 768px) {
+    .history-card { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .history-card-actions { width: 100%; justify-content: flex-end; }
+}

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $event->title }} - ArchiSearch</title>
+    <link rel="stylesheet" href="{{ asset('css/user/common.css') }}">
     <link rel="stylesheet" href="{{ asset('css/user/invitation.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,18 +17,17 @@
             <div class="logo-square">AS</div>
             ArchiSearch
         </div>
-        <div style="color: #94a3b8; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+        <div class="nav-secure-text">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            Portail Étudiant Sécurisé
+            Connexion sécurisée
         </div>
     </nav>
 
     @php
 use Carbon\Carbon;
 $deadline = Carbon::parse($event->end_date)->locale('fr')->isoFormat('LL');
-// Conversion du max_file_size (ex: 2048 Ko -> 2 Mo)
 $maxSizeMo = $event->max_file_size ? round($event->max_file_size / 1024) : 2;
     @endphp
 
@@ -67,7 +67,7 @@ $maxSizeMo = $event->max_file_size ? round($event->max_file_size / 1024) : 2;
                                 stroke-width="2">
                                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
                             </svg>
-                            <strong>{{ $event->documentTypes->count() }} pièces</strong> demandées
+                            <strong>{{ $event->documentTypes->count() }} pièce(s)</strong> demandée(s)
                         </div>
                     </div>
                 </div>
@@ -77,19 +77,16 @@ $maxSizeMo = $event->max_file_size ? round($event->max_file_size / 1024) : 2;
 
                     @forelse($event->documentTypes as $index => $type)
                         @php
-                            // On récupère la taille spécifique au document, 
-                            // ou on utilise 2048 (2Mo) par défaut si c'est vide.
-                            $docMaxSizeKb = $type->max_size_kb ?? 2048;
-                            $docMaxSizeMo = round($docMaxSizeKb / 1024, 1);
+    $docMaxSizeKb = $type->max_size_kb ?? 2048;
+    $docMaxSizeMo = round($docMaxSizeKb / 1024, 1);
                         @endphp
-                            <div class="checklist-item">
-                                <div class="number-badge">{{ $index + 1 }}</div>
-                                <div class="item-name">{{ $type->label }}</div>
-                                <div class="item-format">Format PDF recommandé · Max {{ $maxSizeMo }} Mo</div>
-                            </div>
+                        <div class="checklist-item">
+                            <div class="number-badge">{{ $index + 1 }}</div>
+                            <div class="item-name">{{ $type->label }}</div>
+                            <div class="item-format">Format PDF recommandé · Max {{ $maxSizeMo }} Mo</div>
+                        </div>
                     @empty
-                        <p style="color: #94a3b8; font-style: italic;">Aucun document spécifique n'est requis pour cet
-                            événement.</p>
+                        <p class="empty-checklist">Aucun document spécifique n'est requis pour cet événement.</p>
                     @endforelse
                 </div>
 
@@ -120,6 +117,21 @@ $maxSizeMo = $event->max_file_size ? round($event->max_file_size / 1024) : 2;
     <footer class="main-footer">
         © 2026 ArchiSearch · Université - Service des Diplômes
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('success'))
+                ASAlerts.success("{{ session('success') }}");
+            @endif
+
+            @if(session('error'))
+                ASAlerts.error("Oups !", "{{ session('error') }}");
+            @endif
+
+            @if(session('info'))
+                ASAlerts.info("Note", "{{ session('info') }}");
+            @endif
+        });
+    </script>
 </body>
 
 </html>
