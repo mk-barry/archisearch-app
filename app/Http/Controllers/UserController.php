@@ -244,14 +244,8 @@ class UserController extends Controller
 
     public function heartbeat()
     {
-        // if (auth()->check()) {
-        //     auth()->user()->update([
-        //         'last_seen_at' => now()
-        //     ]);
-        //     return response()->json(['status' => 'online']);
-        // }
         $user = Auth::user();
-        dd(Auth::user());
+        // dd(Auth::user());
         $user->update([
             'last_seen_at' => now()
         ]);

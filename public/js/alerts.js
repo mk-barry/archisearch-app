@@ -29,6 +29,24 @@ const ASAlerts = {
         });
     },
 
+    info: function (title, text) {
+        Swal.fire({
+            icon: "info",
+            title: title,
+            text: text,
+            confirmButtonColor: "#2563eb",
+        });
+    },
+
+    danger: function (title, text) {
+        Swal.fire({
+            icon: "info",
+            title: title,
+            text: text,
+            confirmButtonColor: "#f84141",
+        });
+    },
+
     // Confirmation de suppression
     confirmDelete: function (callback) {
         Swal.fire({
@@ -47,16 +65,16 @@ const ASAlerts = {
         });
     },
 
-    confirmAction: function(title, text, callback) {
+    confirmAction: function (title, text, callback) {
         Swal.fire({
             title: title,
             text: text,
-            icon: 'question',
+            icon: "question",
             showCancelButton: true,
-            confirmButtonColor: '#0369a1', // Ton bleu super-admin
-            cancelButtonColor: '#64748b',
-            confirmButtonText: 'Confirmer',
-            cancelButtonText: 'Annuler'
+            confirmButtonColor: "#0369a1", // Ton bleu super-admin
+            cancelButtonColor: "#64748b",
+            confirmButtonText: "Confirmer",
+            cancelButtonText: "Annuler",
         }).then((result) => {
             if (result.isConfirmed) {
                 callback();
@@ -65,12 +83,12 @@ const ASAlerts = {
     },
 
     // Loader pendant l'upload
-    showLoading: function (
-        message = "Téléversement et indexation en cours...",
-    ) {
+    showLoading: function (text = "Traitement en cours...") {
         Swal.fire({
-            title: message,
+            title: "Un instant...",
+            text: text,
             allowOutsideClick: false,
+            showConfirmButton: false,
             didOpen: () => {
                 Swal.showLoading();
             },

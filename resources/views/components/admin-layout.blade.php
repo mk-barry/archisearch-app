@@ -174,6 +174,7 @@
             </main>
         </div>
     </div>
+    <!-- @include('heartbeat') -->
     @stack('scripts')
 </body>
 

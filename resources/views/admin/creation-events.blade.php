@@ -93,45 +93,59 @@
     {{-- Scripts --}}
     <script>
         $(document).ready(function () {
-            // Initialisation Select2
-            $('#docs-select').select2({ placeholder: "Sélectionner les types de documents" });
-            $('#students-select').select2({ placeholder: "Chercher un étudiant..." });
+                // Initialisation Select2
+                $('#docs-select').select2({ placeholder: "Sélectionner les types de documents" });
+                $('#students-select').select2({ placeholder: "Chercher un étudiant..." });
 
-            // Affichage dynamique
-            $('input[name="invite_type"]').on('change', function() {
-                if ($(this).val() === 'particuliers') {
-                    $('#students-selection-group').show();
-                } else {
-                    $('#students-selection-group').hide();
-                }
-            });
-
-            // Envoi AJAX (Fetch recommandé, mais on garde ta logique AJAX stabilisée)
-            $('#createEventForm').on('submit', function (e) {
-                e.preventDefault();
-                const form = $(this);
-                const submitBtn = form.find('button[type="submit"]');
-
-                submitBtn.prop('disabled', true).text('Traitement...');
-
-                $.ajax({
-                    url: form.attr('action'),
-                    method: 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: function (response) {
-                        if (response.success) {
-                            window.location.href = response.redirect;
-                        }
-                    },
-                    error: function (xhr) {
-                        submitBtn.prop('disabled', false).text('Confirmer la création');
-                        alert("Erreur lors de la création. Vérifiez les champs.");
+                // Affichage dynamique du groupe de sélection des étudiants
+                $('input[name="invite_type"]').on('change', function () {
+                    if ($(this).val() === 'particuliers') {
+                        $('#students-selection-group').fadeIn();
+                    } else {
+                        $('#students-selection-group').fadeOut();
                     }
                 });
+
+                // Envoi AJAX de création d'événement
+                $('#createEventForm').on('submit', function (e) {
+                    e.preventDefault();
+
+                    const form = $(this);
+                    const submitBtn = form.find('button[type="submit"]');
+
+                    // 1. Afficher le loader ArchiSearch
+                    ASAlerts.showLoading("Création de l'événement en cours...");
+                    submitBtn.prop('disabled', true);
+
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: 'POST',
+                        data: new FormData(this),
+                        processData: false,
+                        contentType: false,
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                        success: function (response) {
+                            if (response.success) {
+                                // 2. Alerte de succès avant redirection
+                                ASAlerts.success("Événement créé avec succès !");
+                                setTimeout(() => {
+                                    window.location.href = response.redirect;
+                                }, 1000);
+                            }
+                        },
+                        error: function (xhr) {
+                            submitBtn.prop('disabled', false);
+
+                            // 3. Gestion d'erreur dynamique (si le contrôleur renvoie des erreurs de validation)
+                            let errorMsg = "Vérifiez les champs du formulaire.";
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+
+                            ASAlerts.error("Échec de création", errorMsg);
+                        }
+                    });
+                });
             });
-        });
     </script>
 </x-admin-layout>

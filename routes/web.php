@@ -49,6 +49,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/evenements/{uuid}/edit', [AdminController::class, 'editEvent'])->name('edit-events');
         Route::put('/evenements/{uuid}/update', [AdminController::class, 'update'])->name('evenements.update');
         Route::get('/documents', [AdminController::class, 'documents'])->name('documents');
+        Route::post('/admin/documents/download/', [AdminController::class, 'bulkAction'])->name('documents.bulk');
+        // Route::delete('/admin/documents/{id}', [AdminController::class, 'destroyDocument'])->name('documents.destroy');
         Route::get('/recherche', [AdminController::class, 'recherche'])->name('recherche');
         Route::get('/archives', [AdminController::class, 'archives'])->name('archives');
         Route::get('/cloud', [AdminController::class, 'cloud'])->name('cloud');

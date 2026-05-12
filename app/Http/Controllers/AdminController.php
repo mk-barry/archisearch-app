@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Events;
+use App\Models\Documents;
 use App\Models\DocumentType;
 use App\Models\AuthorizedStudent;
 use Illuminate\Http\Request;
@@ -12,6 +13,11 @@ class AdminController extends Controller
     {
         return view('admin.dashboard');
     }
+
+    // =======================================================================================
+    // =====================================Evenements========================================
+    // =======================================================================================
+
     public function evenements(Request $request)
     {
         $query = Events::query();
@@ -145,10 +151,59 @@ class AdminController extends Controller
         return view('admin.voir-event', compact('event'));
     }
 
-    public function documents()
+    // =======================================================================================
+    // =====================================Documents=========================================
+    // =======================================================================================
+
+    public function documents(Request $request)
     {
-        return view('admin.documents');
+        $query = Documents::with(['student', 'documentType']);
+
+        // 1. Recherche (Nom contributeur ou Nom fichier)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('file_path', 'like', "%{$search}%")
+                    ->orWhereHas('student', function ($sq) use ($search) {
+                        $sq->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // 2. Filtre par type (Extension)
+        if ($request->filled('type') && $request->type !== 'Tous') {
+            $query->where('file_type', 'like', "%" . strtolower($request->type) . "%");
+        }
+
+        // 3. Pagination (10 éléments) + conservation des paramètres dans les liens
+        $documents = $query->latest()->paginate(10)->withQueryString();
+
+        // 4. Réponse AJAX (Fragments uniquement)
+        if ($request->ajax()) {
+            return response()->renderFragments([
+                'table-body' => view('admin.documents', compact('documents')),
+                'pagination' => view('admin.documents', compact('documents')),
+            ]);
+        }
+
+        // 5. Vue initiale
+        return view('admin.documents', compact('documents'));
     }
+
+    // Gestion des actions groupées (Archive / Téléchargement)
+    public function bulkAction(Request $request)
+    {
+        $ids = $request->ids;
+        if ($request->action === 'archive') {
+            Documents::whereIn('id', $ids)->update(['status' => 'Archivé']);
+            return response()->json(['success' => true]);
+        }
+        // Pour le téléchargement, tu peux implémenter ta logique Zip ici
+    }
+
+    // =======================================================================================
+    // =====================================Recherche=========================================
+    // =======================================================================================
     public function recherche()
     {
         return view('admin.recherche');
