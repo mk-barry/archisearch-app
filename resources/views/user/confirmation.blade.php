@@ -10,6 +10,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/alerts.js') }}"></script>
 </head>
 
 <body>
@@ -136,6 +141,22 @@
     <footer class="main-footer">
         © 2026 ArchiSearch · Plateforme de gestion documentaire
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('success'))
+                ASAlerts.success("{{ session('success') }}");
+            @endif
+
+            @if(session('error'))
+                ASAlerts.error("Oups !", "{{ session('error') }}");
+            @endif
+
+            @if(session('info'))
+                ASAlerts.info("Note", "{{ session('info') }}");
+            @endif
+            });
+    </script>
 </body>
 
 </html>
