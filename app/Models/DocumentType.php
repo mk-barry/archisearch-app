@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class DocumentType extends Model
 {
-    protected $fillable = ['slug', 'label'];
+    protected $fillable = ['code', 'label', 'validation_rules', 'max_size_kb'];
 
     protected $casts = [
         'allowed_extensions' => 'array', // Transforme le JSON en tableau PHP
+        'validation_rules' => 'array', // Transforme le JSON en tableau PHP
     ];
 
     public function events()
@@ -18,6 +19,11 @@ class DocumentType extends Model
             Events::class,
             'event_document_type'
         );
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Documents::class, 'document_type_id');
     }
     
     public function allowedExtensions()

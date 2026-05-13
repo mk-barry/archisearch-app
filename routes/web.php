@@ -66,6 +66,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/creation-admin', [SuperAdminController::class, 'creationAdmin'])->name('creation-admin');
         Route::get('/creation-student', [SuperAdminController::class, 'createStudent'])->name('students.create');
         Route::post('/store-student', [SuperAdminController::class, 'storeStudent'])->name('students.store');
+        Route::post('/store-doc-type', [SuperAdminController::class, 'storeDocType'])->name('document-types.store');
+        Route::post('/extension', [SuperAdminController::class, 'storeExtension'])->name('extensions.store');
+        Route::post('/extensions/{extension}', [SuperAdminController::class, 'destroyExtension'])->name('extensions.destroy');
+
+
 
         Route::get('/administrateurs/edit/{user}', [UserController::class, 'edit'])->name('administrateurs.edit');
         Route::patch('/administrateurs/toggle-status/{user}', [UserController::class, 'toggleStatus'])->name('toggle-status');

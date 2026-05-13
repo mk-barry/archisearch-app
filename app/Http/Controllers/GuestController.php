@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Events;
 use App\Models\AuthorizedStudent;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Storage;
+// use Illuminate\Support\Facades\Response;
 use App\Models\Documents;
 use App\Models\DocumentType;
 use Illuminate\Http\Request;
@@ -22,206 +25,6 @@ class GuestController extends Controller
     {
         return view('auth.two-factor');
     }
-
-    // public function invitation($uuid)
-    // {
-    //     // On vérifie que l'événement existe
-    //     $event = Events::where('uuid', $uuid)->firstOrFail();
-
-    //     // On l'envoie à la vue 'home'
-    //     return view('user.invitation', compact('event'));
-    // }
-    // // public function identification($uuid)
-    // // {
-    // //     // On cherche l'événement par son UUID ou on renvoie une erreur 404 s'il n'existe pas
-    // //     $event = Events::where('uuid', $uuid)->firstOrFail();
-
-    // //     // C'est ici qu'on passe la variable $event à la vue identification.blade.php
-    // //     return view('user.identification', compact('event'));
-    // // }
-    // public function identification($uuid)
-    // {
-    //     // On récupère l'événement via l'UUID de l'URL
-    //     $event = Events::where('uuid', $uuid)->firstOrFail();
-
-    //     // On passe l'événement à la vue
-    //     return view('user.identification', compact('event'));
-    // }
-    // public function upload($uuid)
-    // {
-    //     $event = Events::where('uuid', $uuid)->firstOrFail();
-    //     $student = session('student_data'); // Récupéré lors de ton identification
-
-    //     // 1. L'événement est-il ouvert à tous ou restreint ?
-    //     if ($event->invite_type === 'particuliers') {
-    //         // Vérifier si l'ID de l'étudiant est dans la table pivot de l'événement
-    //         $isAuthorized = $event->authorizedStudents()
-    //             ->where('authorized_student_id', $student->id)
-    //             ->exists();
-
-    //         if (!$isAuthorized) {
-    //             return redirect()->route('invitation.home', $uuid)
-    //                 ->with('error', "Désolé, vous n'êtes pas autorisé pour cet événement spécifique.");
-    //         }
-    //     }
-
-    //     // 2. Récupérer les documents attendus pour cet événement
-    //     $expectedDocs = $event->documentTypes;
-
-    //     return view('invitation.upload', compact('event', 'student', 'expectedDocs'));
-    // }
-
-    // public function storeDocument(Request $request)
-    // {
-    //     // 1. Récupération des entités
-    //     $event = Events::findOrFail($request->event_id);
-    //     $docConfig = DocumentType::where('code', $request->document_type)->firstOrFail();
-
-    //     // 2. Validation dynamique
-    //     $request->validate([
-    //         'document' => [
-    //             'required',
-    //             'file',
-    //             'mimes:' . implode(',', $docConfig->allowed_extensions),
-    //             'max:' . $docConfig->max_size_kb,
-    //         ],
-    //         'document_type' => 'required|exists:document_types,code'
-    //     ]);
-
-    //     $file = $request->file('document');
-
-    //     // 3. Sécurité d'accès (La logique demandée)
-    //     $student = session('student_data'); // Données de session de l'étudiant
-    
-    //     if ($event->invite_type === 'particuliers') {
-    //         $isAuthorized = DB::table('event_student')
-    //             ->where('event_id', $event->id)
-    //             ->where('authorized_student_id', $student->id)
-    //             ->exists();
-
-    //         if (!$isAuthorized) {
-    //             return response()->json(['message' => 'Accès non autorisé pour cet événement.'], 403);
-    //         }
-    //     }
-
-    //     // 4. Préparation et Stockage
-    //     $matricule = $student->matricule;
-    //     $extension = strtolower($file->getClientOriginalExtension());
-    //     $sizeInKb = round($file->getSize() / 1024);
-    //     $trackingCode = 'AS-' . strtoupper(Str::random(6));
-
-    //     // Organisation physique : documents/MATRICULE/EVENEMENT/TYPE_DOC
-    //     $path = $file->store("documents/{$matricule}/{$event->id}");
-
-    //     // 5. Enregistrement aligné sur ta migration
-    //     return Documents::create([
-    //         'event_id' => $event->id,
-    //         'identifier' => $matricule,
-    //         'tracking_code' => $trackingCode,
-    //         'file_path' => $path,
-    //         'file_type' => $extension,
-    //         'file_size' => $sizeInKb,
-    //         'category' => $docConfig->code, // "CNI", "BACC", etc.
-    //         'status' => 'submitted',
-    //         'metadata' => [
-    //             'original_name' => $file->getClientOriginalName(),
-    //             'upload_ip' => $request->ip(),
-    //             'validated_at' => null // Pour ton futur système de certification
-    //         ]
-    //     ]);
-    // }
-    // public function confirmation()
-    // {
-    //     $matricule = session('student_matricule');
-
-    //     // On récupère les documents pour l'affichage dynamique
-    //     $documents = Documents::where('identifier', $matricule)
-    //         ->orderBy('created_at', 'desc')
-    //         ->get();
-
-    //     return view('user.confirmation', compact('documents'));
-    // }
-    // public function verifyIdentification(Request $request)
-    // {
-    //     // On valide que les données arrivent bien
-    //     $request->validate([
-    //         'identifier' => 'required',
-    //         'fullname' => 'required'
-    //     ]);
-
-    //     // On cherche l'étudiant
-    //     $student = AuthorizedStudent::where('matricule', $request->identifier)->first();
-
-    //     if (!$student) {
-    //         return back()->with('error', 'Matricule non reconnu.');
-    //     }
-
-    //     // On stocke en session (attention à bien utiliser fullname ici)
-    //     session([
-    //         'student_id' => $student->id,
-    //         'student_name' => $request->fullname,
-    //         'student_matricule' => $student->matricule,
-    //         'current_event_id' => $request->event_id // Stocké pour le téléversement
-    //     ]);
-
-    //     // On récupère l'UUID depuis un champ caché du formulaire ou la session
-    //     $event = Events::findOrFail($request->event_id);
-
-    //     // On redirige vers le téléversement AVEC l'UUID dans l'URL
-    //     return redirect()->route('invitation.upload', ['uuid' => $event->uuid]);
-    // }
-    // public function accessEvent(Request $request, $uuid)
-    // {
-    //     $event = Events::where('uuid', $uuid)->firstOrFail();
-
-    //     // 1. Vérifier si l'étudiant est identifié en session
-    //     if (!session()->has('student_id')) {
-    //         return redirect()->route('invitation.identification', ['event' => $uuid]);
-    //     }
-
-    //     $studentId = session('student_id');
-
-    //     // 2. Logique de restriction par type d'invitation
-    //     if ($event->invite_type === 'particuliers') {
-    //         $isInvited = \DB::table('event_authorized_student')
-    //             ->where('event_id', $event->id)
-    //             ->where('authorized_student_id', $studentId)
-    //             ->exists();
-
-    //         if (!$isInvited) {
-    //             return abort(403, "Vous n'êtes pas sur la liste des invités pour cet événement.");
-    //         }
-    //     }
-
-    //     return view('invitation.upload', compact('event'));
-    // }
-    
-    // public function history()
-    // {
-    //     $matricule = session('student_matricule');
-
-    //     if (!$matricule) {
-    //         return redirect()->route('invitation.home')->with('error', 'Veuillez vous identifier.');
-    //     }
-
-    //     // On récupère tous les événements où cet étudiant a déposé au moins un document
-    //     $events = Events::whereHas('documents', function ($query) use ($matricule) {
-    //         $query->where('identifier', $matricule);
-    //     })->get();
-
-    //     return view('invitation.history', compact('events'));
-    // }
-    // public function logout()
-    // {
-    //     session()->forget([
-    //         'student_id',
-    //         'student_name',
-    //         'student_matricule',
-    //         'current_event_id'
-    //     ]);
-
-    //     return redirect()->route('invitation.home');
-    // }
 
     /**
      * Étape 0 : Page d'invitation (Landing)
@@ -315,59 +118,75 @@ class GuestController extends Controller
      * Étape 4 : Traitement du fichier (Logique demandée)
      */
     public function storeDocument(Request $request, $uuid)
-    {
-        $event = Events::where('uuid', $uuid)->firstOrFail();
-        $docType = DocumentType::where('id', $request->document_type_id)->firstOrFail();
+{
+    $event = Events::where('uuid', $uuid)->firstOrFail();
+    $docType = DocumentType::where('id', $request->document_type_id)->firstOrFail();
 
-        // 1. Validation (Extension et Taille)
-        $request->validate([
-            'document' => [
-                'required',
-                'file',
-                'mimes:pdf,jpg,png,jpeg',
-                'max:' . ($docType->max_size_kb ?? 2048), // On utilise la taille de la BD
-            ]
-        ]);
+    $request->validate([
+        'document' => ['required', 'file', 'mimes:pdf,jpg,png,jpeg', 'max:' . ($docType->max_size_kb ?? 2048)]
+    ]);
 
-        $file = $request->file('document');
-        $matricule = session('student_matricule');
-        $originalName = $file->getClientOriginalName();
+    $file = $request->file('document');
+    $matricule = session('student_matricule');
+    $path = $file->storeAs("documents/{$matricule}/{$event->id}", time() . '_' . $file->getClientOriginalName(), 'public');
+    $fullPath = storage_path("app/public/" . $path);
+    $pythonPath = base_path('.venv\Scripts\python.exe');
 
-        // 2. Renommage si le nom existe déjà (Sécurité doublons)
-        $fileName = $originalName;
-        if (\Storage::disk('public')->exists("documents/{$matricule}/{$fileName}")) {
-            $fileName = time() . '_' . $originalName; 
-        }
+    // --- LOGIQUE OCR ---
+    $scriptPath = base_path('scripts/ocr_script.py');
+    
+    // Préparation des règles JSON issues de ta BD
+    $rules = json_encode([
+        'keywords' => $docType->validation_rules['keywords'] ?? [],
+        'min_score' => $docType->validation_rules['min_score'] ?? 1
+    ]);
 
-        // 3. Stockage Physique
-        $path = $file->storeAs("documents/{$matricule}/{$event->id}", $fileName, 'public');
+    // Exécution (Attention aux guillemets pour les chemins Windows/Linux)
+    $process = Process::run([
+        $pythonPath,
+        $scriptPath,
+        $fullPath,
+        $rules
+    ]);
 
-        // 4. Indexation en Base de Données
-        $document = Documents::create([
-            'event_id'      => $event->id,
-            'identifier'    => $matricule,
-            'tracking_code' => 'AS-' . strtoupper(Str::random(8)),
-            'file_path'     => $path,
-            'file_type'     => $file->getClientOriginalExtension(),
-            'file_size'     => round($file->getSize() / 1024),
-            'category'      => $docType->label,
-            'status'        => 'submitted',
-            'metadata'      => [
-                'original_name' => $originalName,
-                'client_ip'     => $request->ip(),
-                'browser'       => $request->header('User-Agent')
-            ]
-        ]);
-
-        // C'est ici que tu déclencheras plus tard ton indexation Elasticsearch
-        // IndexerDocument::dispatch($document);
-
-        return response()->json([
-            'success' => true, 
-            'message' => 'Document téléversé et indexé.',
-            'doc' => $document
-        ]);
+    if (!$process->successful()) {
+        \Storage::disk('public')->delete($path);
+        $errorOutput = $process->errorOutput(); // Récupère l'erreur réelle de Python
+        \Log::error("Erreur OCR : " . $errorOutput); // Écrit l'erreur dans storage/logs/laravel.log
+        return response()->json(['success' => false, 'message' => 'Erreur technique OCR.'], 500);
     }
+
+    $ocrData = json_decode($process->output(), true);
+
+    // Si le script Python renvoie un statut d'erreur ou is_valid = false
+    if ($ocrData['status'] === 'error' || (isset($ocrData['is_valid']) && !$ocrData['is_valid'])) {
+        \Storage::disk('public')->delete($path);
+        return response()->json([
+            'success' => false, 
+            'message' => 'Document non conforme : ' . ($ocrData['message'] ?? 'Critères de validation non atteints.')
+        ], 422);
+    }
+
+    // --- ENREGISTREMENT FINAL ---
+    $document = Documents::create([
+        'event_id' => $event->id,
+        'identifier' => $matricule,
+        'tracking_code' => 'AS-' . strtoupper(Str::random(8)),
+        'file_path' => $path,
+        'file_type' => $file->getClientOriginalExtension(),
+        'file_size' => round($file->getSize() / 1024),
+        'category' => $docType->label,
+        'status' => 'pending', 
+        'metadata' => [
+            'score_ocr' => $ocrData['score'],
+            'mots_trouves' => $ocrData['match_keywords'] ?? [],
+            'validated_at' => now()->toDateTimeString()
+        ],
+        'extracted_text' => $ocrData['extracted_text'] ?? ''
+    ]);
+
+    return response()->json(['success' => true, 'message' => 'Document validé et enregistré.']);
+}
 
     public function confirmation(Request $request, $uuid)
     {

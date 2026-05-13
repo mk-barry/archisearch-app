@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Documents;
+use App\Models\DocumentType;
 use App\Models\AuditLog;
+use App\Models\Events;
 use Illuminate\Http\Request;
 use App\Models\AuthorizedStudent;
+use App\Models\FileExtension;
 // use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -34,7 +37,8 @@ class SuperAdminController extends Controller
 
         // --- CHART 1 : ACTIVITÉ (7 derniers jours) ---
         $days = collect(range(6, 0))->map(function ($i) {
-            return now()->subDays($i)->format('D');
+            // ucfirst pour mettre la majuscule (ex: Lun)
+            return ucfirst(now()->subDays($i)->translatedFormat('D'));
         });
 
         // Simulation de données (à remplacer par des requêtes count() groupées par date)
@@ -42,10 +46,15 @@ class SuperAdminController extends Controller
         $uploadData = [42, 67, 53, 88, 74, 20, 12];
 
         // --- CHART 2 : RÉPARTITION ---
+        $eventCounts = Events::selectRaw('status, count(*) as total')
+        ->groupBy('status')
+        ->pluck('total', 'status')
+        ->all();
+
         $eventStats = [
-            'actifs' => 38, // Remplace par ta logique métier
-            'clotures' => 22,
-            'archives' => 15
+            'actifs'   => $eventCounts['actif'] ?? 0,
+            'clotures' => $eventCounts['cloture'] ?? 0,
+            'archives' => $eventCounts['archive'] ?? 0,
         ];
 
         // --- ACTIVITÉ RÉCENTE ---
@@ -172,7 +181,63 @@ class SuperAdminController extends Controller
 
     public function settings()
     {
-        return view('super-admin.settings');
+        $documentTypes = DocumentType::with(['allowedExtensions', 'documents'])->get();
+        $fileExtensions = FileExtension::all(); // On récupère la liste des formats existants
+    
+        return view('super-admin.settings', compact('documentTypes', 'fileExtensions'));
+    }
+
+    public function storeDocType(Request $request)
+    {
+        $validated = $request->validate([
+            'label' => 'required|string|max:255',
+            'code' => 'required|string|unique:document_types,code|max:10',
+            'max_size_mb' => 'required|integer|min:1', // On saisit en Mo pour l'UI
+            'keywords' => 'nullable|string',
+            'min_score' => 'required|integer|min:1',
+            'extensions' => 'required|array', // Tableau d'IDs d'extensions
+        ]);
+    
+        try {
+            DB::beginTransaction();
+    
+            // 1. Création du type de document
+            $documentType = DocumentType::create([
+                'label' => $validated['label'],
+                'code' => strtoupper($validated['code']),
+                'max_size_kb' => $validated['max_size_mb'] * 1024, // Conversion en Ko pour la BD
+                'validation_rules' => [
+                    'keywords' => array_map('trim', explode(',', $request->keywords)),
+                    'min_score' => (int)$validated['min_score']
+                ]
+            ]);
+    
+            // 2. Association des extensions (Table document_type_extension)
+            $documentType->allowedExtensions()->attach($validated['extensions']);
+    
+            DB::commit();
+            return back()->with('success', 'Type de document configuré avec succès !');
+    
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            DB::rollback();
+            return back()->with('error', 'Erreur lors de la création : ' . $e->getMessage());
+        }
+    }
+
+    public function storeExtension(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|unique:file_extensions,name|max:10',
+            // 'mime_type' => 'required|string|max:100'
+        ]);
+
+        FileExtension::create([
+            'name' => strtolower($validated['name']),
+            'mime_type' => strtolower("application/".$validated['name'])
+        ]);
+
+        return back()->with('success', 'Extension ajoutée avec succès !');
     }
     public function creationAdmin()
     {

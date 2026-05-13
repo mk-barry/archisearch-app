@@ -40,7 +40,10 @@
             <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Événements</span>
             <span class="stat-value">{{ array_sum($eventStats) }}</span>
             <span style="color: #94a3b8; font-size: 0.8rem;">{{ $eventStats['actifs'] }} en cours</span>
-            <div style="margin-top: 0.75rem;"><span class="trend up">↑ +{{ $eventStats['clotures'] }}</span> <span style="color: #94a3b8; font-size: 0.8rem;">clôturés</span></div>
+            <div style="margin-top: 0.75rem;">
+                <span class="trend up">↑ {{ $eventStats['clotures'] }}</span> 
+                <span style="color: #94a3b8; font-size: 0.8rem;">clôturés</span>
+            </div>
         </div>
 
         <div class="stat-card">
