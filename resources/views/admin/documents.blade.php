@@ -1,6 +1,8 @@
-<!-- <x-admin-layout active="documents" title="Documents - ArchiSearch">
+<x-admin-layout active="documents" title="Documents - ArchiSearch">
     <div class="page-header">
-        <h1>Documents de l'événement</h1>
+        <div class="page-info">
+            <h1>Documents de l'événement</h1>
+        </div>
         <div class="admin-info">
             <div class="avatar"
                 style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
@@ -54,88 +56,148 @@
             </thead>
             <tbody id="documents-body">
                 @fragment('table-body')
-                    @forelse($documents as $doc)
-                        <tr>
-                            <td><input type="checkbox" class="doc-checkbox" value="{{ $doc->id }}"></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <div class="file-icon-box bg-{{ $doc->extension }}">{{ strtoupper($doc->extension) }}</div>
-                                    <div class="text-sizes">
-                                        <div style="font-weight: 700; color: #1e293b;">{{ basename($doc->file_path) }}</div>
-                                        <div class="file-size">{{ $doc->file_size }} Ko</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="tag">{{ $doc->documentType->name ?? $doc->category }}</span></td>
-                            <td style="font-weight: 500;">{{ $doc->student->name ?? $doc->identifier }}</td>
-                            <td style="color: #64748b;">{{ $doc->created_at->format('d M') }}</td>
-                            <td><span class="badge {{ $doc->status_class }}">{{ $doc->status }}</span></td>
-                            <td style="display: grid; border-bottom: none; grid-template-columns: repeat(2, 1fr);">
-                                <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2">
-                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                        <circle cx="12" cy="12" r="3" />
-                                    </svg></button>
-                                <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                        <polyline points="7 10 12 15 17 10" />
-                                        <line x1="12" x2="12" y1="15" y2="3" />
-                                    </svg></button>
-                                <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2">
-                                        <circle cx="18" cy="5" r="3" />
-                                        <circle cx="6" cy="12" r="3" />
-                                        <circle cx="18" cy="19" r="3" />
-                                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
-                                        <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
-                                    </svg></button>
-                                <button class="action-btn" style="color: #ef4444;"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M3 6h18" />
-                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                                    </svg></button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 20px;">Aucun document trouvé.</td>
-                        </tr>
-                    @endforelse
+                @forelse($documents as $doc)
+                <tr>
+                    <td><input type="checkbox" class="doc-checkbox" value="{{ $doc->id }}"></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="file-icon-box bg-{{ $doc->extension }}">{{ strtoupper($doc->extension) }}</div>
+                            <div class="text-sizes">
+                                <div style="font-weight: 700; color: #1e293b;">{{ basename($doc->file_path) }}</div>
+                                <div class="file-size">{{ $doc->file_size }} Ko</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="tag">{{ $doc->documentType->name ?? $doc->category }}</span></td>
+                    <td style="font-weight: 500;">{{ $doc->student->name ?? $doc->identifier }}</td>
+                    <td style="color: #64748b;">{{ $doc->created_at->format('d M') }}</td>
+                    <td><span class="badge {{ $doc->status_class }}">{{ $doc->status }}</span></td>
+                    <td style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;">
+                        <!-- Voir -->
+                        <a href="{{ route('admin.documents.show', $doc->id) }}" class="action-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </a>
+
+                        <!-- Télécharger -->
+                        <a href="{{ route('admin.documents.download', $doc->id) }}" class="action-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" x2="12" y1="15" y2="3" />
+                            </svg>
+                        </a>
+
+                        <!-- Partager (Optionnel : Copier le lien) -->
+                        <button class="action-btn"
+                            onclick="shareDocument('{{ basename($doc->file_path) }}', '{{ Storage::url($doc->file_path) }}')"
+                            title="Partager le document">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3" />
+                                <circle cx="6" cy="12" r="3" />
+                                <circle cx="18" cy="19" r="3" />
+                                <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+                                <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+                            </svg>
+                        </button>
+
+                        <!-- Supprimer -->
+                        <button class="action-btn" style="color: #ef4444;" onclick="deleteDoc({{ $doc->id }})">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">Aucun document trouvé.</td>
+                </tr>
+                @endforelse
                 @endfragment
             </tbody>
         </table>
     </div>
 
-    <div id="pagination-container" style="margin-top: 20px;">
+    <div id="pagination-container">
         @fragment('pagination')
-            {{ $documents->links() }}
+        <div class="pagination-row" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+            <span style="font-size: 0.85rem; color: #64748b;">
+                Affichage <strong>{{ $documents->firstItem() }}</strong> à <strong>{{ $documents->lastItem() }}</strong> sur <strong>{{ $documents->total() }}</strong> documents
+            </span>
+
+            <div class="page-numbers" style="display: flex; gap: 5px;">
+                {{-- Bouton Précédent --}}
+                @if ($documents->onFirstPage())
+                <button class="page-btn" disabled style="opacity: 0.5; cursor: not-allowed; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; background: white;">
+                    Précédent
+                </button>
+                @else
+                <a href="{{ $documents->previousPageUrl() }}" class="page-btn"
+                    style="text-decoration: none; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; background: white; color: #1e293b; font-size: 0.85rem;">
+                    Précédent
+                </a>
+                @endif
+
+                {{-- Numéros de pages (Limité pour éviter une ligne trop longue) --}}
+                @foreach ($documents->getUrlRange(max(1, $documents->currentPage() - 2), min($documents->lastPage(), $documents->currentPage() + 2)) as $page => $url)
+                <a href="{{ $url }}"
+                    class="page-btn {{ ($page == $documents->currentPage()) ? 'active' : '' }}"
+                    style="text-decoration: none; padding: 0.5rem 0.75rem; border: 1px solid {{ ($page == $documents->currentPage()) ? '#1e3a8a' : '#e2e8f0' }}; 
+                              border-radius: 6px; background: {{ ($page == $documents->currentPage()) ? '#1e3a8a' : 'white' }}; 
+                              color: {{ ($page == $documents->currentPage()) ? 'white' : '#1e293b' }}; font-size: 0.85rem; font-weight: 600;">
+                    {{ $page }}
+                </a>
+                @endforeach
+
+                {{-- Bouton Suivant --}}
+                @if ($documents->hasMorePages())
+                <a href="{{ $documents->nextPageUrl() }}" class="page-btn"
+                    style="text-decoration: none; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; background: white; color: #1e293b; font-size: 0.85rem;">
+                    Suivant
+                </a>
+                @else
+                <button class="page-btn" disabled style="opacity: 0.5; cursor: not-allowed; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; background: white;">
+                    Suivant
+                </button>
+                @endif
+            </div>
+        </div>
         @endfragment
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function () {
-            let state = { search: '', type: 'Tous', page: 1 };
+        $(document).ready(function() {
+            let state = {
+                search: '',
+                type: 'Tous',
+                page: 1
+            };
 
             function updateUI(isAuto = false) {
+                console.log("Envoi des données :", state); // Vérifie si l'état est correct
                 $.ajax({
                     url: "{{ route('admin.documents') }}",
                     data: state,
-                    success: function (res) {
+                    success: function(res) {
+                        console.log("Réponse reçue :", res); // Vérifie si le serveur répond
                         $('#documents-body').html(res['table-body']);
                         $('#pagination-container').html(res['pagination']);
-
-                        // Si on coche "Tout sélectionner", on garde l'état après rafraîchissement
-                        if ($('#selectAll').is(':checked')) $('.doc-checkbox').prop('checked', true);
+                    },
+                    error: function(err) {
+                        console.error("Erreur AJAX :", err); // Affiche l'erreur si le contrôleur plante
                     }
                 });
             }
 
             // Recherche avec délai (Debounce)
             let timer;
-            $('#searchInput').on('keyup', function () {
+            $('#searchInput').on('keyup', function() {
                 clearTimeout(timer);
                 state.search = $(this).val();
                 state.page = 1;
@@ -143,7 +205,7 @@
             });
 
             // Filtres par type
-            $('.log-tab').on('click', function () {
+            $('.log-tab').on('click', function() {
                 $('.log-tab').removeClass('active');
                 $(this).addClass('active');
                 state.type = $(this).data('type');
@@ -152,217 +214,106 @@
             });
 
             // Pagination (Capter les clics sur les liens de Laravel)
-            $(document).on('click', '#pagination-container a', function (e) {
+            $(document).on('click', '#pagination-container a', function(e) {
                 e.preventDefault();
                 state.page = $(this).attr('href').split('page=')[1];
                 updateUI();
             });
 
             // Checkbox Master
-            $('#selectAll').on('change', function () {
+            $('#selectAll').on('change', function() {
                 $('.doc-checkbox').prop('checked', $(this).prop('checked'));
             });
 
             // Archiver sélection
-            $('#bulkArchive').on('click', function () {
-                let ids = $('.doc-checkbox:checked').map(function () { return $(this).val(); }).get();
+            $('#bulkArchive').on('click', function() {
+                let ids = $('.doc-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
                 if (ids.length === 0) return alert('Sélectionnez au moins un document');
 
                 $.post("{{ route('admin.documents.bulk') }}", {
                     _token: "{{ csrf_token() }}",
                     ids: ids,
                     action: 'archive'
-                }, function () {
+                }, function() {
                     updateUI();
                 });
             });
 
+            // Fonction de suppression unique
+            function deleteDoc(id) {
+                if (confirm('Voulez-vous vraiment supprimer ce document ?')) {
+                    $.ajax({
+                        url: "/admin/documents/" + id,
+                        type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function() {
+                            updateUI();
+                        }
+                    });
+                }
+            }
+
+            // Téléchargement groupé
+            $('#bulkDownload').on('click', function() {
+                let ids = $('.doc-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                if (ids.length === 0) return alert('Sélectionnez au moins un document');
+
+                // Pour un téléchargement de fichier (ZIP), on utilise un formulaire temporaire
+                let form = $('<form>', {
+                    action: "{{ route('admin.documents.bulk') }}",
+                    method: 'POST'
+                });
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: '_token',
+                    value: "{{ csrf_token() }}"
+                }));
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'action',
+                    value: 'download'
+                }));
+                ids.forEach(id => form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'ids[]',
+                    value: id
+                })));
+                $('body').append(form);
+                form.submit().remove();
+            });
+
+            async function shareDocument(title, url) {
+                const fullUrl = window.location.origin + url;
+
+                // On vérifie si le navigateur supporte le partage natif
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Document ArchiSearch : ' + title,
+                            text: 'Voici un document partagé depuis ArchiSearch',
+                            url: fullUrl,
+                        });
+                        console.log('Partage réussi');
+                    } catch (err) {
+                        console.log('Erreur ou partage annulé :', err);
+                    }
+                } else {
+                    // Fallback : Si le partage natif n'est pas dispo, on copie le lien
+                    navigator.clipboard.writeText(fullUrl);
+                    alert('Partage natif non supporté. Le lien a été copié dans le presse-papiers.');
+                }
+            }
+
             // Rafraîchissement automatique (Toutes les 10 secondes)
-            setInterval(function () {
+            setInterval(function() {
                 updateUI(true);
             }, 10000);
         });
     </script>
-</x-admin-layout> -->
-
-<x-admin-layout active="documents" title="Documents - ArchiSearch">
-    <div class="page-header">
-        <!-- <div class="breadcrumb-small">Portail Admin > Événements > Collecte Contrats RH > Documents</div> -->
-        <h1>Documents de l'événement</h1>
-        <div class="admin-info">
-                <div class="avatar" style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                        @if(Auth::user()->avatar)
-                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
-                                alt="Avatar de {{ Auth::user()->name }}">
-                        @else
-                            <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
-                            {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
-                        @endif
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                    <span class="admin-name">{{ Auth::user()->name }}</span>
-                    <span class="admin-mail">{{ Auth::user()->role }}</span>
-                </div>
-            </div>
-    </div>
-
-    <!-- Controls Row -->
-    <div class="controls-row">
-        <div class="search-filter-group" style="flex: 2;">
-            <div class="input-wrapper" style="width: 350px; background: white; display: flex; justify-content: center; align-items: center; border-radius: 10px; gap: 5px;">
-                <svg class="input-icon" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" placeholder="Filtrer les documents..." style="width: 80%; padding: 0.75rem 1rem 0.75rem 1rem; border: none; outline: none;">
-            </div>
-            
-            <div class="log-tabs">
-                <button class="log-tab active">Tous</button>
-                <button class="log-tab">PDF</button>
-                <button class="log-tab">JPG</button>
-                <button class="log-tab">XLS</button>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 1rem;">
-            <button class="btn-outline">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                Tout télécharger
-            </button>
-            <button class="btn-primary" style="background: #1e3a8a; display: flex; align-items: center; gap: 10px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect width="22" height="5" x="1" y="3"/><line x1="10" x2="14" y1="12" y2="12"/></svg>
-                Archiver sélection
-            </button>
-        </div>
-    </div>
-
-    <!-- Data Table -->
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>DOCUMENT</th>
-                    <th>CATÉGORIE</th>
-                    <th>CONTRIBUTEUR</th>
-                    <th>DATE</th>
-                    <th>STATUT</th>
-                    <th>ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Doc 1 -->
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-pdf">PDF</div>
-                            <div class="text-sizes">
-                                <div style="font-weight: 700; color: #1e293b;">CNI_Dupont_2026.pdf</div>
-                                <div class="file-size">1.2 Mo</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="tag" style="background: #f1f5f9; color: #475569;">Identité</span></td>
-                    <td style="font-weight: 500;">J. Dupont</td>
-                    <td style="color: #64748b;">02 Avr</td>
-                    <td><span class="badge badge-green">Accepté</span></td>
-                    <td style="text-align: right;">
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
-                        <button class="action-btn" style="color: #ef4444;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
-                    </td>
-                </tr>
-
-                <!-- Doc 2 -->
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-pdf">PDF</div>
-                            <div class="text-sizes">
-                                <div style="font-weight: 700; color: #1e293b;">Contrat_Moreau_sign.pdf</div>
-                                <div class="file-size">2.8 Mo</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="tag" style="background: #f1f5f9; color: #475569;">Contrat</span></td>
-                    <td style="font-weight: 500;">A. Moreau</td>
-                    <td style="color: #64748b;">02 Avr</td>
-                    <td><span class="badge badge-green">Accepté</span></td>
-                    <td style="text-align: right;">
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
-                        <button class="action-btn" style="color: #ef4444;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
-                    </td>
-                </tr>
-
-                <!-- Doc 3 -->
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-pdf">PDF</div>
-                            <div class="text-sizes">
-                                <div style="font-weight: 700; color: #1e293b;">Facture_Kone_092.pdf</div>
-                                <div class="file-size">542 Ko</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="tag" style="background: #f1f5f9; color: #475569;">Finance</span></td>
-                    <td style="font-weight: 500;">M. Koné</td>
-                    <td style="color: #64748b;">03 Avr</td>
-                    <td><span class="badge badge-blue">En traitement</span></td>
-                    <td style="text-align: right;">
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
-                        <button class="action-btn" style="color: #ef4444;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
-                    </td>
-                </tr>
-
-                <!-- Doc 4 -->
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-jpg">JPG</div>
-                            <div class="text-sizes">
-                                <div style="font-weight: 700; color: #1e293b;">Photo_Pereira.jpg</div>
-                                <div class="file-size">3.1 Mo</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="tag" style="background: #f1f5f9; color: #475569;">Identité</span></td>
-                    <td style="font-weight: 500;">M. Pereira</td>
-                    <td style="color: #64748b;">03 Avr</td>
-                    <td><span class="badge badge-orange">À revoir</span></td>
-                    <td style="text-align: right;">
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
-                        <button class="action-btn" style="color: #ef4444;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
-                    </td>
-                </tr>
-
-                <!-- Doc 5 -->
-                <tr>
-                    <td style="border-bottom: none;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="file-icon-box bg-xls">XLS</div>
-                            <div class="text-sizes">
-                                <div style="font-weight: 700; color: #1e293b;">Bilan_Diallo_Q1.xlsx</div>
-                                <div class="file-size">128 Ko</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td style="border-bottom: none;"><span class="tag" style="background: #f1f5f9; color: #475569;">Finance</span></td>
-                    <td style="border-bottom: none; font-weight: 500;">F. Diallo</td>
-                    <td style="border-bottom: none; color: #64748b;">04 Avr</td>
-                    <td style="border-bottom: none;"><span class="badge badge-blue">Indexé</span></td>
-                    <td style="text-align: right; border-bottom: none;">
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></button>
-                        <button class="action-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
-                        <button class="action-btn" style="color: #ef4444;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
 </x-admin-layout>

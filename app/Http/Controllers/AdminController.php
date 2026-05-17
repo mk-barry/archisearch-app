@@ -1,11 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Events;
 use App\Models\Documents;
 use App\Models\DocumentType;
 use App\Models\AuthorizedStudent;
+use Illuminate\Support\Facades\Process; // Import indispensable
+use App\Http\Controllers\Log;
+// use App\Http\Controllers\Storage;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
+use ZipArchive;
 
 class AdminController extends Controller
 {
@@ -145,8 +152,8 @@ class AdminController extends Controller
     {
         // On récupère l'événement avec ses types de docs et les étudiants liés
         $event = Events::with(['documentTypes', 'authorizedStudent'])
-                       ->where('uuid', $uuid)
-                       ->firstOrFail();
+            ->where('uuid', $uuid)
+            ->firstOrFail();
 
         return view('admin.voir-event', compact('event'));
     }
@@ -159,7 +166,7 @@ class AdminController extends Controller
     {
         $query = Documents::with(['student', 'documentType']);
 
-        // 1. Recherche (Nom contributeur ou Nom fichier)
+        // --- RECHERCHE ---
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -170,35 +177,159 @@ class AdminController extends Controller
             });
         }
 
-        // 2. Filtre par type (Extension)
+        // --- FILTRE TYPE ---
         if ($request->filled('type') && $request->type !== 'Tous') {
             $query->where('file_type', 'like', "%" . strtolower($request->type) . "%");
         }
 
-        // 3. Pagination (10 éléments) + conservation des paramètres dans les liens
         $documents = $query->latest()->paginate(10)->withQueryString();
 
-        // 4. Réponse AJAX (Fragments uniquement)
+        // --- LOGIQUE DE FRAGMENT ---
         if ($request->ajax()) {
-            return response()->renderFragments([
-                'table-body' => view('admin.documents', compact('documents')),
-                'pagination' => view('admin.documents', compact('documents')),
+            // Si ton JS attend un objet JSON avec deux clés différentes :
+            return response()->json([
+                'table-body' => view('admin.documents', compact('documents'))->fragment('table-body'),
+                'pagination' => view('admin.documents', compact('documents'))->fragment('pagination'),
             ]);
         }
 
-        // 5. Vue initiale
         return view('admin.documents', compact('documents'));
     }
 
-    // Gestion des actions groupées (Archive / Téléchargement)
+    public function showDocumentAnalysis(Documents $document)
+    {
+        try {
+            // Décoder metadata si c'est une string, sinon utiliser tel quel
+            $metadata = is_string($document->metadata)
+                ? json_decode($document->metadata, true)
+                : $document->metadata;
+
+            $studentName = $document->student->name;
+
+            // On récupère le texte soit dans metadata, soit dans la colonne dédiée
+            $text = $metadata['extracted_text'] ?? $document->extracted_text ?? '';
+
+            $checkExpiry = $document->documentType?->is_perishable ?? false;
+
+            $data = json_encode([
+                'text' => $text,
+                'name' => $studentName,
+                'check_expiry' => (bool)$checkExpiry
+            ]);
+
+            $pythonPath = base_path('.venv\Scripts\python.exe');
+            $scriptPath = base_path('scripts/deep_analysis.py');
+
+            // Exécution avec la façade Process (plus stable)
+            $process = \Illuminate\Support\Facades\Process::run([
+                $pythonPath,
+                $scriptPath,
+                $data
+            ]);
+
+            if ($process->failed()) {
+                throw new \Exception("Script Python : " . $process->errorOutput());
+            }
+
+            $analysis = json_decode($process->output(), true);
+
+            // Sécurité si Python renvoie n'importe quoi
+            if (!isset($analysis['name_match'])) {
+                $analysis = [
+                    'name_match' => false,
+                    'name_score' => 0,
+                    'is_expired' => false,
+                    'flags' => ['Données d\'analyse manquantes']
+                ];
+            }
+
+            return view('admin.voir-document', compact('document', 'analysis'));
+        } catch (\Exception $e) {
+            \Log::error("Erreur Expertise : " . $e->getMessage());
+            return redirect()->route('admin.documents')->with('error', 'Analyse impossible : ' . $e->getMessage());
+        }
+    }
+
+    public function updateStatus(Request $request, Documents $document)
+    {
+        $request->validate([
+            'status' => 'required|in:valide,rejete,pending,Archivé'
+        ]);
+
+        try {
+            $document->update([
+                'status' => $request->status
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Le statut du document a été mis à jour avec succès.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // public function showDocument(Documents $document)
+    // {
+    //     $path = storage_path("app/public/" . $document->file_path);
+    //     if (!file_exists($path)) abort(404);
+
+    //     return response()->file($path);
+    // }
+
+    // Télécharger un document unique
+    public function downloadDocument(Documents $document)
+    {
+        return \Storage::disk('public')->download($document->file_path);
+    }
+
+    // Supprimer un document
+    public function destroyDocument(Documents $document)
+    {
+        // Supprimer le fichier physique
+        \Storage::disk('public')->delete($document->file_path);
+        // Supprimer l'entrée en base de données
+        $document->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    // Actions groupées (Bulk)
     public function bulkAction(Request $request)
     {
         $ids = $request->ids;
-        if ($request->action === 'archive') {
+        $action = $request->action;
+
+        if (!$ids || count($ids) === 0) return response()->json(['error' => 'Aucun document sélectionné'], 400);
+
+        if ($action === 'archive') {
             Documents::whereIn('id', $ids)->update(['status' => 'Archivé']);
             return response()->json(['success' => true]);
         }
-        // Pour le téléchargement, tu peux implémenter ta logique Zip ici
+
+        if ($action === 'download') {
+            $zip = new ZipArchive;
+            $zipName = 'documents_export_' . time() . '.zip';
+            $zipPath = storage_path('app/public/' . $zipName);
+
+            if ($zip->open($zipPath, ZipArchive::CREATE) === TRUE) {
+                $files = Documents::whereIn('id', $ids)->get();
+                foreach ($files as $file) {
+                    $filePath = storage_path("app/public/" . $file->file_path);
+                    if (file_exists($filePath)) {
+                        $zip->addFile($filePath, basename($file->file_path));
+                    }
+                }
+                $zip->close();
+                return response()->download($zipPath)->deleteFileAfterSend(true);
+            }
+        }
+
+        return response()->json(['error' => 'Action inconnue'], 400);
     }
 
     // =======================================================================================

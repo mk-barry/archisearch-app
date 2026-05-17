@@ -97,7 +97,7 @@ class GuestController extends Controller
     public function upload($uuid)
     {
         $event = Events::with('documentTypes')->where('uuid', $uuid)->firstOrFail();
-        
+
         // Sécurité session
         if (session('auth_event_uuid') !== $uuid) {
             return redirect()->route('invitation.identification', $uuid);
@@ -118,75 +118,76 @@ class GuestController extends Controller
      * Étape 4 : Traitement du fichier (Logique demandée)
      */
     public function storeDocument(Request $request, $uuid)
-{
-    $event = Events::where('uuid', $uuid)->firstOrFail();
-    $docType = DocumentType::where('id', $request->document_type_id)->firstOrFail();
+    {
+        $event = Events::where('uuid', $uuid)->firstOrFail();
+        $docType = DocumentType::where('id', $request->document_type_id)->firstOrFail();
 
-    $request->validate([
-        'document' => ['required', 'file', 'mimes:pdf,jpg,png,jpeg', 'max:' . ($docType->max_size_kb ?? 2048)]
-    ]);
+        $request->validate([
+            'document' => ['required', 'file', 'mimes:pdf,jpg,png,jpeg', 'max:' . ($docType->max_size_kb ?? 2048)]
+        ]);
 
-    $file = $request->file('document');
-    $matricule = session('student_matricule');
-    $path = $file->storeAs("documents/{$matricule}/{$event->id}", time() . '_' . $file->getClientOriginalName(), 'public');
-    $fullPath = storage_path("app/public/" . $path);
-    $pythonPath = base_path('.venv\Scripts\python.exe');
+        $file = $request->file('document');
+        $matricule = session('student_matricule');
+        $path = $file->storeAs("documents/{$matricule}/{$event->id}", time() . '_' . $file->getClientOriginalName(), 'public');
+        $fullPath = storage_path("app/public/" . $path);
+        $pythonPath = base_path('.venv\Scripts\python.exe');
 
-    // --- LOGIQUE OCR ---
-    $scriptPath = base_path('scripts/ocr_script.py');
-    
-    // Préparation des règles JSON issues de ta BD
-    $rules = json_encode([
-        'keywords' => $docType->validation_rules['keywords'] ?? [],
-        'min_score' => $docType->validation_rules['min_score'] ?? 1
-    ]);
+        // --- LOGIQUE OCR ---
+        $scriptPath = base_path('scripts/ocr_script.py');
 
-    // Exécution (Attention aux guillemets pour les chemins Windows/Linux)
-    $process = Process::run([
-        $pythonPath,
-        $scriptPath,
-        $fullPath,
-        $rules
-    ]);
+        // Préparation des règles JSON issues de ta BD
+        $rules = json_encode([
+            'keywords' => $docType->validation_rules['keywords'] ?? [],
+            'min_score' => $docType->validation_rules['min_score'] ?? 1
+        ]);
 
-    if (!$process->successful()) {
-        \Storage::disk('public')->delete($path);
-        $errorOutput = $process->errorOutput(); // Récupère l'erreur réelle de Python
-        \Log::error("Erreur OCR : " . $errorOutput); // Écrit l'erreur dans storage/logs/laravel.log
-        return response()->json(['success' => false, 'message' => 'Erreur technique OCR.'], 500);
+        // Exécution (Attention aux guillemets pour les chemins Windows/Linux)
+        $process = Process::run([
+            $pythonPath,
+            $scriptPath,
+            $fullPath,
+            $rules
+        ]);
+
+        if (!$process->successful()) {
+            \Storage::disk('public')->delete($path);
+            $errorOutput = $process->errorOutput(); // Récupère l'erreur réelle de Python
+            \Log::error("Erreur OCR : " . $errorOutput); // Écrit l'erreur dans storage/logs/laravel.log
+            return response()->json(['success' => false, 'message' => 'Erreur technique OCR.'], 500);
+        }
+
+        $ocrData = json_decode($process->output(), true);
+
+        // Si le script Python renvoie un statut d'erreur ou is_valid = false
+        if ($ocrData['status'] === 'error' || (isset($ocrData['is_valid']) && !$ocrData['is_valid'])) {
+            \Storage::disk('public')->delete($path);
+            return response()->json([
+                'success' => false,
+                'message' => 'Document non conforme : ' . ($ocrData['message'] ?? 'Critères de validation non atteints.')
+            ], 422);
+        }
+
+        // --- ENREGISTREMENT FINAL ---
+        $document = Documents::create([
+            'event_id' => $event->id,
+            'document_type_id' => $docType->id,
+            'identifier' => $matricule,
+            'tracking_code' => 'AS-' . strtoupper(Str::random(8)),
+            'file_path' => $path,
+            'file_type' => $file->getClientOriginalExtension(),
+            'file_size' => round($file->getSize() / 1024),
+            'category' => $docType->label,
+            'status' => 'pending',
+            'metadata' => [
+                'score_ocr' => $ocrData['score'],
+                'mots_trouves' => $ocrData['match_keywords'] ?? [],
+                'validated_at' => now()->toDateTimeString()
+            ],
+            'extracted_text' => $ocrData['extracted_text'] ?? ''
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Document validé et enregistré.']);
     }
-
-    $ocrData = json_decode($process->output(), true);
-
-    // Si le script Python renvoie un statut d'erreur ou is_valid = false
-    if ($ocrData['status'] === 'error' || (isset($ocrData['is_valid']) && !$ocrData['is_valid'])) {
-        \Storage::disk('public')->delete($path);
-        return response()->json([
-            'success' => false, 
-            'message' => 'Document non conforme : ' . ($ocrData['message'] ?? 'Critères de validation non atteints.')
-        ], 422);
-    }
-
-    // --- ENREGISTREMENT FINAL ---
-    $document = Documents::create([
-        'event_id' => $event->id,
-        'identifier' => $matricule,
-        'tracking_code' => 'AS-' . strtoupper(Str::random(8)),
-        'file_path' => $path,
-        'file_type' => $file->getClientOriginalExtension(),
-        'file_size' => round($file->getSize() / 1024),
-        'category' => $docType->label,
-        'status' => 'pending', 
-        'metadata' => [
-            'score_ocr' => $ocrData['score'],
-            'mots_trouves' => $ocrData['match_keywords'] ?? [],
-            'validated_at' => now()->toDateTimeString()
-        ],
-        'extracted_text' => $ocrData['extracted_text'] ?? ''
-    ]);
-
-    return response()->json(['success' => true, 'message' => 'Document validé et enregistré.']);
-}
 
     public function confirmation(Request $request, $uuid)
     {
@@ -216,7 +217,7 @@ class GuestController extends Controller
         if ($documents->isEmpty()) {
             // On le renvoie vers la page de téléversement avec un message d'erreur
             return redirect()->route('invitation.upload', ['uuid' => $uuid])
-                             ->with('error', 'Vous devez téléverser au moins un document avant d\'accéder à la confirmation.');
+                ->with('error', 'Vous devez téléverser au moins un document avant d\'accéder à la confirmation.');
         }
 
         // 4. Envoyer les données à la vue
@@ -238,10 +239,10 @@ class GuestController extends Controller
         $events = Events::whereHas('documents', function ($query) use ($matricule) {
             $query->where('identifier', $matricule);
         })->withCount([
-                    'documents' => function ($query) use ($matricule) {
-                        $query->where('identifier', $matricule);
-                    }
-                ])->latest()->get();
+            'documents' => function ($query) use ($matricule) {
+                $query->where('identifier', $matricule);
+            }
+        ])->latest()->get();
 
         return view('user.history', compact('events'));
     }

@@ -1,7 +1,9 @@
 <x-admin-layout active="archives" title="Archives documentaires - ArchiSearch">
     <div class="page-header">
-        <div class="breadcrumb-small">Portail Admin > Archives</div>
-        <h1>Archives documentaires</h1>
+        <div class="page-info">
+            <div class="breadcrumb-small">Portail Admin > Archives</div>
+            <h1>Archives documentaires</h1>
+        </div>
         <div class="admin-info">
                 <div class="avatar" style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
                         @if(Auth::user()->avatar)
