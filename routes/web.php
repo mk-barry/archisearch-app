@@ -74,16 +74,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/extension', [SuperAdminController::class, 'storeExtension'])->name('extensions.store');
         Route::post('/extensions/{extension}', [SuperAdminController::class, 'destroyExtension'])->name('extensions.destroy');
 
-
-
         Route::get('/administrateurs/edit/{user}', [UserController::class, 'edit'])->name('administrateurs.edit');
         Route::patch('/administrateurs/toggle-status/{user}', [UserController::class, 'toggleStatus'])->name('toggle-status');
     });
 
     // Profile Routes
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile.view');
-    // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Route::get('/profile', [UserController::class, 'profile'])->name('profile.view');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
