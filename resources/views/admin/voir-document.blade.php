@@ -55,22 +55,35 @@
             <!-- Formulaire de Décision -->
             <div class="card">
                 <h4>Décision Finale</h4>
-                <form id="decisionForm">
+                <form id="decisionForm" method="POST">
+                    @csrf
+                    @method('PATCH')
                     <textarea id="adminComment" style="width: 100%; min-height: 100px; border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" placeholder="Commentaire facultatif..."></textarea>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem;">
                         <button type="button" onclick="submitDecision('valide')" class="btn-primary" style="background: #10b981;">Valider</button>
                         <button type="button" onclick="submitDecision('rejete')" class="btn-primary" style="background: #ef4444;">Rejeter</button>
                     </div>
-                    <button type="button" onclick="submitDecision('archive')" class="btn-outline" style="width: 100%; margin-top: 10px;">Archiver sans valider</button>
+                    <!-- <button type="button" onclick="submitDecision('archive')" class="btn-outline" style="width: 100%; margin-top: 10px;">Archiver sans valider</button> -->
                 </form>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
     <script>
         function submitDecision(status) {
+            const comment = document.getElementById('adminComment').value.trim();
+            if (status === 'rejete' && comment.lenght < 5) {
+                Swal.fire({
+                    title: 'Action requise',
+                    text: "Vous devez saisir un motif de rejet plus explicite",
+                    icon: 'stop',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444'
+                });
+                return;
+            }
             Swal.fire({
                 title: 'Confirmer la décision ?',
                 text: "Le statut passera en : " + status,
@@ -79,15 +92,21 @@
                 confirmButtonColor: '#1e3a8a'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    if (status === 'valide') {
+                        status = 'validated'
+                    } else {
+                        status = 'rejected'
+                    }
                     fetch("{{ route('admin.documents.updateStatus', $document->id) }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         body: JSON.stringify({
                             status: status,
-                            comment: document.getElementById('adminComment').value
+                            comment: comment
                         })
                     })
                     .then(response => response.json())

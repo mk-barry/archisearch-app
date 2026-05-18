@@ -24,10 +24,29 @@ def analyze():
         expected_name = data.get('name', '')
         check_expiry = data.get('check_expiry', False)
 
+        # --- REMPLACE LA SECTION 1 PAR CELLE-CI ---
+
         # 1. Matching du nom
-        score = SequenceMatcher(None, expected_name.lower(), text.lower()).ratio()
-        result["name_score"] = round(score, 2)
-        result["name_match"] = score > 0.7 or expected_name.lower() in text.lower()
+        expected_name_clean = expected_name.lower().strip()
+        text_clean = text.lower().replace(" ", "") # On enlève les espaces du texte extrait pour comparer
+
+        # On calcule le score classique (ratio)
+        score = SequenceMatcher(None, expected_name_clean, text.lower()).ratio()
+
+        # NOUVELLE LOGIQUE : Vérification par mots individuels
+        # On sépare "Orielle Onana" en ["orielle", "onana"]
+        name_parts = expected_name_clean.split()
+        found_parts = 0
+
+        for part in name_parts:
+            if part in text_clean: # On cherche si "orielle" est dans "onanaalbeneoriellejoelle"
+                found_parts += 1
+
+        # Le match est validé si le score est bon OU si TOUS les prénoms sont présents dans le bloc collé
+        is_name_present = (found_parts == len(name_parts)) and len(name_parts) > 0
+
+        result["name_score"] = round(max(score, found_parts/len(name_parts) if len(name_parts) > 0 else 0), 2)
+        result["name_match"] = score > 0.7 or is_name_present
 
         # 2. Vérification d'expiration
         if check_expiry:

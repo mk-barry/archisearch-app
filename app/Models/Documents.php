@@ -17,10 +17,15 @@ class Documents extends Model
         'file_size',
         'category',
         'status',
-        'metadata'
+        'metadata',
+        'extracted_text',
+        'rejection_reason',
+        'processed_by',
+        'processed_at',
     ];
 
     protected $casts = [
+        'processed_at' => 'datetime',
         'metadata' => 'array',
     ];
 
@@ -42,6 +47,11 @@ class Documents extends Model
     public function student(): BelongsTo
     {
         return $this->belongsTo(AuthorizedStudent::class, 'identifier', 'matricule');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'processed_by');
     }
 
     /**

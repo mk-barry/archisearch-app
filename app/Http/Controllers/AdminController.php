@@ -253,12 +253,19 @@ class AdminController extends Controller
     public function updateStatus(Request $request, Documents $document)
     {
         $request->validate([
-            'status' => 'required|in:valide,rejete,pending,Archivé'
+            'status' => 'required|in:validated,rejected,pending,error',
+            'comment' => 'required_if:status,rejected|nullable|string|min:5'
+        ],[
+            'comment.required_if' => 'Veuillez preciser le motif du rejet',
+            'comment.min' => 'Le motif doit etre plus detaille (min. 5 caracteres)'
         ]);
 
         try {
             $document->update([
-                'status' => $request->status
+                'status' => $request->status,
+                'rejection_reason' => $request->comment,
+                'processed_at' => now(),
+                'processed_by' => auth()->id()
             ]);
 
             return response()->json([

@@ -20,17 +20,18 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::controller(GuestController::class)->prefix('invitation')->name('invitation.')->group(function () {
 
     // 1. Routes Libres : L'étudiant arrive ici pour s'identifier
+    Route::get('/historique', 'history')->name('history');
     Route::get('/{uuid}', 'invitation')->name('home');
     Route::get('/identification/{uuid}', 'identification')->name('identification');
     Route::post('/verify/{uuid}', 'verifyIdentification')->name('verify'); // La route qui crée la session
 
     // 2. Routes Protégées : L'étudiant doit être identifié (Middleware student.auth)
     Route::middleware(['student.auth', 'student.allowed'])->group(function () {
+        
+        Route::get('/logout', 'logout')->name('logout');
         Route::get('/televersement/{uuid}', 'upload')->name('upload');
         Route::post('/televersement/{uuid}/store', 'storeDocument')->name('store.document');
         Route::get('/confirmation/{uuid}', 'confirmation')->name('confirmation');
-        Route::get('/historique', 'history')->name('history');
-        Route::post('/logout', 'logout')->name('logout');
     });
 });
 
@@ -53,7 +54,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/document/{document}/download', [AdminController::class, 'downloadDocument'])->name('documents.download');
         Route::delete('/document/{document}', [AdminController::class, 'destroyDocument'])->name('documents.destroy');
         Route::post('/bulk', [AdminController::class, 'bulkAction'])->name('documents.bulk');
-        Route::patch('/document/{document}/status', [AdminController::class, 'updateStatus'])->name('documents.updateStatus');
+        Route::post('/document/{document}/status', [AdminController::class, 'updateStatus'])->name('documents.updateStatus');
         Route::get('/recherche', [AdminController::class, 'recherche'])->name('recherche');
         Route::get('/archives', [AdminController::class, 'archives'])->name('archives');
         Route::get('/cloud', [AdminController::class, 'cloud'])->name('cloud');

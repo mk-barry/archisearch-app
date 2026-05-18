@@ -42,7 +42,7 @@ def validate(file_path, rules):
         if not text.strip():
             return {"status": "error", "message": "Aucun texte détecté."}
         
-        raw_text = text
+        # raw_text = text
 
         # 2. Logique de scoring basée sur la BD
         score = 0
@@ -62,7 +62,7 @@ def validate(file_path, rules):
             "score": score,
             "min_required": min_score,
             "match_keywords": found_keywords,
-            "extracted_text": raw_text,
+            "extracted_text": text,
             "is_valid": valid,
             # "preview": text[:100] # Optionnel pour debug
         }
