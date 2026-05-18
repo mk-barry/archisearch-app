@@ -253,4 +253,8 @@ class UserController extends Controller
         return response()->json(['status' => 'online']);
         // return response()->json(['status' => 'offline'], 401);
     }
+
+    public function profile(){
+        return view ('profile');
+    }
 }
