@@ -86,4 +86,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Documents::class, 'processed_by', 'id');
     }
+
+    public function savedSearches()
+    {
+        return $this->hasMany(SavedSearch::class)->latest();
+    }
 }

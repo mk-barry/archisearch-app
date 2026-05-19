@@ -4,9 +4,13 @@
             <h1>Documents de l'événement</h1>
         </div>
         <div class="admin-info">
-            <div class="avatar"
-                style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+            <div class="avatar" style="width: 50px; height: 50px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
+                @if(Auth::user()->avatar_path)
+                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar de {{ Auth::user()->name }}"  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #1e3a8a;">
+                @else
+                    <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
+                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+                @endif
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-start;">
                 <span class="admin-name">{{ Auth::user()->name }}</span>

@@ -12,6 +12,7 @@ class Documents extends Model
         'document_type_id', // Assure-toi que cette colonne existe dans ta migration
         'identifier',
         'tracking_code',
+        'title',
         'file_path',
         'file_type',
         'file_size',

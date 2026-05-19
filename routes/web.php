@@ -56,6 +56,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/bulk', [AdminController::class, 'bulkAction'])->name('documents.bulk');
         Route::post('/document/{document}/status', [AdminController::class, 'updateStatus'])->name('documents.updateStatus');
         Route::get('/recherche', [AdminController::class, 'recherche'])->name('recherche');
+        Route::get('/recherche/save', [AdminController::class, 'sauvegarderRecherche'])->name('recherche.save');
+        // Route::get('/recherche/search_result', [AdminController::class, 'recherche'])->name('recherche.partial');
         Route::get('/archives', [AdminController::class, 'archives'])->name('archives');
         Route::get('/cloud', [AdminController::class, 'cloud'])->name('cloud');
     });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Events;
+use App\Models\User;
 use App\Models\Documents;
 use App\Models\DocumentType;
 use App\Models\AuthorizedStudent;
@@ -18,7 +19,47 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        return view('admin.dashboard');
+        // 1. Stats des Cartes
+        $stats = [
+            'evenements_actifs' => Events::where('status', 'actif')->count(),
+            'docs_recus_semaine' => Documents::where('created_at', '<=', now()->startOfWeek())->count(),
+            'en_attente' => Documents::where('status', 'pending')->count(),
+            'anomalies' => Documents::where('rejection_reason', 'like', '%fraude%')
+                ->orWhere('status', 'rejected')->count(),
+        ];
+
+        // 2. Données pour le Graphique (7 derniers jours)
+        $last7Days = collect(range(6, 0))->map(function ($i) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            return [
+                'label' => now()->subDays($i)->translatedFormat('D'),
+                'count' => Documents::whereDate('created_at', $date)->count()
+            ];
+        });
+
+        // 3. Stats des événements (Progress bars)
+        $evenementStats = [
+            'actifs' => Events::where('status', 'actif')->count(),
+            'clotures' => Events::where('status', 'cloture')->count(),
+            'brouillons' => Events::where('status', 'brouillon')->count(),
+            'archives' => Events::where('status', 'archive')->count(),
+            'total' => Events::count() ?: 1, // Éviter division par 0
+        ];
+
+        // 4. Derniers téléversements
+        $derniersDocs = Documents::with(['student', 'event'])
+            ->latest()
+            ->take(4)
+            ->get();
+
+        // 5. Invités sans soumission (Exemple : Users qui n'ont aucun document lié)
+        $invitesEnAttente = User::where('role', 'student')
+            ->whereDoesntHave('documents')
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'last7Days', 'evenementStats', 'derniersDocs', 'invitesEnAttente'));
     }
 
     // =======================================================================================
@@ -342,9 +383,49 @@ class AdminController extends Controller
     // =======================================================================================
     // =====================================Recherche=========================================
     // =======================================================================================
-    public function recherche()
+    public function recherche(Request $request)
     {
-        return view('admin.recherche');
+        $query = Documents::query()->with(['student', 'event']);
+
+        // Filtre par mot-clé (Titre ou Nom de l'étudiant)
+        if ($request->filled('q')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', "%{$request->q}%")
+                    ->orWhereHas('student', function ($sq) use ($request) {
+                        $sq->where('name', 'like', "%{$request->q}%");
+                    });
+            });
+        }
+
+        // Filtre par Statuts (submitted, pending, validated, rejected, error)
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $results = $query->latest()->paginate(10);
+
+        // Récupérer les 10 dernières recherches sauvegardées de l'utilisateur
+        $savedSearches = auth()->user()->savedSearches()->latest()->take(10)->get();
+
+        // if ($request->ajax()) {
+        //     return view('admin.partials.search_result', compact('results', 'savedSearches'))->render();
+        // }
+
+        return view('admin.recherche', compact('results', 'savedSearches'));
+    }
+
+    // Fonction pour sauvegarder via AJAX
+    public function sauvegarderRecherche(Request $request)
+    {
+        auth()->user()->savedSearches()->create([
+            'keyword' => $request->q,
+            'filters' => [
+                'status' => $request->status,
+                'date' => $request->date
+            ]
+        ]);
+
+        return response()->json(['success' => true]);
     }
     public function archives()
     {

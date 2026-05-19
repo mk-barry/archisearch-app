@@ -173,6 +173,7 @@ class GuestController extends Controller
             'document_type_id' => $docType->id,
             'identifier' => $matricule,
             'tracking_code' => 'AS-' . strtoupper(Str::random(8)),
+            'title' => time() . '_' . $file->getClientOriginalName(),
             'file_path' => $path,
             'file_type' => $file->getClientOriginalExtension(),
             'file_size' => round($file->getSize() / 1024),

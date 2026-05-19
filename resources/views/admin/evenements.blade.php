@@ -5,10 +5,9 @@
             <h1>Gestion des événements</h1>
         </div>
         <div class="admin-info">
-            <div class="avatar"
-                style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                @if(Auth::user()->avatar)
-                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar de {{ Auth::user()->name }}">
+            <div class="avatar" style="width: 50px; height: 50px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
+                @if(Auth::user()->avatar_path)
+                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar de {{ Auth::user()->name }}"  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #1e3a8a;">
                 @else
                     <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
                     {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
@@ -71,9 +70,9 @@
 
                                 <div class="event-progress-section">
                                     @php
-                $percentage = $event->total_expected > 0
-                    ? ($event->submissions_count / $event->total_expected) * 100
-                    : 0;
+    $percentage = $event->total_expected > 0
+        ? ($event->submissions_count / $event->total_expected) * 100
+        : 0;
                                     @endphp
                                     <div class="compact-progress-bg" style="height: 10px; background: #f1f5f9;">
                                         <!-- <div class="compact-progress-fill" style="width: {{ $percentage }}%; background: #2563eb;"></div> -->

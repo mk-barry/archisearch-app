@@ -33,7 +33,7 @@ class SuperAdminController extends Controller
         $docsThisWeek = Documents::where('created_at', '>=', now()->startOfWeek())->count();
 
         // Anomalies (ex: documents rejetés ou erreurs de checksum)
-        $anomalies = Documents::where('status', 'rejectes')->count();
+        $anomalies = Documents::where('status', 'rejected')->count();
 
         // --- CHART 1 : ACTIVITÉ (7 derniers jours) ---
         $days = collect(range(6, 0))->map(function ($i) {
