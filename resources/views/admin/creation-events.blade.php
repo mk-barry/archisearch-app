@@ -1,9 +1,9 @@
-<x-admin-layout sec_css="{{ asset('css/dashboard/main.css') }}" active="evenements">
+<x-admin-layout sec_css="{{  asset('css/dashboard/main.css') }}" active="evenements">
     <x-slot:title>Créer un événement - ArchiSearch</x-slot>
 
     <div class="page-header">
         <div class="page-info">
-            <div class="breadcrumb-small">Admin > Événements > Nouveau</div>
+            <div class="breadcrumb-small">Super Admin > Événements > Nouveau</div>
             <h1>Créer un nouvel événement</h1>
         </div>
         <div class="admin-info">
