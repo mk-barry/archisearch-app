@@ -72,7 +72,8 @@
                     <div class="context-details">
                         <div class="context-title">{{ $event->title }}</div>
                         <div class="context-meta">
-                            {{ is_array($event->required_docs) ? count($event->required_docs) : 0 }} documents à soumettre ·
+                            {{ ($event->documentTypes) ? count($event->documentTypes) : 0 }} document(s) à soumettre ·
+                            <!-- {{ ($event->documentTypes) ? count($event->documentTypes) - count($event->documents->pluck('document_type_id')->unique()) : 0 }} documents à soumettre · -->
                             Expire le {{ $event->end_date->format('d M Y') }}
                         </div>
                     </div>

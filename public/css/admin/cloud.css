@@ -1,4 +1,20 @@
-/* Cloud Backup Interface Styles */
+.cloud-container { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; margin-top: 1.5rem; }
+.cloud-config-col { width: 30%; flex-shrink: 0; display: flex; flex-direction: column; gap: 1.5rem; }
+.cloud-status-col { width: 65%; flex-shrink: 0; flex-grow: 1; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.cloud-card { background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); }
+.cloud-card-title { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 1.25rem; }
+
+.selection-card { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.2s; width: 100%; }
+.selection-card:hover { border-color: #cbd5e1; }
+.selection-card.active { border-color: var(--primary-blue); background: #eff6ff; }
+.selection-card input[type="radio"] { width: 20px; height: 20px; margin-right: 0.75rem; accent-color: var(--primary-blue); cursor: pointer; display: none; }
+.selection-card.active input[type="radio"] { display: block; }
+.icon-inner { width: 40px; height: 40px; background: #f1f5f9; color: #64748b; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.selection-card.active .icon-inner { background: var(--primary-blue); color: white; }
+.selection-title { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+.selection-desc { font-size: 0.8rem; color: #94a3b8; }
+
 .selection-card {
     background: white;
     border: 1px solid var(--border-color);
@@ -48,24 +64,42 @@
     color: white;
 }
 
-.cloud-stat-box {
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-align: center;
-    flex: 1;
+.selection-card .dot {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.cloud-stat-box .number {
-    font-size: 1.75rem;
-    font-weight: 800;
-    margin-bottom: 4px;
+.selection-card.active .dot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--primary-blue);
+    border-radius: 50%;
 }
 
-.cloud-stat-box .label {
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
+.cloud-stats-row { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.cloud-stat-box { border-radius: 16px; padding: 1.5rem; text-align: center; flex: 1; min-width: 120px; }
+.cloud-stat-box .number { font-size: 1.75rem; font-weight: 800; margin-bottom: 4px; }
+.cloud-stat-box .label { font-size: 0.85rem; font-weight: 600; }
 .bg-green-light { background: #ecfdf5; border: 1px solid #10b981; color: #10b981; }
 .bg-orange-light { background: #fffcf0; border: 1px solid #f59e0b; color: #f59e0b; }
 .bg-red-light { background: #fef2f2; border: 1px solid #ef4444; color: #ef4444; }
+
+.chart-box { height: 250px; border: 1px dashed #e2e8f0; border-radius: 10px; width: 100%; }
+.status-table th { padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+.status-table td { padding: 1.25rem 0; border-bottom: 1px solid #f1f5f9; }
+.status-table tr:last-child td { border-bottom: none; }
+.doc-name { font-weight: 600; color: #475569; }
+.doc-category { color: #64748b; }
+.doc-date { color: #94a3b8; }
+
+@media screen and (max-width: 1024px) {
+    .cloud-container { flex-direction: column; }
+    .cloud-config-col, .cloud-status-col { width: 100%; }
+}

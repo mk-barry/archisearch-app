@@ -1,9 +1,9 @@
-<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="evenements">
+<x-admin-layout sec_css="{{ asset('css/dashboard/main.css') }}" active="evenements">
     <x-slot:title>Créer un événement - ArchiSearch</x-slot>
 
     <div class="page-header">
         <div class="page-info">
-            <div class="breadcrumb-small">Super Admin > Événements > Nouveau</div>
+            <div class="breadcrumb-small">Admin > Événements > Nouveau</div>
             <h1>Créer un nouvel événement</h1>
         </div>
         <div class="admin-info">
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="form-container" style="max-width: 850px; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-top: 20px;">
+    <div class="form-container" style="max-width: 850px; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin: 0 auto;">
         <form action="{{ route('admin.events.store') }}" method="POST" id="createEventForm">
             @csrf
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
