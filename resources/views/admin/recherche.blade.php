@@ -1,4 +1,4 @@
-<x-admin-layout active="recherche" title="Recherche de documents - ArchiSearch">
+<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="recherche" title="Recherche de documents - ArchiSearch">
     <div class="page-header">
         <div class="page-info">
             <div class="breadcrumb-small">Portail Admin > Recherche</div>
@@ -67,7 +67,7 @@
                 <select name="date" class="select-filter" onchange="this.form.submit()">
                     <option>Date : Toutes</option>
                 </select>
-                <select name="uploder" class="select-filter" onchange="this.form.submit()">
+                <select name="uploader" class="select-filter" onchange="this.form.submit()">
                     <option>Auteur : Tous</option>
                 </select>
                 <select name="status" class="select-filter" onchange="this.form.submit()">

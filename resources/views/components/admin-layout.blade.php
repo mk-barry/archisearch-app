@@ -1,4 +1,4 @@
-@props(['active' => 'dashboard', 'title' => 'ArchiSearch - Admin Dashboard'])
+@props(['pri_css' => '', 'sec_css' => '', 'active' => 'dashboard', 'title' => 'ArchiSearch - Admin Dashboard'])
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -8,7 +8,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title }}</title>
-    <link rel="stylesheet" href="{{ asset('css/dashboard/main.css') }}">
+    <link rel="stylesheet" href="{{ $pri_css }}">
+    <link rel="stylesheet" href="{{ $sec_css }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,6 +24,8 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- @yield('css') -->
 </head>
 
 <body>

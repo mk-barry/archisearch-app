@@ -1,4 +1,4 @@
-<x-admin-layout active="dashboard">
+<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="dashboard">
     <div class="page-header">
         <h1>Tableau de bord</h1>
         <div class="admin-info">

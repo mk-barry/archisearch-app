@@ -1,4 +1,4 @@
-<x-admin-layout active="documents" title="Analyse Document - ArchiSearch">
+<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="documents" title="Analyse Document - ArchiSearch">
     <div class="page-header">
         <div class="page-info">
             <h1>Expertise : {{ basename($document->file_path) }}</h1>

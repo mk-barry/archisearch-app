@@ -37,7 +37,7 @@ class Documents extends Model
     {
         // On lie via 'document_type_id' ou 'category' selon ta structure
         // Si ta colonne s'appelle 'category' et contient l'ID :
-        return $this->belongsTo(DocumentType::class, 'category');
+        return $this->belongsTo(DocumentType::class, 'document_type_id');
     }
 
     public function event(): BelongsTo

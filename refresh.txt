@@ -6,3 +6,58 @@
                     }
                 }, 15000);
             });
+
+
+public function showDocumentAnalysis(Documents $document)
+    {
+        try {
+            // Décoder metadata si c'est une string, sinon utiliser tel quel
+            $metadata = is_string($document->metadata)
+                ? json_decode($document->metadata, true)
+                : $document->metadata;
+
+            $studentName = $document->student->name;
+
+            // On récupère le texte soit dans metadata, soit dans la colonne dédiée
+            $text = $metadata['extracted_text'] ?? $document->extracted_text ?? '';
+
+            $checkExpiry = $document->documentType?->is_perishable ?? false;
+
+            $data = json_encode([
+                'text' => $text,
+                'name' => $studentName,
+                'check_expiry' => (bool)$checkExpiry
+            ]);
+
+            $pythonPath = base_path('.venv\Scripts\python.exe');
+            $scriptPath = base_path('scripts/deep_analysis.py');
+
+            // Exécution avec la façade Process (plus stable)
+            $process = \Illuminate\Support\Facades\Process::run([
+                $pythonPath,
+                $scriptPath,
+                $data
+            ]);
+
+            if ($process->failed()) {
+                throw new \Exception("Script Python : " . $process->errorOutput());
+            }
+
+            $analysis = json_decode($process->output(), true);
+
+            // Sécurité si Python renvoie n'importe quoi
+            if (!isset($analysis['name_match'])) {
+                $analysis = [
+                    'name_match' => false,
+                    'name_score' => 0,
+                    'is_expired' => false,
+                    'flags' => ['Données d\'analyse manquantes']
+                ];
+            }
+
+            return view('admin.doc-view', compact('document', 'analysis'));
+        } catch (\Exception $e) {
+            \Log::error("Erreur Expertise : " . $e->getMessage());
+            return redirect()->route('admin.documents')->with('error', 'Analyse impossible : ' . $e->getMessage());
+        }
+    }

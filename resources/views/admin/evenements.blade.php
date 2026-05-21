@@ -1,4 +1,4 @@
-<x-admin-layout active="evenements" title="Gestion des événements - ArchiSearch">
+<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="evenements" title="Gestion des événements - ArchiSearch">
     <div class="page-header">
         <div class="page-info">
             <div class="breadcrumb-small">Admin > Evenements</div>

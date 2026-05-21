@@ -53,7 +53,7 @@ class AdminController extends Controller
             ->get();
 
         // 5. Invités sans soumission (Exemple : Users qui n'ont aucun document lié)
-        $invitesEnAttente = User::where('role', 'student')
+        $invitesEnAttente = AuthorizedStudent::where('matricule')
             ->whereDoesntHave('documents')
             ->latest()
             ->take(4)
@@ -238,58 +238,134 @@ class AdminController extends Controller
     }
 
     public function showDocumentAnalysis(Documents $document)
-    {
-        try {
-            // Décoder metadata si c'est une string, sinon utiliser tel quel
-            $metadata = is_string($document->metadata)
-                ? json_decode($document->metadata, true)
-                : $document->metadata;
+{
+    try {
 
-            $studentName = $document->student->name;
+        $metadata = is_string($document->metadata)
+            ? json_decode($document->metadata, true)
+            : ($document->metadata ?? []);
 
-            // On récupère le texte soit dans metadata, soit dans la colonne dédiée
-            $text = $metadata['extracted_text'] ?? $document->extracted_text ?? '';
+        $text = $metadata['extracted_text']
+            ?? $document->extracted_text
+            ?? '';
 
-            $checkExpiry = $document->documentType?->is_perishable ?? false;
+        $student = $document->student;
 
-            $data = json_encode([
-                'text' => $text,
-                'name' => $studentName,
-                'check_expiry' => (bool)$checkExpiry
-            ]);
+        $documentType = $document->documentType;
 
-            $pythonPath = base_path('.venv\Scripts\python.exe');
-            $scriptPath = base_path('scripts/deep_analysis.py');
+        $rules = $documentType?->validation_rules;
 
-            // Exécution avec la façade Process (plus stable)
-            $process = \Illuminate\Support\Facades\Process::run([
-                $pythonPath,
-                $scriptPath,
-                $data
-            ]);
-
-            if ($process->failed()) {
-                throw new \Exception("Script Python : " . $process->errorOutput());
-            }
-
-            $analysis = json_decode($process->output(), true);
-
-            // Sécurité si Python renvoie n'importe quoi
-            if (!isset($analysis['name_match'])) {
-                $analysis = [
-                    'name_match' => false,
-                    'name_score' => 0,
-                    'is_expired' => false,
-                    'flags' => ['Données d\'analyse manquantes']
-                ];
-            }
-
-            return view('admin.voir-document', compact('document', 'analysis'));
-        } catch (\Exception $e) {
-            \Log::error("Erreur Expertise : " . $e->getMessage());
-            return redirect()->route('admin.documents')->with('error', 'Analyse impossible : ' . $e->getMessage());
+        if (is_string($rules)) {
+            $rules = json_decode($rules, true);
         }
+
+        $payload = [
+
+            'text' => $text,
+
+            'student' => [
+                'name' => $student?->name,
+                'matricule' => $student?->matricule,
+                'email' => $student?->email,
+            ],
+
+            'rules' => [
+
+                'required_keywords' => (
+                    $rules['required_keywords'] ?? []
+                ),
+
+                'forbidden_keywords' => (
+                    $rules['forbidden_keywords'] ?? []
+                ),
+
+                'metadata_patterns' => (
+                    $rules['metadata_patterns'] ?? []
+                ),
+
+                'minimum_confidence' => (
+                    $rules['minimum_confidence'] ?? 70
+                ),
+
+                'is_perishable' => (
+                    (bool)($documentType?->is_perishable ?? false)
+                )
+            ]
+        ];
+
+        $pythonPath = base_path(
+            '.venv/Scripts/python.exe'
+        );
+
+        $scriptPath = base_path(
+            'scripts/deep_analysis.py'
+        );
+
+        $process = \Illuminate\Support\Facades\Process::run([
+            $pythonPath,
+            $scriptPath,
+            json_encode(
+                $payload,
+                JSON_UNESCAPED_UNICODE
+            )
+        ]);
+
+        if ($process->failed()) {
+
+            throw new \Exception(
+                $process->errorOutput()
+            );
+        }
+
+        $analysis = json_decode(
+            $process->output(),
+            true
+        );
+
+        if (!$analysis) {
+
+            throw new \Exception(
+                'Réponse Python invalide'
+            );
+        }
+
+        // =================================================
+        // SAVE ANALYSIS
+        // =================================================
+
+        $document->metadata = array_merge(
+            $metadata,
+            [
+                'analysis' => $analysis
+            ]
+        );
+
+        $document->save();
+
+        return view(
+            'admin.doc-view',
+            compact(
+                'document',
+                'analysis'
+            )
+        );
+
+    } catch (\Exception $e) {
+
+        \Log::error(
+            "Erreur Expertise : " .
+            $e->getMessage()
+        );
+
+        return redirect()
+            ->route('admin.documents')
+            ->with(
+                'error',
+                'Analyse impossible : ' .
+                $e->getMessage()
+            );
     }
+}
 
     public function updateStatus(Request $request, Documents $document)
     {
@@ -393,11 +469,30 @@ class AdminController extends Controller
                 $q->where('title', 'like', "%{$request->q}%")
                     ->orWhereHas('student', function ($sq) use ($request) {
                         $sq->where('name', 'like', "%{$request->q}%");
-                    });
+                    })
+                    ->orWhere('extracted_text', 'like', "%{$request->q}%");
             });
         }
 
         // Filtre par Statuts (submitted, pending, validated, rejected, error)
+
+        if ($request->filled('event')) {
+            $query->where('event', $request->event);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->file_type);
+        }
+
+        if ($request->filled('date')) {
+            $query->where('date', $request->created_at);
+        }
+
+        if ($request->filled('uploader')) {
+            $query->where('student', $request->student);
+        }
+
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }

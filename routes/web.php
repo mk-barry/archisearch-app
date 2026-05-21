@@ -50,7 +50,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/evenements/{uuid}/edit', [AdminController::class, 'editEvent'])->name('edit-events');
         Route::put('/evenements/{uuid}/update', [AdminController::class, 'update'])->name('evenements.update');
         Route::get('/documents', [AdminController::class, 'documents'])->name('documents');
-        Route::get('/document/{document}/view', [AdminController::class, 'showDocumentAnalysis'])->name('documents.show');
+        // Route::get('/document/{document}/view', [AdminController::class, 'showDocumentAnalysis'])->name('documents.show');
+        Route::get('/document/{document}/test', [AdminController::class, 'showDocumentAnalysis'])->name('doc.show');
         Route::get('/document/{document}/download', [AdminController::class, 'downloadDocument'])->name('documents.download');
         Route::delete('/document/{document}', [AdminController::class, 'destroyDocument'])->name('documents.destroy');
         Route::post('/bulk', [AdminController::class, 'bulkAction'])->name('documents.bulk');

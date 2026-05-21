@@ -1,4 +1,4 @@
-<x-admin-layout active="archives" title="Archives documentaires - ArchiSearch">
+<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="archives" title="Archives documentaires - ArchiSearch">
     <div class="page-header">
         <div class="page-info">
             <div class="breadcrumb-small">Portail Admin > Archives</div>

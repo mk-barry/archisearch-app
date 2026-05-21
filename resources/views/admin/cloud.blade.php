@@ -1,4 +1,4 @@
-<x-admin-layout active="cloud" title="Sauvegarde Cloud - ArchiSearch">
+<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="cloud" title="Sauvegarde Cloud - ArchiSearch">
     <div class="page-header">
         <div class="breadcrumb-small">Portail Admin > Sauvegarde Cloud</div>
         <h1>Configuration de la sauvegarde cloud</h1>
