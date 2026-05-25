@@ -135,11 +135,14 @@
                         },
                         error: function (xhr) {
                             submitBtn.prop('disabled', false);
+                            Swal.close();
 
                             // 3. Gestion d'erreur dynamique (si le contrôleur renvoie des erreurs de validation)
                             let errorMsg = "Vérifiez les champs du formulaire.";
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMsg = xhr.responseJSON.message;
+                            if (xhr.responseJSON?.errors) {
+                                errorMsg = Object.values(xhr.responseJSON.errors)
+                                    .flat()
+                                    .join('\n');
                             }
 
                             ASAlerts.error("Échec de création", errorMsg);

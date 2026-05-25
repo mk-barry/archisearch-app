@@ -33,7 +33,7 @@ class AdminController extends Controller
         $last7Days = collect(range(6, 0))->map(function ($i) {
             $date = now()->subDays($i)->format('Y-m-d');
             return [
-                'label' => now()->subDays($i)->translatedFormat('D'),
+                'label' => ucfirst(now()->subDays($i)->translatedFormat('D')),
                 'count' => Documents::whereDate('created_at', $date)->count()
             ];
         });
@@ -41,9 +41,9 @@ class AdminController extends Controller
         // 3. Stats des événements (Progress bars)
         $evenementStats = [
             'actifs' => Events::where('status', 'actif')->count(),
-            'clotures' => Events::where('status', 'cloture')->count(),
+            'clotures' => Events::where('status', 'cloturé')->count(),
             'brouillons' => Events::where('status', 'brouillon')->count(),
-            'archives' => Events::where('status', 'archive')->count(),
+            'archives' => Events::where('status', 'archivé')->count(),
             'total' => Events::count() ?: 1, // Éviter division par 0
         ];
 
@@ -69,6 +69,12 @@ class AdminController extends Controller
 
     public function evenements(Request $request)
     {
+        Events::where('status', 'actif')
+            ->where('end_date', '<', now())
+            ->update([
+                'status' => 'cloturé'
+            ]);
+
         $query = Events::query();
 
         // Filtre Recherche
@@ -94,7 +100,7 @@ class AdminController extends Controller
     public function cloturePrematuree(Events $event)
     {
         $event->update([
-            'status' => 'cloture',
+            'status' => 'cloturé',
             'end_date' => now(),
         ]);
 
@@ -104,15 +110,24 @@ class AdminController extends Controller
     public function storeEvent(Request $request)
     {
         // 1. Validation stricte
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'invite_type' => 'required|in:tous,particuliers',
-            'document_types' => 'required|array|min:1', // On valide le nouveau nom du champ
-            'invited_students' => 'required_if:invite_type,particuliers|array',
-        ]);
+        $validated = $request->validate(
+            [
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'start_date' => 'required|date|after_or_equal:today',
+                'end_date' => 'required|date|after_or_equal:start_date',
+                'invite_type' => 'required|in:tous,particuliers',
+                'document_types' => 'required|array|min:1', // On valide le nouveau nom du champ
+                'invited_students' => 'required_if:invite_type,particuliers|array',
+            ],
+            [
+                'start_date.after_or_equal' =>
+                "La date de début ne peut pas être dans le passé.",
+
+                'end_date.after_or_equal' =>
+                "La date de fin doit être après la date de début.",
+            ]
+        );
 
         // 2. Création de l'événement
         $event = Events::create([
@@ -159,13 +174,13 @@ class AdminController extends Controller
 
         if ($event->status === "actif") {
 
-        // 2. On récupère tous les types de documents disponibles en BD 
-        // pour pouvoir les afficher sous forme de checkboxes dans le formulaire
-        $documentTypes = DocumentType::all();
+            // 2. On récupère tous les types de documents disponibles en BD 
+            // pour pouvoir les afficher sous forme de checkboxes dans le formulaire
+            $documentTypes = DocumentType::all();
 
-        // 3. On retourne la VUE (le fichier .blade.php) et on lui passe les données
-        return view('admin.edit-event', compact('event', 'documentTypes'));
-        }else{
+            // 3. On retourne la VUE (le fichier .blade.php) et on lui passe les données
+            return view('admin.edit-event', compact('event', 'documentTypes'));
+        } else {
             return back();
         }
     }
@@ -181,7 +196,7 @@ class AdminController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'invite_type' => 'required|in:tous,particuliers',
-            'status' => 'required|in:actif,cloture,archive,brouillon',
+            'status' => 'required|in:actif,cloturé,archivé,brouillon',
         ]);
 
         // Update
@@ -244,141 +259,140 @@ class AdminController extends Controller
     }
 
     public function showDocumentAnalysis(Documents $document)
-{
-    try {
+    {
+        try {
 
-        $metadata = is_string($document->metadata)
-            ? json_decode($document->metadata, true)
-            : ($document->metadata ?? []);
+            $metadata = is_string($document->metadata)
+                ? json_decode($document->metadata, true)
+                : ($document->metadata ?? []);
 
-        $text = $metadata['extracted_text']
-            ?? $document->extracted_text
-            ?? '';
+            $text = $metadata['extracted_text']
+                ?? $document->extracted_text
+                ?? '';
 
-        $student = $document->student;
+            $student = $document->student;
 
-        $documentType = $document->documentType;
+            $documentType = $document->documentType;
 
-        $rules = $documentType?->validation_rules;
+            $rules = $documentType?->validation_rules;
 
-        if (is_string($rules)) {
-            $rules = json_decode($rules, true);
-        }
+            if (is_string($rules)) {
+                $rules = json_decode($rules, true);
+            }
 
-        $payload = [
+            $payload = [
 
-            'text' => $text,
+                'text' => $text,
 
-            'student' => [
-                'name' => $student?->name,
-                'matricule' => $student?->matricule,
-                'email' => $student?->email,
-            ],
+                'student' => [
+                    'name' => $student?->name,
+                    'matricule' => $student?->matricule,
+                    'email' => $student?->email,
+                ],
 
-            'rules' => [
+                'rules' => [
 
-                'required_keywords' => (
-                    $rules['required_keywords'] ?? []
-                ),
+                    'required_keywords' => (
+                        $rules['required_keywords'] ?? []
+                    ),
 
-                'forbidden_keywords' => (
-                    $rules['forbidden_keywords'] ?? []
-                ),
+                    'forbidden_keywords' => (
+                        $rules['forbidden_keywords'] ?? []
+                    ),
 
-                'metadata_patterns' => (
-                    $rules['metadata_patterns'] ?? []
-                ),
+                    'metadata_patterns' => (
+                        $rules['metadata_patterns'] ?? []
+                    ),
 
-                'minimum_confidence' => (
-                    $rules['minimum_confidence'] ?? 70
-                ),
+                    'minimum_confidence' => (
+                        $rules['minimum_confidence'] ?? 70
+                    ),
 
-                'is_perishable' => (
-                    (bool)($documentType?->is_perishable ?? false)
+                    'is_perishable' => (
+                        (bool)($documentType?->is_perishable ?? false)
+                    )
+                ]
+            ];
+
+            $pythonPath = base_path(
+                '.venv/Scripts/python.exe'
+            );
+
+            $scriptPath = base_path(
+                'scripts/deep_analysis.py'
+            );
+
+            $process = \Illuminate\Support\Facades\Process::run([
+                $pythonPath,
+                $scriptPath,
+                json_encode(
+                    $payload,
+                    JSON_UNESCAPED_UNICODE
                 )
-            ]
-        ];
+            ]);
 
-        $pythonPath = base_path(
-            '.venv/Scripts/python.exe'
-        );
+            if ($process->failed()) {
 
-        $scriptPath = base_path(
-            'scripts/deep_analysis.py'
-        );
+                throw new \Exception(
+                    $process->errorOutput()
+                );
+            }
 
-        $process = \Illuminate\Support\Facades\Process::run([
-            $pythonPath,
-            $scriptPath,
-            json_encode(
-                $payload,
-                JSON_UNESCAPED_UNICODE
-            )
-        ]);
-
-        if ($process->failed()) {
-
-            throw new \Exception(
-                $process->errorOutput()
+            $analysis = json_decode(
+                $process->output(),
+                true
             );
+
+            if (!$analysis) {
+
+                throw new \Exception(
+                    'Réponse Python invalide'
+                );
+            }
+
+            // =================================================
+            // SAVE ANALYSIS
+            // =================================================
+
+            $document->metadata = array_merge(
+                $metadata,
+                [
+                    'analysis' => $analysis
+                ]
+            );
+
+            $document->save();
+
+            return view(
+                'admin.doc-view',
+                compact(
+                    'document',
+                    'analysis'
+                )
+            );
+        } catch (\Exception $e) {
+
+            \Log::error(
+                "Erreur Expertise : " .
+                    $e->getMessage()
+            );
+
+            return redirect()
+                ->route('admin.documents')
+                ->with(
+                    'error',
+                    'Analyse impossible : ' .
+                        $e->getMessage()
+                );
         }
-
-        $analysis = json_decode(
-            $process->output(),
-            true
-        );
-
-        if (!$analysis) {
-
-            throw new \Exception(
-                'Réponse Python invalide'
-            );
-        }
-
-        // =================================================
-        // SAVE ANALYSIS
-        // =================================================
-
-        $document->metadata = array_merge(
-            $metadata,
-            [
-                'analysis' => $analysis
-            ]
-        );
-
-        $document->save();
-
-        return view(
-            'admin.doc-view',
-            compact(
-                'document',
-                'analysis'
-            )
-        );
-
-    } catch (\Exception $e) {
-
-        \Log::error(
-            "Erreur Expertise : " .
-            $e->getMessage()
-        );
-
-        return redirect()
-            ->route('admin.documents')
-            ->with(
-                'error',
-                'Analyse impossible : ' .
-                $e->getMessage()
-            );
     }
-}
 
     public function updateStatus(Request $request, Documents $document)
     {
         $request->validate([
             'status' => 'required|in:validated,rejected,pending,error',
             'comment' => 'required_if:status,rejected|nullable|string|min:5'
-        ],[
+        ], [
             'comment.required_if' => 'Veuillez preciser le motif du rejet',
             'comment.min' => 'Le motif doit etre plus detaille (min. 5 caracteres)'
         ]);
@@ -458,178 +472,185 @@ class AdminController extends Controller
     // =====================================Recherche=========================================
     // =======================================================================================
     public function recherche(Request $request)
-{
-    $query = Documents::query()
-        ->with([
-            'student',
-            'event'
-        ]);
+    {
+        $query = Documents::query()
+            ->with([
+                'student',
+                'event'
+            ]);
 
-    // =====================================================
-    // SEARCH
-    // =====================================================
+        // =====================================================
+        // SEARCH
+        // =====================================================
 
-    if ($request->filled('q')) {
+        if ($request->filled('q')) {
 
-        $search = $request->q;
+            $search = $request->q;
 
-        $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search) {
 
-            $q->where(
-                'title',
-                'like',
-                "%{$search}%"
-            )
-
-            ->orWhere(
-                'extracted_text',
-                'like',
-                "%{$search}%"
-            )
-
-            ->orWhereHas('student', function ($sq) use ($search) {
-
-                $sq->where(
-                    'name',
+                $q->where(
+                    'title',
                     'like',
                     "%{$search}%"
+                )
+
+                    ->orWhere(
+                        'extracted_text',
+                        'like',
+                        "%{$search}%"
+                    )
+
+                    ->orWhereHas('student', function ($sq) use ($search) {
+
+                        $sq->where(
+                            'name',
+                            'like',
+                            "%{$search}%"
+                        );
+                    });
+            });
+        }
+
+        // =====================================================
+        // EVENT
+        // =====================================================
+
+        if ($request->filled('event')) {
+
+            $query->where(
+                'event_id',
+                $request->event
+            );
+        }
+
+        // =====================================================
+        // DATE
+        // =====================================================
+
+        // if ($request->filled('date')) {
+
+        //     $query->whereDate(
+        //         'created_at',
+        //         $request->date
+        //     );
+        // }
+
+        // =====================================================
+        // TYPE
+        // =====================================================
+
+        if ($request->filled('type')) {
+
+            $query->where(
+                'file_type',
+                $request->type
+            );
+        }
+
+
+        // =====================================================
+        // AUTHOR
+        // =====================================================
+
+        if ($request->filled('student')) {
+
+            $query->whereHas('student', function ($q) use ($request) {
+
+                $q->where(
+                    'name',
+                    $request->uploader
                 );
             });
-        });
-    }
+        }
 
-    // =====================================================
-    // EVENT
-    // =====================================================
+        // =====================================================
+        // STATUS
+        // =====================================================
 
-    if ($request->filled('event')) {
+        if ($request->filled('status')) {
 
-        $query->where(
-            'event_id',
-            $request->event
-        );
-    }
-
-    // =====================================================
-    // DATE
-    // =====================================================
-
-    if ($request->filled('date')) {
-
-        $query->whereDate(
-            'created_at',
-            $request->date
-        );
-    }
-
-    // =====================================================
-    // TYPE
-    // =====================================================
-
-    if ($request->filled('type')) {
-
-        $query->where(
-            'file_type',
-            $request->type
-        );
-    }
-
-
-    // =====================================================
-    // AUTHOR
-    // =====================================================
-
-    if ($request->filled('student')) {
-
-        $query->whereHas('student', function ($q) use ($request) {
-
-            $q->where(
-                'name',
-                $request->uploader
+            $query->where(
+                'status',
+                $request->status
             );
-        });
-    }
+        }
 
-    // =====================================================
-    // STATUS
-    // =====================================================
+        // =====================================================
+        // RESULTS
+        // =====================================================
 
-    if ($request->filled('status')) {
+        $results = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        $query->where(
-            'status',
-            $request->status
+        // =====================================================
+        // FILTER DATA
+        // =====================================================
+
+        $events = Events::orderBy('title')->get();
+
+        $uploaders = AuthorizedStudent::orderBy('name')->get();
+
+        $types = DocumentType::orderBy('code')->get();
+
+        $enum = DB::select("SHOW COLUMNS FROM documents WHERE Field = 'status'");
+
+        $type = $enum[0]->Type;
+
+        preg_match('/^enum\((.*)\)$/', $type, $matches);
+
+        $statuses = [];
+
+        if (isset($matches[1])) {
+
+            foreach (explode(',', $matches[1]) as $value) {
+
+                $statuses[] = trim($value, "'");
+            }
+        }
+
+        // =====================================================
+        // SAVED SEARCHES
+        // =====================================================
+
+        $savedSearches = auth()
+            ->user()
+            ->savedSearches()
+            ->latest()
+            ->take(10)
+            ->get();
+
+        // =====================================================
+        // AJAX RESPONSE
+        // =====================================================
+
+        if ($request->ajax()) {
+
+            return response()->json([
+
+                'html' => view(
+                    'admin.partials.search-result',
+                    compact('results')
+                )->render(),
+
+                'count' => $results->total()
+            ]);
+        }
+
+        return view(
+            'admin.recherche',
+            compact(
+                'results',
+                'savedSearches',
+                'events',
+                'uploaders',
+                'types',
+                'statuses'
+            )
         );
     }
-
-    // =====================================================
-    // RESULTS
-    // =====================================================
-
-    $results = $query
-        ->latest()
-        ->paginate(10)
-        ->withQueryString();
-
-    // =====================================================
-    // FILTER DATA
-    // =====================================================
-
-    $events = Events::orderBy('title')
-        ->get();
-
-    $uploaders = AuthorizedStudent::where('matricule')
-        ->orderBy('name')
-        ->get();  
-
-    $documents = Documents::orderBy('title')
-        ->get();
-
-    $statuses = DB::select("SHOW COLUMNS FROM documents WHERE Field = 'status'");
-
-    $types = DocumentType::orderBy('code')->get();
-
-    // =====================================================
-    // SAVED SEARCHES
-    // =====================================================
-
-    $savedSearches = auth()
-        ->user()
-        ->savedSearches()
-        ->latest()
-        ->take(10)
-        ->get();
-
-    // =====================================================
-    // AJAX RESPONSE
-    // =====================================================
-
-    if ($request->ajax()) {
-
-        return response()->json([
-
-            'html' => view(
-                'admin.partials.search-result',
-                compact('results')
-            )->render(),
-
-            'count' => $results->total()
-        ]);
-    }
-
-    return view(
-        'admin.recherche',
-        compact(
-            'results',
-            'savedSearches',
-            'events',
-            'documents',
-            'statuses',
-            'uploaders',
-            'types'
-        )
-    );
-}
 
     // Fonction pour sauvegarder via AJAX
     public function sauvegarderRecherche(Request $request)

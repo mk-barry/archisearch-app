@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User; // Ne pas oublier !
-use Illuminate\Support\Facades\Auth;   
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str; 
+use Illuminate\Support\Str;
 use App\Models\AuditLog;
 use App\Models\ActionDescription;
 
@@ -38,34 +38,34 @@ class UserController extends Controller
                     $query->where('last_seen_at', '>=', now()->subMinutes(5));
                 if ($filter == 'never')
                     $query->whereNull('last_login_at');
-                if ($filter == 'never')
-                    $query->whereNull('last_login_at');
-                if ($filter == 'never')
-                    $query->whereNull('last_login_at');
-                if ($filter == 'never')
-                    $query->whereNull('last_login_at');
+                // if ($filter == 'never')
+                //     $query->whereNull('last_login_at');
+                // if ($filter == 'never')
+                //     $query->whereNull('last_login_at');
+                // if ($filter == 'never')
+                //     $query->whereNull('last_login_at');
                 if ($filter == '500plus')
-                    $query->where('documents_count', '>=', 500);
+                    $query->having('documents_count', '>=', 500);
                 if ($filter == '500moins')
-                    $query->where('documents_count', '<=', 500);
+                    $query->having('documents_count', '<=', 500);
                 if ($filter == '100plus')
-                    $query->where('documents_count', '>=', 100);
+                    $query->having('documents_count', '>=', 100);
                 if ($filter == '100moins')
-                    $query->where('documents_count', '<=', 100);
+                    $query->having('documents_count', '<=', 100);
                 if ($filter == '50plus')
-                    $query->where('documents_count', '>=', 50);
+                    $query->having('documents_count', '>=', 50);
                 if ($filter == '50moins')
-                    $query->where('documents_count', '<=', 50);
+                    $query->having('documents_count', '<=', 50);
                 if ($filter == '10plus')
-                    $query->where('documents_count', '>=', 10);
+                    $query->having('documents_count', '>=', 10);
                 if ($filter == '10moins')
-                    $query->where('documents_count', '<=', 10);
+                    $query->having('documents_count', '<=', 10);
                 // ... tes autres conditions
             }
         }
 
         // --- TRI ---
-// On récupère la valeur proprement
+        // On récupère la valeur proprement
         $sortData = $request->input('sort');
 
         if ($sortData) {
@@ -87,7 +87,7 @@ class UserController extends Controller
                     break;
                 case 'plusdocs':
                     $query->orderByDesc('documents_count');
-                        break;
+                    break;
                 case 'moinsdocs':
                     $query->orderBy('documents_count', 'desc');
                     break;
@@ -106,7 +106,8 @@ class UserController extends Controller
 
     public function create()
     {
-        return view("super-admin.create-admin");
+        $roles = ['admin', 'super-admin'];
+        return view('super-admin.creation-admin', compact('roles'));
     }
 
     /**
@@ -116,24 +117,28 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+
             'email' => 'required|email|unique:users',
+
             'password' => 'required|min:8',
-            'organisation' => 'nullable|string'
+
+            'role' => 'nullable|in:admin,super-admin',
         ]);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'organisation' => $request->organisation,
+            'role' => $validated['role'] ?? 'admin',
         ]);
-        
+
         return response()->json([
             'success' => true,
             'message' => "L'administrateur a bien été créé.",
             'redirect' => route('users.index')
         ]);
     }
+
     public function edit(string $id)
     {
         $user = User::findOrFail($id); // Trouve l'user ou affiche une erreur 404
@@ -249,7 +254,7 @@ class UserController extends Controller
         $user->update([
             'last_seen_at' => now()
         ]);
-        
+
         return response()->json(['status' => 'online']);
         // return response()->json(['status' => 'offline'], 401);
     }

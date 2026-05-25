@@ -30,7 +30,7 @@ return new class extends Migration
             $table->integer('max_file_size')->default(2048);
 
             // Gestion de l'état du lien
-            $table->enum('status', ['brouillon', 'actif', 'cloture', 'archive'])->default('actif');
+            $table->enum('status', ['brouillon', 'actif', 'cloturé', 'archivé'])->default('actif');
             // $table->timestamp('expires_at')->nullable();
 
             // Génère automatiquement created_at et updated_at

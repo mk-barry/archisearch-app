@@ -2,7 +2,7 @@
     <div class="page-header">
         <h1>Tableau de bord</h1>
         <div class="admin-info">
-            <div class="avatar-base avatar-sm">
+            <div class="avatar-base avatar-md">
                 @if(Auth::user()->avatar_path)
                     <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
                 @else
@@ -21,6 +21,9 @@
             <div class="stat-icon badge-blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg></div>
             <span class="stat-label">Événements actifs</span>
             <span class="stat-value">{{ $stats['evenements_actifs'] }}</span>
+            <div style="margin-top: 0.75rem;">
+                <span class="trend up">↑ +1</span> 
+                <span class="trend-text">vs. mois dernier</span></div>
         </div>
 
         <div class="stat-card">
@@ -28,6 +31,9 @@
             <span class="stat-label">Documents reçus</span>
             <span class="stat-value">{{ $stats['docs_recus_semaine'] }}</span>
             <span class="stat-subtext">cette semaine</span>
+            <div style="margin-top: 0.75rem;">
+                <span class="trend up">↑ +47</span>
+                <span class="trend-text">vs. mois dernier</span></div>
         </div>
 
         <div class="stat-card">

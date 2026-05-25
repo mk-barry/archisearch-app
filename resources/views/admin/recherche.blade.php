@@ -5,7 +5,7 @@
             <h1>Recherche de documents</h1>
         </div>
         <div class="admin-info">
-            <div class="avatar"
+            <div class="avatar avatar-md"
                 style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden;">
                 @if(Auth::user()->avatar_path)
                 <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar"
@@ -77,25 +77,16 @@
 
                 </select>
 
-                <select name="date" class="select-filter">
+                <!-- <select name="date" class="select-filter">
 
                     <option value="">
                         Date : Tous
                     </option>
+                    <option value=""></option>
+                    <option value=""></option>
+                    <option value=""></option>
 
-                    @foreach($documents as $docs)
-
-                    <option
-                        value="{{ $docs->created_at }}"
-                        {{ request('created_at') == $docs->created_at ? 'selected' : '' }}>
-
-                        {{ $docs->created_at }}
-
-                    </option>
-
-                    @endforeach
-
-                </select>
+                </select> -->
 
                 <select name="type" class="select-filter">
 
@@ -126,8 +117,8 @@
                     @foreach($uploaders as $uploader)
 
                     <option
-                        value="{{ student->id }}"
-                        {{ request('uploader') == $student->id ? 'selected' : '' }}>
+                        value="{{ $uploader->name }}"
+                        {{ request('uploader') == $uploader->name ? 'selected' : '' }}>
 
                         {{ $uploader->name }}
 
@@ -143,16 +134,33 @@
                         Status : Tous
                     </option>
 
-                    @foreach($statuses as $status)
-
-                    <option
-                        value="{{ $docs->status }}"
-                        {{ request('status') == $docs->status ? 'selected' : '' }}>
-
-                        {{ $docs->status }}
-
+                    <!-- <option>
+                        Soumis
                     </option>
 
+                    <option>
+                        En attente
+                    </option>
+
+                    <option>
+                        Valide
+                    </option>
+
+                    <option>
+                        Rejete
+                    </option>
+
+                    <option>
+                        Erreur
+                    </option>
+
+                    <option>
+                        Archive
+                    </option> -->
+                    @foreach($statuses as $status)
+                    <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                        {{ ucfirst($status) }}
+                    </option>
                     @endforeach
 
                 </select>

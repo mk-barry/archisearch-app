@@ -120,9 +120,77 @@
                             </div>
 
                             <div>
-                                <label style="font-size:0.85rem; font-weight: 700;">Mots-clés OCR (Séparés par des virgules)</label>
-                                <textarea name="keywords" placeholder="republique, ministere, diplome, session, decerne..." style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:80px; margin-top: 5px; font-family: sans-serif;"></textarea>
-                                <small style="color: #94a3b8; font-size: 0.75rem;">Ces mots seront recherchés par le script Python pour valider l'authenticité.</small>
+                                <span style="font-size:0.85rem; font-weight: 700;">Pour les informations suivates. (Séparés par des virgules)</span>
+                                <!-- <textarea name="keywords" placeholder="republique, ministere, diplome, session, decerne..." style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:80px; margin-top: 5px; font-family: sans-serif;"></textarea>
+                                <small style="color: #94a3b8; font-size: 0.75rem;">Ces mots seront recherchés par le script Python pour valider l'authenticité.</small> -->
+                            </div>
+
+                            <div>
+                                <label style="font-size:0.85rem; font-weight:700;">
+                                    Mots requis
+                                </label>
+
+                                <textarea
+                                    name="required_keywords"
+                                    placeholder="baccalauréat, baccalau, diplôme..."
+                                    style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
+
+                                <small style="color:#94a3b8;">
+                                    Si absents, le document sera considéré comme suspect.
+                                </small>
+                            </div>
+
+                            <div>
+                                <label style="font-size:0.85rem; font-weight:700;">
+                                    Mots interdits
+                                </label>
+
+                                <textarea
+                                    name="forbidden_keywords"
+                                    placeholder="probatoire, specimen..."
+                                    style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
+
+                                <small style="color:#94a3b8;">
+                                    Si détectés, le document sera immédiatement flagué.
+                                </small>
+                            </div>
+
+                            <div>
+                                <label style="font-size:0.85rem; font-weight:700;">
+                                    Champs obligatoires
+                                </label>
+
+                                <textarea
+                                    name="required_metadata"
+                                    placeholder="jury, mention, student_name..."
+                                    style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
+
+                                <small style="color:#94a3b8;">
+                                    Si un champ est absent après extraction OCR, le document sera signalé.
+                                </small>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <input
+                                    type="checkbox"
+                                    name="is_perishable"
+                                    value="1"
+                                    id="is_perishable">
+
+                                <label for="is_perishable" style="font-weight:700;">
+                                    Document expirable
+                                </label>
+                            </div>
+
+                            <div>
+                                <label style="font-size:0.85rem; font-weight:700;">
+                                    Regex date d'expiration
+                                </label>
+
+                                <textarea
+                                    name="expiry_patterns"
+                                    placeholder="expire le..."
+                                    style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
                             </div>
 
                             <div style="display:flex; justify-content:flex-end; gap:1rem; padding-top: 10px; border-top: 1px solid #f1f5f9;">
@@ -196,20 +264,20 @@
                                     @csrf
                                     @method('DELETE')
                                     <span class="tag" style="background: #eff6ff; color: #1e40af; display: flex; align-items: center; gap: 5px;">
-                                    {{ strtoupper($ext->label) }}
-                                    <!-- Optionnel : bouton de suppression -->
-                                    <button
-                                        type="button"
-                                        onclick="ASAlerts.confirmAction(
+                                        {{ strtoupper($ext->label) }}
+                                        <!-- Optionnel : bouton de suppression -->
+                                        <button
+                                            type="button"
+                                            onclick="ASAlerts.confirmAction(
                                             'Supprimer ?',
                                             'Voulez-vous supprimer cette extension ?',
                                             () => this.closest('form').submit()
                                         )"
-                                        style="border:none; background:none; cursor:pointer;">
-                                        ×
-                                    </button>
+                                            style="border:none; background:none; cursor:pointer;">
+                                            ×
+                                        </button>
                                     </span>
-                                    
+
                                 </form>
                                 @endforeach
                             </div>

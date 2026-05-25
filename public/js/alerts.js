@@ -24,7 +24,7 @@ const ASAlerts = {
         Swal.fire({
             icon: "error",
             title: title || "Oups...",
-            text: message,
+            html: message,
             confirmButtonColor: "#2563eb",
         });
     },

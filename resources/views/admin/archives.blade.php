@@ -5,20 +5,20 @@
             <h1>Archives documentaires</h1>
         </div>
         <div class="admin-info">
-                <div class="avatar" style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                        @if(Auth::user()->avatar)
-                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
-                                alt="Avatar de {{ Auth::user()->name }}">
-                        @else
-                            <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
-                            {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
-                        @endif
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                    <span class="admin-name">{{ Auth::user()->name }}</span>
-                    <span class="admin-mail">{{ Auth::user()->role }}</span>
-                </div>
+            <div class="avatar avatar-md"
+                style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden;">
+                @if(Auth::user()->avatar_path)
+                <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar"
+                    style="width: 100%; height: 100%; object-fit: cover;">
+                @else
+                {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                @endif
             </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <span class="admin-name">{{ Auth::user()->name }}</span>
+                <span class="admin-mail">{{ Auth::user()->role }}</span>
+            </div>
+        </div>
     </div>
 
     <div class="admin-archives-container" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-top: 1.5rem;">

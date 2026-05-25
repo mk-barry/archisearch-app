@@ -55,7 +55,8 @@
                             <h3 class="event-title">{{ $event->title }}</h3>
                             <p class="event-subtitle">{{ Str::limit($event->description, 45) }}</p>
                         </div>
-                        <span class="badge {{ $event->status == 'actif' ? 'badge-blue' : ($event->status == 'cloture' ? 'badge-orange' : ($event->status == 'archive' ? 'badge-green' : 'badge-red')) }}">
+                        
+                        <span class="badge {{ $event->status == 'actif' ? 'badge-blue' : ($event->status == 'cloturé' ? 'badge-orange' : ($event->status == 'archivé' ? 'badge-green' : 'badge-red')) }}">
                             {{ ucfirst($event->status) }}
                         </span>
                     </div>

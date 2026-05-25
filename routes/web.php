@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/students', [SuperAdminController::class, 'indexStudents'])->name('students');
         Route::get('/logs', [SuperAdminController::class, 'logs'])->name('logs');
         Route::get('/settings', [SuperAdminController::class, 'settings'])->name('settings');
-        Route::get('/creation-admin', [SuperAdminController::class, 'creationAdmin'])->name('creation-admin');
+        Route::get('/creation-admin', [UserController::class, 'create'])->name('creation-admin');
         Route::get('/creation-student', [SuperAdminController::class, 'createStudent'])->name('students.create');
         Route::post('/store-student', [SuperAdminController::class, 'storeStudent'])->name('students.store');
         Route::post('/store-doc-type', [SuperAdminController::class, 'storeDocType'])->name('document-types.store');

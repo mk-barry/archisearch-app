@@ -10,6 +10,7 @@ use App\Models\Events;
 use Illuminate\Http\Request;
 use App\Models\AuthorizedStudent;
 use App\Models\FileExtension;
+use App\Models\SavedSearch;
 // use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -38,9 +39,40 @@ class SuperAdminController extends Controller
             return ucfirst(now()->subDays($i)->translatedFormat('D'));
         });
 
+
+        $searches = SavedSearch::selectRaw('DATE(created_at) as date, COUNT(*) as total')
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $uploads = Documents::selectRaw('DATE(created_at) as date, COUNT(*) as total')
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
         // Simulation de données (à remplacer par des requêtes count() groupées par date)
-        $searchData = [85, 102, 91, 130, 118, 32, 18];
-        $uploadData = [42, 67, 53, 88, 74, 20, 12];
+        // $searchData = [85, 102, 91, 130, 118, 32, 18];
+        // $uploadData = collect(range(6, 0))->map(function ($i) {
+        //     $date = now()->subDays($i)->format('Y-m-d');
+        //     return [
+        //         // 'label' => ucfirst(now()->subDays($i)->translatedFormat('D')),
+        //         'data' => Documents::whereDate('created_at', $date)->count()
+        //     ];
+        // });
+
+        $uploadData = collect(range(6, 0))->map(function ($i) use ($uploads) {
+
+            $date = now()->subDays($i)->format('Y-m-d');
+
+            return $uploads[$date] ?? 0;
+        });
+
+        $searchData = collect(range(6, 0))->map(function ($i) use ($searches) {
+
+            $date = now()->subDays($i)->format('Y-m-d');
+
+            return $searches[$date] ?? 0;
+        });
 
         // --- CHART 2 : RÉPARTITION ---
         $eventCounts = Events::selectRaw('status, count(*) as total')
@@ -50,8 +82,8 @@ class SuperAdminController extends Controller
 
         $eventStats = [
             'actifs'   => $eventCounts['actif'] ?? 0,
-            'clotures' => $eventCounts['cloture'] ?? 0,
-            'archives' => $eventCounts['archive'] ?? 0,
+            'clotures' => $eventCounts['cloturé'] ?? 0,
+            'archives' => $eventCounts['archivé'] ?? 0,
         ];
 
         // --- ACTIVITÉ RÉCENTE ---
