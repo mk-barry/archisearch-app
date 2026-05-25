@@ -17,10 +17,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SuperAdminController extends Controller
 {
-    public function index()
-    {
-
-    }
+    public function index() {}
 
     public function dashboard()
     {
@@ -47,9 +44,9 @@ class SuperAdminController extends Controller
 
         // --- CHART 2 : RÉPARTITION ---
         $eventCounts = Events::selectRaw('status, count(*) as total')
-        ->groupBy('status')
-        ->pluck('total', 'status')
-        ->all();
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->all();
 
         $eventStats = [
             'actifs'   => $eventCounts['actif'] ?? 0,
@@ -119,29 +116,31 @@ class SuperAdminController extends Controller
             }
         }
 
-        // --- TRI ---
-        $sortData = $request->input('sort');
-        if ($sortData) {
-            $currentSort = is_array($sortData) ? end($sortData) : $sortData;
-            switch ($currentSort) {
-                case 'az':
-                    $query->orderBy('name', 'asc');
-                    break;
-                case 'za':
-                    $query->orderBy('name', 'desc');
-                    break;
-                case 'plusdocs':
-                    $query->orderByDesc('documents_count');
-                    break;
-                case 'moinsdocs':
-                    $query->orderBy('documents_count', 'asc');
-                    break;
-                default:
-                    $query->latest();
-            }
-        } else {
-            $query->latest();
-        }
+        // // --- TRI ---
+        // $sortData = $request->input('sort');
+        // if ($sortData) {
+        //     $currentSort = is_array($sortData) ? end($sortData) : $sortData;
+        //     switch ($currentSort) {
+        //         case 'az':
+        //             $query->orderBy('name', 'asc');
+        //             break;
+        //         case 'za':
+        //             $query->orderBy('name', 'desc');
+        //             break;
+        //         case 'plusdocs':
+        //             $query->orderByDesc('documents_count');
+        //             break;
+        //         case 'moinsdocs':
+        //             $query->orderBy('documents_count', 'asc');
+        //             break;
+        //         default:
+        //             $query->latest();
+        //     }
+        // } else {
+        //     $query->latest();
+        // }
+
+        $query->latest();
 
         // Utilise paginate(5) comme pour tes admins pour tester la pagination
         $students = $query->paginate(5)->withQueryString();
@@ -183,8 +182,14 @@ class SuperAdminController extends Controller
     {
         $documentTypes = DocumentType::with(['allowedExtensions', 'documents'])->get();
         $fileExtensions = FileExtension::all(); // On récupère la liste des formats existants
-    
-        return view('super-admin.settings', compact('documentTypes', 'fileExtensions'));
+        $documents = Documents::all();
+        $maxStorage = 15;
+        $currentStorage = 0;
+
+        foreach ($documents as $docs) {
+            $currentStorage = $currentStorage + $docs->file_size;
+        }
+        return view('super-admin.settings', compact('documentTypes', 'fileExtensions', 'maxStorage', 'currentStorage'));
     }
 
     public function storeDocType(Request $request)
@@ -197,10 +202,10 @@ class SuperAdminController extends Controller
             'min_score' => 'required|integer|min:1',
             'extensions' => 'required|array', // Tableau d'IDs d'extensions
         ]);
-    
+
         try {
             DB::beginTransaction();
-    
+
             // 1. Création du type de document
             $documentType = DocumentType::create([
                 'label' => $validated['label'],
@@ -211,13 +216,12 @@ class SuperAdminController extends Controller
                     'min_score' => (int)$validated['min_score']
                 ]
             ]);
-    
+
             // 2. Association des extensions (Table document_type_extension)
             $documentType->allowedExtensions()->attach($validated['extensions']);
-    
+
             DB::commit();
             return back()->with('success', 'Type de document configuré avec succès !');
-    
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             DB::rollback();
@@ -234,11 +238,47 @@ class SuperAdminController extends Controller
 
         FileExtension::create([
             'name' => strtolower($validated['name']),
-            'mime_type' => strtolower("application/".$validated['name'])
+            'mime_type' => strtolower("application/" . $validated['name'])
         ]);
 
         return back()->with('success', 'Extension ajoutée avec succès !');
     }
+
+
+
+    public function destroyExtension(FileExtension $extension)
+    {
+        // Vérifie si l'extension est liée à des types de documents
+        if ($extension->documentTypes()->exists()) {
+
+            return back()->with(
+                'error',
+                'Impossible de supprimer cette extension car elle est utilisée par un type de document.'
+            );
+        }
+
+        // Vérifie si des documents utilisent cette extension
+        $isUsedInDocuments = Documents::whereRaw(
+            'LOWER(file_type) = ?',
+            [strtolower($extension->name)]
+        )->exists();
+
+        if ($isUsedInDocuments) {
+
+            return back()->with(
+                'error',
+                'Impossible de supprimer cette extension car des documents l’utilisent.'
+            );
+        }
+
+        $extension->delete();
+
+        return back()->with(
+            'success',
+            'Extension supprimée avec succès.'
+        );
+    }
+
     public function creationAdmin()
     {
         return view('super-admin.creation-admin');

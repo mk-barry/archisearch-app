@@ -48,8 +48,9 @@
                         style="width: 100%; padding: 0.75rem; border: none; outline: none; background: transparent;">
                 </div>
 
-                <select class="js-basic-multiple" name="filters[]" multiple="multiple" id="filtre">
+                <select class="" name="filters" id="filtre">
                     <optgroup label="Participation">
+                        <option value="">Tous</option>
                         <option value="has_uploads">Ayant déjà déposé</option>
                         <option value="no_uploads">Aucun dépôt</option>
                     </optgroup>
@@ -159,7 +160,7 @@
                     const tableBody = document.getElementById('table-body');
                     const paginationContainer = document.getElementById('pagination-row');
                     const filterSelect = document.getElementById('filtre');
-                    const sortSelect = document.getElementById('tri');
+                    // const sortSelect = document.getElementById('tri');
 
                     let timeout = null;
 
@@ -176,12 +177,12 @@
                             url.searchParams.set('page', page);
 
                         // Récupération des filtres Select2 (Participation : has_uploads, no_uploads)
-                        const filters = $(filterSelect).val() || [];
-                        filters.forEach(f => url.searchParams.append('filters[]', f));
+                        const filters = $(filterSelect).val();
+                        filters.forEach(f => url.searchParams.append('filters', f));
 
-                        // Récupération du tri (A-Z, Nombre de docs, etc.)
-                        const sorts = $(sortSelect).val() || [];
-                        sorts.forEach(s => url.searchParams.append('sort[]', s));
+                        // // Récupération du tri (A-Z, Nombre de docs, etc.)
+                        // const sorts = $(sortSelect).val() || [];
+                        // sorts.forEach(s => url.searchParams.append('sort[]', s));
 
                         return url.href;
                     }
@@ -232,12 +233,12 @@
                         updateContent(getFullUrl("{{ route('super-admin.students') }}"));
                     });
 
-                    // Changement de Tri (si tu as un select #tri)
-                    if (sortSelect) {
-                        $(sortSelect).on('change', function () {
-                            updateContent(getFullUrl("{{ route('super-admin.students') }}"));
-                        });
-                    }
+                    // // Changement de Tri (si tu as un select #tri)
+                    // if (sortSelect) {
+                    //     $(sortSelect).on('change', function () {
+                    //         updateContent(getFullUrl("{{ route('super-admin.students') }}"));
+                    //     });
+                    // }
 
                     // Pagination
                     paginationContainer?.addEventListener('click', function (e) {

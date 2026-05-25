@@ -77,4 +77,9 @@ class Documents extends Model
     {
         return pathinfo($this->file_path, PATHINFO_EXTENSION) ?: 'file';
     }
+
+    // public function extension()
+    // {
+    //     return $this->belongsTo(FileExtension::class, 'extension_id');
+    // }
 }

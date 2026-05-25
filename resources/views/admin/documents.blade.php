@@ -6,10 +6,10 @@
         <div class="admin-info">
             <div class="avatar" style="width: 50px; height: 50px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
                 @if(Auth::user()->avatar_path)
-                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar de {{ Auth::user()->name }}"  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #1e3a8a;">
+                <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar de {{ Auth::user()->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #1e3a8a;">
                 @else
-                    <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
-                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+                <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
+                {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
                 @endif
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-start;">
@@ -60,68 +60,68 @@
             </thead>
             <tbody id="documents-body">
                 @fragment('table-body')
-                    @forelse($documents as $doc)
-                        <tr>
-                            <td><input type="checkbox" class="doc-checkbox" value="{{ $doc->id }}"></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <div class="file-icon-box bg-{{ $doc->extension }}">{{ strtoupper($doc->extension) }}</div>
-                                    <div class="text-sizes">
-                                        <div style="font-weight: 700; color: #1e293b;">{{ basename($doc->file_path) }}</div>
-                                        <div class="file-size">{{ $doc->file_size }} Ko</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="tag">{{ $doc->documentType->name ?? $doc->category }}</span></td>
-                            <td style="font-weight: 500;">{{ $doc->student->name ?? $doc->identifier }}</td>
-                            <td style="color: #64748b;">{{ $doc->created_at->format('d M') }}</td>
-                            <td><span class="badge {{ $doc->status_class }}">{{ $doc->status }}</span></td>
-                            <td style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;">
-                                <!-- Voir -->
-                                <a href="{{ route('admin.doc.show', $doc->id) }}" class="action-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                        <circle cx="12" cy="12" r="3" />
-                                    </svg>
-                                </a>
+                @forelse($documents as $doc)
+                <tr>
+                    <td><input type="checkbox" class="doc-checkbox" value="{{ $doc->id }}"></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="file-icon-box bg-{{ $doc->extension }}">{{ strtoupper($doc->extension) }}</div>
+                            <div class="text-sizes">
+                                <div style="font-weight: 700; color: #1e293b;">{{ basename($doc->file_path) }}</div>
+                                <div class="file-size">{{ $doc->file_size }} Ko</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="tag">{{ $doc->documentType->name ?? $doc->category }}</span></td>
+                    <td style="font-weight: 500;">{{ $doc->student->name ?? $doc->identifier }}</td>
+                    <td style="color: #64748b;">{{ $doc->created_at->format('d M') }}</td>
+                    <td><span class="badge {{ $doc->status_class }}">{{ $doc->status }}</span></td>
+                    <td style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;">
+                        <!-- Voir -->
+                        <a href="{{ route('admin.doc.show', $doc->id) }}" class="action-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </a>
 
-                                <!-- Télécharger -->
-                                <a href="{{ route('admin.documents.download', $doc->id) }}" class="action-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                        <polyline points="7 10 12 15 17 10" />
-                                        <line x1="12" x2="12" y1="15" y2="3" />
-                                    </svg>
-                                </a>
+                        <!-- Télécharger -->
+                        <a href="{{ route('admin.documents.download', $doc->id) }}" class="action-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" x2="12" y1="15" y2="3" />
+                            </svg>
+                        </a>
 
-                                <!-- Partager (Optionnel : Copier le lien) -->
-                                <button class="action-btn"
-                                    onclick="shareDocument('{{ basename($doc->file_path) }}', '{{ Storage::url($doc->file_path) }}')"
-                                    title="Partager le document">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="18" cy="5" r="3" />
-                                        <circle cx="6" cy="12" r="3" />
-                                        <circle cx="18" cy="19" r="3" />
-                                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
-                                        <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
-                                    </svg>
-                                </button>
+                        <!-- Partager (Optionnel : Copier le lien) -->
+                        <button class="action-btn"
+                            onclick="shareDocument('{{ basename($doc->file_path) }}', '{{ Storage::url($doc->file_path) }}')"
+                            title="Partager le document">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3" />
+                                <circle cx="6" cy="12" r="3" />
+                                <circle cx="18" cy="19" r="3" />
+                                <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+                                <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+                            </svg>
+                        </button>
 
-                                <!-- Supprimer -->
-                                <button class="action-btn" style="color: #ef4444;" onclick="deleteDoc({{ $doc->id }})">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M3 6h18" />
-                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" style="text-align: center; padding: 20px;">Aucun document trouvé.</td>
-                    </tr>
-                    @endforelse
+                        <!-- Supprimer -->
+                        <button class="action-btn delete-doc-btn" style="color: #ef4444;" data-id="{{ $doc->id }}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">Aucun document trouvé.</td>
+                </tr>
+                @endforelse
                 @endfragment
             </tbody>
         </table>
@@ -246,20 +246,39 @@
             });
 
             // Fonction de suppression unique
-            function deleteDoc(id) {
-                if (confirm('Voulez-vous vraiment supprimer ce document ?')) {
-                    $.ajax({
-                        url: "/admin/documents/" + id,
-                        type: 'DELETE',
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function() {
-                            updateUI();
-                        }
-                    });
-                }
-            }
+            $(document).on('click', '.delete-doc-btn', function() {
+
+                const id = $(this).data('id');
+
+                ASAlerts.confirmAction(
+                    'Suppression du document',
+                    'Voulez-vous vraiment supprimer ce document ?',
+                    () => {
+
+                        $.ajax({
+                            url: "/admin/document/" + id,
+                            type: 'DELETE',
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+
+                            success: function() {
+
+                                ASAlerts.success("Document supprimé avec succès");
+
+                                updateUI();
+                            },
+
+                            error: function() {
+
+                                ASAlerts.error("Erreur lors de la suppression");
+                            }
+                        });
+
+                    }
+                );
+
+            });
 
             // Téléchargement groupé
             $('#bulkDownload').on('click', function() {

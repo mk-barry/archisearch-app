@@ -26,12 +26,20 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'password' => ['nullable', 'confirmed', Password::defaults()],
-        ]);
+        $validated = $request->validate(
+            [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+                'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+                'password' => ['nullable', 'confirmed', Password::defaults()],
+                'old_password' => ['required_with:password', 'current_password'],
+            ],
+            [
+                'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+                'old_password.current_password' => 'Le mot de passe actuel est incorrect.',
+                'password_confirmation.required_with' => 'Veuillez confirmer le nouveau mot de passe.',
+            ]
+        );
 
         // Gestion de l'avatar
         if ($request->hasFile('avatar')) {

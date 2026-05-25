@@ -1,4 +1,4 @@
-<x-admin-layout sec_css="{{ asset('css/profile/profile.css') }}" active="profil" title="Mon Profil">
+<x-profil-layout sec_css="{{ asset('css/profile/profile.css') }}" active="profil" title="Mon Profil">
     <div class="page-header">
         <div class="page-info">
             <div class="breadcrumb-small">Portail {{ ucfirst(Auth::user()->role) }} > Profil</div>
@@ -61,6 +61,11 @@
             <h3 class="profile-section-title">Sécurité</h3>
             <div class="profile-grid">
                 <div class="form-group">
+                    <label class="form-label">Ancient mot de passe</label>
+                    <input type="password" name="old_password" class="form-control">
+                    @error('old_password') <span class="form-error">{{ $message }}</span> @enderror
+                </div>
+                <div class="form-group">
                     <label class="form-label">Nouveau mot de passe</label>
                     <input type="password" name="password" class="form-control">
                     @error('password') <span class="form-error">{{ $message }}</span> @enderror
@@ -76,4 +81,4 @@
             </div>
         </form>
     </div>
-</x-admin-layout>
+</x-profil-layout>

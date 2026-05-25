@@ -62,8 +62,8 @@
                         </p>
                     </div>
                     @php
-$now = now();
-$daysRemaining = $now->diffInDays($event->end_date, false);
+                        $now = now();
+                        $daysRemaining = $now->diffInDays($event->end_date, false);
                     @endphp
                     @if($event->status === 'cloturé' || $now->gt($event->end_date))
                         <div class="badge-red">
@@ -96,8 +96,8 @@ $daysRemaining = $now->diffInDays($event->end_date, false);
                 <div class="document-list">
                     @foreach($event->documentTypes as $type)
                         @php
-    $uploadedFile = $submissions->where('category', $type->label)->first();
-    $extensions = is_array($type->allowed_extensions) ? implode(', ', array_map('strtoupper', $type->allowed_extensions)) : 'PDF, JPG, PNG';
+                            $uploadedFile = $submissions->where('category', $type->label)->first();
+                            $extensions = is_array($type->allowed_extensions) ? implode(', ', array_map('strtoupper', $type->allowed_extensions)) : 'PDF, JPG, PNG';
                         @endphp
 
                         @if($uploadedFile)

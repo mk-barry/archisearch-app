@@ -8,10 +8,10 @@
             <div class="avatar"
                 style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden;">
                 @if(Auth::user()->avatar_path)
-                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar"
+                <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar"
                     style="width: 100%; height: 100%; object-fit: cover;">
                 @else
-                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
                 @endif
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-start;">
@@ -42,45 +42,123 @@
                         Vos recherches sauvegardées
                     </div>
                     @forelse($savedSearches as $search)
-                        <a href="{{ route('admin.search', ['q' => $search->keyword] + ($search->filters ?? [])) }}"
-                            style="display: block; padding: 0.75rem 1.25rem; color: #1e293b; text-decoration: none; border-bottom: 1px solid #f8fafc; transition: background 0.2s;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"
-                                style="margin-right: 8px;">
-                                <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-                            </svg>
-                            {{ Str::limit($search->keyword, 40) }}
-                        </a>
+                    <a href="{{ route('admin.search', ['q' => $search->keyword] + ($search->filters ?? [])) }}"
+                        style="display: block; padding: 0.75rem 1.25rem; color: #1e293b; text-decoration: none; border-bottom: 1px solid #f8fafc; transition: background 0.2s;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"
+                            style="margin-right: 8px;">
+                            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+                        </svg>
+                        {{ Str::limit($search->keyword, 40) }}
+                    </a>
                     @empty
-                        <div style="padding: 1rem; text-align: center; color: #94a3b8; font-size: 0.9rem;">Aucune recherche
-                            sauvegardée</div>
+                    <div style="padding: 1rem; text-align: center; color: #94a3b8; font-size: 0.9rem;">Aucune recherche
+                        sauvegardée</div>
                     @endforelse
                 </div>
             </div>
 
             <div class="quick-filter-row" style="margin-top: 1rem; display: flex; gap: 10px; align-items: center;">
-                <select name="event" class="select-filter" onchange="this.form.submit()">
-                    <option>Événement : Tous</option>
+                
+                <select name="event" class="select-filter">
+
+                    <option value="">
+                        Événement : Tous
+                    </option>
+
+                    @foreach($events as $event)
+
+                    <option value="{{ $event->id }}" {{ request('event') == $event->id ? 'selected' : '' }}>
+
+                        {{ $event->title }}
+
+                    </option>
+
+                    @endforeach
+
                 </select>
-                <select name="type" class="select-filter" onchange="this.form.submit()">
-                    <option>Type : Tous</option>
+
+                <select name="date" class="select-filter">
+
+                    <option value="">
+                        Date : Tous
+                    </option>
+
+                    @foreach($documents as $docs)
+
+                    <option
+                        value="{{ $docs->created_at }}"
+                        {{ request('created_at') == $docs->created_at ? 'selected' : '' }}>
+
+                        {{ $docs->created_at }}
+
+                    </option>
+
+                    @endforeach
+
                 </select>
-                <select name="date" class="select-filter" onchange="this.form.submit()">
-                    <option>Date : Toutes</option>
+
+                <select name="type" class="select-filter">
+
+                    <option value="">
+                        Type : Tous
+                    </option>
+
+                    @foreach($types as $type)
+
+                    <option
+                        value="{{ $type->code }}"
+                        {{ request('type') == $type->code ? 'selected' : '' }}>
+
+                        {{ strtoupper($type->code) }}
+
+                    </option>
+
+                    @endforeach
+
                 </select>
-                <select name="uploader" class="select-filter" onchange="this.form.submit()">
-                    <option>Auteur : Tous</option>
+
+                <select name="uploader" class="select-filter">
+
+                    <option value="">
+                        Auteur : Tous
+                    </option>
+
+                    @foreach($uploaders as $uploader)
+
+                    <option
+                        value="{{ student->id }}"
+                        {{ request('uploader') == $student->id ? 'selected' : '' }}>
+
+                        {{ $uploader->name }}
+
+                    </option>
+
+                    @endforeach
+
                 </select>
-                <select name="status" class="select-filter" onchange="this.form.submit()">
-                    <option value="">Statuts : Tous</option>
-                    <option value="submitted" {{ request('status') == 'submitted' ? 'selected' : '' }}>Soumis</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En attente</option>
-                    <option value="validated" {{ request('status') == 'validated' ? 'selected' : '' }}>Validé</option>
-                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejeté</option>
-                    <option value="error" {{ request('status') == 'error' ? 'selected' : '' }}>Erreur</option>
+
+                <select name="status" class="select-filter">
+
+                    <option value="">
+                        Status : Tous
+                    </option>
+
+                    @foreach($statuses as $status)
+
+                    <option
+                        value="{{ $docs->status }}"
+                        {{ request('status') == $docs->status ? 'selected' : '' }}>
+
+                        {{ $docs->status }}
+
+                    </option>
+
+                    @endforeach
+
                 </select>
 
                 <button type="button" id="saveSearchBtn" class="btn-outline"
-                     style="border-radius: 10px; padding: 0.6rem 1.25rem; font-size: 0.9rem; border-color: #3b82f6; color: #3b82f6;">
+                    style="border-radius: 10px; padding: 0.6rem 1.25rem; font-size: 0.9rem; border-color: #3b82f6; color: #3b82f6;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         style="margin-right: 8px;">
                         <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
@@ -92,43 +170,14 @@
     </div>
 
     <div class="results-column" style="width: 100%; margin-top: 2rem;">
-        <div id="result-count" style="margin-bottom: 1.5rem; color: #64748b;">
-            <strong>{{ $results->total() }} résultats</strong> trouvés
-        </div>
+        <div id="ajax-results">
 
-        <div class="results-list">
-            @foreach($results as $doc)
-                <div class="result-card">
-                    <div class="file-icon-box bg-pdf">PDF</div>
-                    <!-- <div class="file-icon-box bg-pdf" style="width: 44px; height: 44px;">
-                        {{ strtoupper(pathinfo($doc->path, PATHINFO_EXTENSION)) }}</div> -->
-                    <div class="result-info">
-                        <div class="result-top" >
-                            <h3 class="result-filename">{{ $doc->title }}</h3>
-                            <span class="badge"
-                                style="padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; text-transform: uppercase; background: #f1f5f9;">
-                                {{ $doc->status }}
-                            </span>
-                        </div>
-                        <div class="result-meta" style="margin-top: 10px;">
-                            <div class="meta-item"><i class="fas fa-user"></i> {{ $doc->student->name ?? 'Inconnu' }}</div>
-                            <div class="meta-item"><i class="fas fa-calendar"></i> {{ $doc->created_at->format('d M Y') }}
-                            </div>
-                            <div class="meta-item"><i class="fas fa-tag"></i>
-                                {{ $doc->event->title ?? 'Sans événement' }}</div>
-                        </div>
-                    </div>
-                    <div class="result-actions">
-                        <button class="action-btn"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+    @include(
+        'admin.partials.search-result',
+        ['results' => $results]
+    )
 
-        <div style="margin-top: 2rem;">
-            {{ $results->appends(request()->query())->links() }}
-        </div>
+</div>
     </div>
 
     <script>
@@ -147,7 +196,7 @@
         });
 
         // Sauvegarde via AJAX
-        document.getElementById('saveSearchBtn').addEventListener('click', function () {
+        document.getElementById('saveSearchBtn').addEventListener('click', function() {
             const query = searchInput.value;
             if (!query) return alert('Tapez quelque chose à sauvegarder !');
 
@@ -157,11 +206,143 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ q: query })
+                body: JSON.stringify({
+                    q: query
+                })
             }).then(() => {
                 this.innerHTML = "✅ Sauvegardé";
                 setTimeout(() => location.reload(), 500); // Recharger pour voir la nouvelle recherche dans le menu
             });
         });
+    </script>
+    <script>
+        const form = document.getElementById(
+            'searchForm'
+        );
+
+        const ajaxResults = document.getElementById(
+            'ajax-results'
+        );
+
+        const resultCount = document.getElementById(
+            'result-count'
+        );
+
+        // =====================================================
+        // FETCH
+        // =====================================================
+
+        async function fetchResults(url = null) {
+            const formData = new FormData(form);
+
+            const params = new URLSearchParams(
+                formData
+            );
+
+            const endpoint = url || (
+                form.action + '?' + params.toString()
+            );
+
+            try {
+
+                ajaxResults.style.opacity = '.5';
+
+                const response = await fetch(
+                    endpoint, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }
+                );
+
+                const data = await response.json();
+
+                ajaxResults.innerHTML = data.html;
+
+                resultCount.innerHTML = `
+                <strong>${data.count} résultats</strong> trouvés
+            `;
+
+                bindPagination();
+
+            } catch (error) {
+
+                console.error(error);
+
+            } finally {
+
+                ajaxResults.style.opacity = '1';
+            }
+        }
+
+        // =====================================================
+        // PAGINATION
+        // =====================================================
+
+        function bindPagination() {
+            document.querySelectorAll(
+                '.pagination-link'
+            ).forEach(link => {
+
+                link.addEventListener(
+                    'click',
+                    function(e) {
+                        e.preventDefault();
+
+                        fetchResults(
+                            this.href
+                        );
+                    }
+                );
+            });
+        }
+
+        // =====================================================
+        // AUTO FILTERS
+        // =====================================================
+
+        form.querySelectorAll(
+            'select'
+        ).forEach(select => {
+
+            select.addEventListener(
+                'change',
+                () => fetchResults()
+            );
+        });
+
+        // =====================================================
+        // SEARCH INPUT
+        // =====================================================
+
+        let timeout = null;
+
+        searchInput.addEventListener(
+            'input',
+            () => {
+
+                clearTimeout(timeout);
+
+                timeout = setTimeout(
+                    () => fetchResults(),
+                    400
+                );
+            }
+        );
+
+        // =====================================================
+        // SUBMIT
+        // =====================================================
+
+        form.addEventListener(
+            'submit',
+            function(e) {
+                e.preventDefault();
+
+                fetchResults();
+            }
+        );
+
+        bindPagination();
     </script>
 </x-admin-layout>

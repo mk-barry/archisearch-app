@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Documents;
 use App\Models\DocumentType;
 use App\Models\AuthorizedStudent;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process; // Import indispensable
 use App\Http\Controllers\Log;
 // use App\Http\Controllers\Storage;
@@ -156,12 +157,17 @@ class AdminController extends Controller
         // 1. On récupère l'événement avec ses relations
         $event = Events::with('documentTypes')->where('uuid', $uuid)->firstOrFail();
 
+        if ($event->status === "actif") {
+
         // 2. On récupère tous les types de documents disponibles en BD 
         // pour pouvoir les afficher sous forme de checkboxes dans le formulaire
         $documentTypes = DocumentType::all();
 
         // 3. On retourne la VUE (le fichier .blade.php) et on lui passe les données
         return view('admin.edit-event', compact('event', 'documentTypes'));
+        }else{
+            return back();
+        }
     }
 
     public function update(Request $request, $uuid)
@@ -397,14 +403,6 @@ class AdminController extends Controller
         }
     }
 
-    // public function showDocument(Documents $document)
-    // {
-    //     $path = storage_path("app/public/" . $document->file_path);
-    //     if (!file_exists($path)) abort(404);
-
-    //     return response()->file($path);
-    // }
-
     // Télécharger un document unique
     public function downloadDocument(Documents $document)
     {
@@ -460,54 +458,178 @@ class AdminController extends Controller
     // =====================================Recherche=========================================
     // =======================================================================================
     public function recherche(Request $request)
-    {
-        $query = Documents::query()->with(['student', 'event']);
+{
+    $query = Documents::query()
+        ->with([
+            'student',
+            'event'
+        ]);
 
-        // Filtre par mot-clé (Titre ou Nom de l'étudiant)
-        if ($request->filled('q')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', "%{$request->q}%")
-                    ->orWhereHas('student', function ($sq) use ($request) {
-                        $sq->where('name', 'like', "%{$request->q}%");
-                    })
-                    ->orWhere('extracted_text', 'like', "%{$request->q}%");
+    // =====================================================
+    // SEARCH
+    // =====================================================
+
+    if ($request->filled('q')) {
+
+        $search = $request->q;
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where(
+                'title',
+                'like',
+                "%{$search}%"
+            )
+
+            ->orWhere(
+                'extracted_text',
+                'like',
+                "%{$search}%"
+            )
+
+            ->orWhereHas('student', function ($sq) use ($search) {
+
+                $sq->where(
+                    'name',
+                    'like',
+                    "%{$search}%"
+                );
             });
-        }
-
-        // Filtre par Statuts (submitted, pending, validated, rejected, error)
-
-        if ($request->filled('event')) {
-            $query->where('event', $request->event);
-        }
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->file_type);
-        }
-
-        if ($request->filled('date')) {
-            $query->where('date', $request->created_at);
-        }
-
-        if ($request->filled('uploader')) {
-            $query->where('student', $request->student);
-        }
-
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $results = $query->latest()->paginate(10);
-
-        // Récupérer les 10 dernières recherches sauvegardées de l'utilisateur
-        $savedSearches = auth()->user()->savedSearches()->latest()->take(10)->get();
-
-        // if ($request->ajax()) {
-        //     return view('admin.partials.search_result', compact('results', 'savedSearches'))->render();
-        // }
-
-        return view('admin.recherche', compact('results', 'savedSearches'));
+        });
     }
+
+    // =====================================================
+    // EVENT
+    // =====================================================
+
+    if ($request->filled('event')) {
+
+        $query->where(
+            'event_id',
+            $request->event
+        );
+    }
+
+    // =====================================================
+    // DATE
+    // =====================================================
+
+    if ($request->filled('date')) {
+
+        $query->whereDate(
+            'created_at',
+            $request->date
+        );
+    }
+
+    // =====================================================
+    // TYPE
+    // =====================================================
+
+    if ($request->filled('type')) {
+
+        $query->where(
+            'file_type',
+            $request->type
+        );
+    }
+
+
+    // =====================================================
+    // AUTHOR
+    // =====================================================
+
+    if ($request->filled('student')) {
+
+        $query->whereHas('student', function ($q) use ($request) {
+
+            $q->where(
+                'name',
+                $request->uploader
+            );
+        });
+    }
+
+    // =====================================================
+    // STATUS
+    // =====================================================
+
+    if ($request->filled('status')) {
+
+        $query->where(
+            'status',
+            $request->status
+        );
+    }
+
+    // =====================================================
+    // RESULTS
+    // =====================================================
+
+    $results = $query
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+    // =====================================================
+    // FILTER DATA
+    // =====================================================
+
+    $events = Events::orderBy('title')
+        ->get();
+
+    $uploaders = AuthorizedStudent::where('matricule')
+        ->orderBy('name')
+        ->get();  
+
+    $documents = Documents::orderBy('title')
+        ->get();
+
+    $statuses = DB::select("SHOW COLUMNS FROM documents WHERE Field = 'status'");
+
+    $types = DocumentType::orderBy('code')->get();
+
+    // =====================================================
+    // SAVED SEARCHES
+    // =====================================================
+
+    $savedSearches = auth()
+        ->user()
+        ->savedSearches()
+        ->latest()
+        ->take(10)
+        ->get();
+
+    // =====================================================
+    // AJAX RESPONSE
+    // =====================================================
+
+    if ($request->ajax()) {
+
+        return response()->json([
+
+            'html' => view(
+                'admin.partials.search-result',
+                compact('results')
+            )->render(),
+
+            'count' => $results->total()
+        ]);
+    }
+
+    return view(
+        'admin.recherche',
+        compact(
+            'results',
+            'savedSearches',
+            'events',
+            'documents',
+            'statuses',
+            'uploaders',
+            'types'
+        )
+    );
+}
 
     // Fonction pour sauvegarder via AJAX
     public function sauvegarderRecherche(Request $request)

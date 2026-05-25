@@ -128,7 +128,7 @@ class GuestController extends Controller
 
         $file = $request->file('document');
         $matricule = session('student_matricule');
-        $path = $file->storeAs("documents/{$matricule}/{$event->id}", time() . '_' . $file->getClientOriginalName(), 'public');
+        $path = $file->storeAs("documents/{$event->title}/{$matricule}", time() . '_' . $file->getClientOriginalName(), 'public');
         $fullPath = storage_path("app/public/" . $path);
         $pythonPath = base_path('.venv\Scripts\python.exe');
 

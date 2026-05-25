@@ -62,7 +62,7 @@
 
                     <div class="event-progress-section">
                         @php
-                            $percentage = $event->total_expected > 0 ? ($event->submissions_count / $event->total_expected) * 100 : 20;
+                            $percentage = $event->total_expected > 0 ? ($event->submissions_count / $event->total_expected) * 100 : 0;
                         @endphp
                         {{-- La classe compact-progress-bg doit être définie dans common.css pour la couleur de fond --}}
                         <div class="compact-progress-bg">
@@ -91,19 +91,27 @@
                             {{ $event->documentTypes->count() }} {{ Str::plural('type', $event->documentTypes->count()) }} requis
                         </div>
                         <div class="event-actions">
-                            <a href="{{ route('admin.voir-events', $event->uuid) }}" class="action-btn flex-center" title="Voir l'événement">
+                            <a href="{{ route('admin.voir-events', $event->uuid) }}" class="action-btn flex-center action-btn-view" title="Voir l'événement">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />
                                 </svg>
                             </a>
 
-                            <a href="{{ route('admin.edit-events', $event->uuid) }}" class="action-btn" title="Modifier l'événement">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                                </svg>
-                            </a>
+                            @if($event->status === 'actif')
+                                <a href="{{ route('admin.edit-events', $event->uuid) }}" class="action-btn action-btn-edit" title="Modifier l'événement">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                                    </svg>
+                                </a>
+                            @else
+                                <button class="action-btn opacity-30 cursor-not-allowed" disabled>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                                    </svg>
+                                </button>
+                            @endif
 
-                            <button class="action-btn btn-copy" onclick="copyEventLink('{{ $event->uuid }}')" title="Copier le lien">
+                            <button class="action-btn btn-copy action-btn-link" onclick="copyEventLink('{{ $event->uuid }}')" title="Copier le lien">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>

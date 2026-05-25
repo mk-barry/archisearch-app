@@ -31,9 +31,9 @@
     </nav>
 
     @php
-use Carbon\Carbon;
-$deadline = Carbon::parse($event->end_date)->locale('fr')->isoFormat('LL');
-$maxSizeMo = $event->max_file_size ? round($event->max_file_size / 1024) : 2;
+    use Carbon\Carbon;
+    $deadline = Carbon::parse($event->end_date)->locale('fr')->isoFormat('LL');
+    $maxSizeMo = $event->max_file_size ? round($event->max_file_size / 1024) : 2;
     @endphp
 
     <div class="invitation-container">

@@ -13,6 +13,11 @@
 .event-meta { font-size: 0.85rem; color: #94a3b8; }
 .event-actions { display: flex; gap: 8px; }
 .action-btn-danger { color: #ef4444; border-color: transparent; }
+.action-btn-edit { color: #10b981; border-color: transparent; }
+.action-btn-view { color: #64748b; border-color: transparent; }
+.action-btn-link { color: #1e3a8a; border-color: transparent; }
+.cursor-not-allowed { cursor: not-allowed; }
+.cursor-not-allowed:hover { transform: none; }
 
 @media screen and (max-width: 768px) {
     .event-grid { grid-template-columns: 1fr; }

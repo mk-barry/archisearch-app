@@ -1,4 +1,4 @@
-@props(['active' => 'supervision', 'title' => 'ArchiSearch - Dashboard'])
+@props(['active' => 'supervision', 'title' => 'ArchiSearch - Dashboard', 'sec_css' => ''])
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -11,6 +11,9 @@
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard/main.css') }}">
+    @if($sec_css)
+    <link rel="stylesheet" href="{{ $sec_css }}">
+    @endif
 
     <!-- Inter font CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +24,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/fr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/relativeTime.min.js"></script>
-    
+
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/alerts.js') }}"></script>
@@ -102,9 +105,13 @@
                     Paramètres globaux
                 </a>
                 <a href="{{ route('profile.edit') }}" class="nav-item {{ $active == 'profil' ? 'active' : '' }}">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+
+                        <path d="M20 21a8 8 0 0 0-16 0" />
+                        <circle cx="12" cy="7" r="4" />
+
                     </svg>
                     Profil
                 </a>
@@ -114,7 +121,7 @@
                 <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: none;">
                     @csrf
                 </form>
-            
+
                 <a href="{{ route('logout') }}" class="nav-item"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -167,8 +174,18 @@
             </main>
         </div>
     </div>
-    <!-- @include('heartbeat') -->
     @stack('scripts')
+
+    @if(session('success'))
+    <script>
+        ASAlerts.success(@json(session('success')));
+    </script>
+    @endif
+    @if(session('error'))
+    <script>
+        ASAlerts.error(@json(session('error')));
+    </script>
+    @endif
 </body>
 
 </html>
