@@ -137,7 +137,7 @@ class GuestController extends Controller
 
         // Préparation des règles JSON issues de ta BD
         $rules = json_encode([
-            'keywords' => $docType->validation_rules['keywords'] ?? [],
+            'keywords' => $docType->validation_rules['required_keywords'] ?? [],
             'min_score' => $docType->validation_rules['min_score'] ?? 1
         ]);
 
@@ -182,7 +182,7 @@ class GuestController extends Controller
             'metadata' => [
                 'score_ocr' => $ocrData['score'],
                 'mots_trouves' => $ocrData['match_keywords'] ?? [],
-                'validated_at' => now()->toDateTimeString()
+                'uploded_at' => now()->toDateTimeString()
             ],
             'extracted_text' => $ocrData['extracted_text'] ?? ''
         ]);

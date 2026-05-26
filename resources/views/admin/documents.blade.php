@@ -311,25 +311,24 @@
                 form.submit().remove();
             });
 
-            async function shareDocument(title, url) {
+            function shareDocument(title, url) {
+
                 const fullUrl = window.location.origin + url;
 
-                // On vérifie si le navigateur supporte le partage natif
                 if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'Document ArchiSearch : ' + title,
-                            text: 'Voici un document partagé depuis ArchiSearch',
-                            url: fullUrl,
-                        });
-                        console.log('Partage réussi');
-                    } catch (err) {
-                        console.log('Erreur ou partage annulé :', err);
-                    }
+
+                    navigator.share({
+                        title: 'Document ArchiSearch : ' + title,
+                        text: 'Voici un document partagé depuis ArchiSearch',
+                        url: fullUrl,
+                    });
+
                 } else {
-                    // Fallback : Si le partage natif n'est pas dispo, on copie le lien
+
                     navigator.clipboard.writeText(fullUrl);
-                    alert('Partage natif non supporté. Le lien a été copié dans le presse-papiers.');
+
+                    alert('Lien copié.');
+
                 }
             }
 

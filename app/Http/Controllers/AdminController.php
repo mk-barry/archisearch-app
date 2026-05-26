@@ -120,13 +120,6 @@ class AdminController extends Controller
                 'document_types' => 'required|array|min:1', // On valide le nouveau nom du champ
                 'invited_students' => 'required_if:invite_type,particuliers|array',
             ],
-            [
-                'start_date.after_or_equal' =>
-                "La date de début ne peut pas être dans le passé.",
-
-                'end_date.after_or_equal' =>
-                "La date de fin doit être après la date de début.",
-            ]
         );
 
         // 2. Création de l'événement
@@ -260,59 +253,118 @@ class AdminController extends Controller
 
     public function showDocumentAnalysis(Documents $document)
     {
+        // dd($document);
         try {
 
-            $metadata = is_string($document->metadata)
-                ? json_decode($document->metadata, true)
-                : ($document->metadata ?? []);
+            // =========================================================
+            // METADATA EXISTANTE
+            // =========================================================
 
-            $text = $metadata['extracted_text']
-                ?? $document->extracted_text
-                ?? '';
+            $metadata = [];
+
+            if (is_string($document->metadata)) {
+
+                $metadata = json_decode(
+                    $document->metadata,
+                    true
+                ) ?? [];
+            } elseif (is_array($document->metadata)) {
+
+                $metadata = $document->metadata;
+            }
+
+            // =========================================================
+            // RELATIONS
+            // =========================================================
 
             $student = $document->student;
 
             $documentType = $document->documentType;
 
+            // =========================================================
+            // VALIDATION RULES
+            // =========================================================
+
             $rules = $documentType?->validation_rules;
 
             if (is_string($rules)) {
-                $rules = json_decode($rules, true);
+
+                $rules = json_decode(
+                    $rules,
+                    true
+                ) ?? [];
             }
+
+            // =========================================================
+            // PAYLOAD PYTHON
+            // =========================================================
 
             $payload = [
 
-                'text' => $text,
+                'file_path' => storage_path(
+                    'app/public/' . $document->file_path
+                ),
+
+                'document' => [
+
+                    'id' => $document->id,
+
+                    'identifier' => $document->identifier,
+
+                    'tracking_code' => $document->tracking_code,
+
+                    'title' => $document->title,
+
+                    'file_type' => $document->file_type,
+
+                    'category' => $document->category,
+                ],
 
                 'student' => [
+
                     'name' => $student?->name,
+
                     'matricule' => $student?->matricule,
+
                     'email' => $student?->email,
                 ],
 
-                'rules' => [
+                'document_type' => [
 
-                    'required_keywords' => (
-                        $rules['required_keywords'] ?? []
-                    ),
+                    'id' => $documentType?->id,
 
-                    'forbidden_keywords' => (
-                        $rules['forbidden_keywords'] ?? []
-                    ),
+                    'label' => $documentType?->label,
 
-                    'metadata_patterns' => (
-                        $rules['metadata_patterns'] ?? []
-                    ),
+                    'is_perishable' => (bool)($documentType?->is_perishable ?? false),
 
-                    'minimum_confidence' => (
-                        $rules['minimum_confidence'] ?? 70
-                    ),
+                    'validation_rules' => [
 
-                    'is_perishable' => (
-                        (bool)($documentType?->is_perishable ?? false)
-                    )
+                        'required_keywords' => (
+                            $rules['required_keywords'] ?? []
+                        ),
+
+                        'forbidden_keywords' => (
+                            $rules['forbidden_keywords'] ?? []
+                        ),
+
+                        'metadata_patterns' => (
+                            $rules['metadata_patterns'] ?? []
+                        ),
+
+                        'required_metadata' => (
+                            $rules['required_metadata'] ?? []
+                        ),
+
+                        'minimum_confidence' => (
+                            $rules['minimum_confidence'] ?? 70
+                        )
+                    ]
                 ]
             ];
+
+            // =========================================================
+            // PYTHON
+            // =========================================================
 
             $pythonPath = base_path(
                 '.venv/Scripts/python.exe'
@@ -322,14 +374,31 @@ class AdminController extends Controller
                 'scripts/deep_analysis.py'
             );
 
+            if (!file_exists($pythonPath)) {
+
+                dd("Python introuvable", $pythonPath);
+            }
+
+            if (!file_exists($scriptPath)) {
+
+                dd("Script introuvable", $scriptPath);
+            }
+
             $process = \Illuminate\Support\Facades\Process::run([
+
                 $pythonPath,
+
                 $scriptPath,
+
                 json_encode(
                     $payload,
                     JSON_UNESCAPED_UNICODE
                 )
             ]);
+
+            // =========================================================
+            // ERREUR PYTHON
+            // =========================================================
 
             if ($process->failed()) {
 
@@ -338,30 +407,125 @@ class AdminController extends Controller
                 );
             }
 
-            $analysis = json_decode(
+            // =========================================================
+            // RESULTAT
+            // =========================================================
+
+            $response = json_decode(
                 $process->output(),
                 true
             );
 
-            if (!$analysis) {
+            // dd(
+            //     $process->output(),
+            //     json_last_error_msg()
+            // );
+
+            if (
+                !$response
+                || !isset($response['success'])
+            ) {
 
                 throw new \Exception(
                     'Réponse Python invalide'
                 );
             }
 
-            // =================================================
-            // SAVE ANALYSIS
-            // =================================================
+            if (!$response['success']) {
 
-            $document->metadata = array_merge(
-                $metadata,
-                [
-                    'analysis' => $analysis
-                ]
+                throw new \Exception(
+                    $response['error']
+                        ?? 'Erreur Python inconnue'
+                );
+            }
+
+            $analysis = $response['result'];
+
+            // =========================================================
+            // UPDATE DOCUMENT
+            // =========================================================
+
+            $document->document_type_id = (
+                $analysis['document_type_id']
+                ?? $document->document_type_id
             );
 
+            // $document->status = (
+            //     $analysis['status']
+            //     ?? $document->status
+            // );
+
+            $document->ocr_score = (
+                $analysis['ocr_score']
+                ?? 0
+            );
+
+            $document->semantic_score = (
+                $analysis['semantic_score']
+                ?? 0
+            );
+
+            $document->name_match_score = (
+                $analysis['name_match_score']
+                ?? 0
+            );
+
+            $document->is_valid = (
+                $analysis['is_valid']
+                ?? false
+            );
+
+            $document->is_flagged = (
+                $analysis['is_flagged']
+                ?? false
+            );
+
+            $document->is_expired = (
+                $analysis['is_expired']
+                ?? false
+            );
+
+            $document->expiry_date = (
+                $analysis['expiry_date']
+                ?? null
+            );
+
+            $document->flags = json_encode(
+                $analysis['flags']
+                    ?? [],
+                JSON_UNESCAPED_UNICODE
+            );
+
+            $document->ocr_words = json_encode(
+                $analysis['ocr_words']
+                    ?? [],
+                JSON_UNESCAPED_UNICODE
+            );
+
+            $document->extracted_text = (
+                $analysis['extracted_text']
+                ?? ''
+            );
+
+            $document->metadata = json_encode(
+
+                array_merge(
+                    $metadata,
+                    [
+                        'analysis' => $analysis
+                    ]
+                ),
+
+                JSON_UNESCAPED_UNICODE
+            );
+
+            $document->processed_at = now();
+
             $document->save();
+
+            // =========================================================
+            // VIEW
+            // =========================================================
 
             return view(
                 'admin.doc-view',
@@ -373,16 +537,16 @@ class AdminController extends Controller
         } catch (\Exception $e) {
 
             \Log::error(
-                "Erreur Expertise : " .
-                    $e->getMessage()
+                "Erreur Analyse Document : "
+                    . $e->getMessage()
             );
 
             return redirect()
                 ->route('admin.documents')
                 ->with(
                     'error',
-                    'Analyse impossible : ' .
-                        $e->getMessage()
+                    'Analyse impossible : '
+                        . $e->getMessage()
                 );
         }
     }

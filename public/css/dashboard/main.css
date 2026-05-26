@@ -213,6 +213,19 @@ main {
     align-items: center;
 }
 
+.card-ext {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 20% 20px);
+    align-items: center;
+    justify-content: center;
+    /* gap: 5%; */
+    grid-column-gap: 5%;
+    grid-row-gap: 10%;
+}
+
 /* Icons */
 .icon-blue { background: #eff6ff; color: #2563eb; }
 .icon-green { background: #f0fdf4; color: #16a34a; }
@@ -425,8 +438,8 @@ td {
 
 /* Settings Specific */
 .settings-grid {
-    display: grid;
-    grid-template-columns: 1fr 400px;
+    display: flex;
+    flex-direction: column-reverse;
     gap: 1.5rem;
 }
 

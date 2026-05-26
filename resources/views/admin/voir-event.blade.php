@@ -79,8 +79,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if($event->authorizedStudents && $event->authorizedStudents->count() > 0)
-                            @foreach($event->authorizedStudents as $student)
+                        @if($event->authorizedStudent && $event->authorizedStudent->count() > 0)
+                            <span>ok</span>
+                            @foreach($event->authorizedStudent as $student)
                                 <tr>
                                     {{-- Ton code de ligne ici --}}
                                     <td style="padding: 12px;">

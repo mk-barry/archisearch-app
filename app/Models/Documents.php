@@ -23,11 +23,25 @@ class Documents extends Model
         'rejection_reason',
         'processed_by',
         'processed_at',
+        'semantic_score',
+        'name_match_score',
+        'ocr_score',
+        'ocr_words',
+        'flags',
+        'is_perishable',
+        'is_flagged',
+        'expiry_date',
+        'is_expired',
     ];
 
     protected $casts = [
         'processed_at' => 'datetime',
         'metadata' => 'array',
+        'ocr_words' => 'array',
+        'flags' => 'array',
+        'is_valid' => 'boolean',
+        'is_flagged' => 'boolean',
+        'is_expired' => 'boolean',
     ];
 
     /**

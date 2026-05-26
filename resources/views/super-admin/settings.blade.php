@@ -61,10 +61,22 @@
                                         </svg></button>
                                 </div>
                             </div>
+                            <span style="font-size: 0.75rem; italic;">Mots a rechercher</span><br>
                             <div class="tag-list">
-                                @if(isset($type->validation_rules['keywords']))
-                                @foreach($type->validation_rules['keywords'] as $kw)
-                                <span class="tag" style="background: #f1f5f9; color: #475569;">{{ $kw }}</span>
+                                @if(isset($type->validation_rules['required_keywords']))
+                                @foreach($type->validation_rules['required_keywords'] as $rkw)
+                                <span class="tag" style="background: #f1f5f9; color: #475569;">{{ $rkw }}</span>
+                                @endforeach
+                                @else
+                                <span style="font-size: 0.75rem; color: #cbd5e1; italic;">Aucun mot-clé configuré</span>
+                                @endif
+                            </div>
+
+                            <span style="font-size: 0.75rem; italic;">Mots interdits</span><br>
+                            <div class="tag-list">
+                                @if(isset($type->validation_rules['forbidden_keywords']))
+                                @foreach($type->validation_rules['forbidden_keywords'] as $fkw)
+                                <span class="tag" style="background: #f1f5f9; color: #475569;">{{ $fkw }}</span>
                                 @endforeach
                                 @else
                                 <span style="font-size: 0.75rem; color: #cbd5e1; italic;">Aucun mot-clé configuré</span>
@@ -240,19 +252,18 @@
                     </div>
 
                     <div class="dashboard-card">
-                        <div class="card-title" style="display: flex; flex-direction: column; gap: 10px;">
-                            Formats de fichiers gérés
+                        <div class="progress-container" style="display: flex; justify-content: space-between; font-weight: 700%;">                                Formats de fichiers gérés
                             <form action="{{ route('super-admin.extensions.store') }}" method="POST" style="display: flex; gap: 5px;">
                                 @csrf
                                 <input type="text" name="name" placeholder="ex: PDF" style="width: 60px; padding: 2px 5px; font-size: 0.7rem; border: 1px solid #ddd; border-radius: 4px; outline: none;">
                                 <!-- <button type="submit" class="btn-primary" style="padding: 2px 8px; font-size: 0.7rem;">+</button> -->
                                 <input type="submit" value="+" title="Ajouter une extension" class="btn-primary" style="padding: 2px 8px; font-size: 0.7rem;">
                             </form>
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; justify-content: center;">
-                                @foreach($fileExtensions as $ext)
-                                <label style="display: flex; align-items: center; gap: 5px; background: #f8fafc; padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0; width: 60%;">
-                                    <!-- <input type="checkbox" name="extensions[]" value="{{ $ext->id }}"> -->
-                                    <span style="font-size: 0.8rem; font-weight: 600;">
+                        </div>
+                        <div class="card-ext">
+                            @foreach($fileExtensions as $ext)
+                                <label style="display: flex; align-items: center; gap: 5px; background: #f8fafc; padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0;">
+                                    <span style="font-size: 0.8rem; font-weight: 600; display: flex; flex-direction: column;">
                                         {{ strtoupper($ext->name) }} <small style="color: #94a3b8;">({{ $ext->mime_type }})</small>
                                     </span>
                                 </label>
@@ -263,8 +274,8 @@
 
                                     @csrf
                                     @method('DELETE')
-                                    <span class="tag" style="background: #eff6ff; color: #1e40af; display: flex; align-items: center; gap: 5px;">
-                                        {{ strtoupper($ext->label) }}
+                                    <span class="tag" style="background: #eff6ff; color: #1e40af; display: flex; justify-content: center; align-items: center; gap: 5px;">
+                                        <!-- {{ strtoupper($ext->label) }} -->
                                         <!-- Optionnel : bouton de suppression -->
                                         <button
                                             type="button"
@@ -273,14 +284,13 @@
                                             'Voulez-vous supprimer cette extension ?',
                                             () => this.closest('form').submit()
                                         )"
-                                            style="border:none; background:none; cursor:pointer;">
+                                            style="border:none; background:none; cursor:pointer; display: flex; justify-content:center; align-items: center;">
                                             ×
                                         </button>
                                     </span>
 
                                 </form>
                                 @endforeach
-                            </div>
                         </div>
 
                         <!-- <div class="tag-list" style="margin-top: 1rem;">
@@ -332,9 +342,9 @@
         </div> -->
 
                     <!-- Bottom Actions -->
-                    <div
-                        style="position: fixed; bottom: 0; right: 0; left: 260px; padding: 1.5rem 2rem; background: white; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 1rem; z-index: 80;">
+                    <!-- <div
+                        style="position: fixed; bottom: 0; right: 0; left: 260px; padding: 1rem 2rem; background: white; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 1rem; z-index: 80;">
                         <button class="btn-outline">Annuler</button>
                         <button class="btn-primary" style="padding: 0.75rem 2rem;">Enregistrer les paramètres</button>
-                    </div>
+                    </div> -->
 </x-super-admin-layout>
