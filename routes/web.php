@@ -74,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/creation-student', [SuperAdminController::class, 'createStudent'])->name('students.create');
         Route::post('/store-student', [SuperAdminController::class, 'storeStudent'])->name('students.store');
         Route::post('/store-doc-type', [SuperAdminController::class, 'storeDocType'])->name('document-types.store');
+        Route::put('/super-admin/document-types/{documentType}', [SuperAdminController::class, 'updateDocType'])->name('.document-types.update');
         Route::post('/extension', [SuperAdminController::class, 'storeExtension'])->name('extensions.store');
         Route::delete('/extensions/{extension}', [SuperAdminController::class, 'destroyExtension'])->name('extensions.destroy');
 

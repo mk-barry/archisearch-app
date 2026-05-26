@@ -228,36 +228,167 @@ class SuperAdminController extends Controller
     {
         $validated = $request->validate([
             'label' => 'required|string|max:255',
-            'code' => 'required|string|unique:document_types,code|max:10',
-            'max_size_mb' => 'required|integer|min:1', // On saisit en Mo pour l'UI
-            'keywords' => 'nullable|string',
+
+            'code' => 'required|string|unique:document_types,code|max:50',
+
+            'max_size_mb' => 'required|integer|min:1',
+
+            'required_keywords' => 'nullable|string',
+
+            'forbidden_keywords' => 'nullable|string',
+
             'min_score' => 'required|integer|min:1',
-            'extensions' => 'required|array', // Tableau d'IDs d'extensions
+
+            'required_metadata' => 'nullable|string',
+
+            'is_perishable' => 'nullable|boolean',
+
+            'expiry_patterns' => 'nullable|string',
+
+            'extensions' => 'required|array',
         ]);
 
         try {
+
             DB::beginTransaction();
 
-            // 1. Création du type de document
             $documentType = DocumentType::create([
+
                 'label' => $validated['label'],
+
                 'code' => strtoupper($validated['code']),
-                'max_size_kb' => $validated['max_size_mb'] * 1024, // Conversion en Ko pour la BD
+
+                'max_size_kb' => $validated['max_size_mb'] * 1024,
+
                 'validation_rules' => [
-                    'keywords' => array_map('trim', explode(',', $request->keywords)),
+
+                    'required_keywords' => array_filter(
+                        array_map('trim', explode(',', $request->required_keywords))
+                    ),
+
+                    'forbidden_keywords' => array_filter(
+                        array_map('trim', explode(',', $request->forbidden_keywords))
+                    ),
+
+                    'required_metadata' => array_filter(
+                        array_map('trim', explode(',', $request->required_metadata))
+                    ),
+
+                    'expiry_patterns' => array_filter(
+                        array_map('trim', explode(',', $request->expiry_patterns))
+                    ),
+
                     'min_score' => (int)$validated['min_score']
-                ]
+                ],
+
+                'is_perishable' => $request->boolean('is_perishable')
             ]);
 
-            // 2. Association des extensions (Table document_type_extension)
-            $documentType->allowedExtensions()->attach($validated['extensions']);
+            $documentType
+                ->allowedExtensions()
+                ->attach($validated['extensions']);
 
             DB::commit();
-            return back()->with('success', 'Type de document configuré avec succès !');
+
+            return back()->with(
+                'success',
+                'Type de document configuré avec succès !'
+            );
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+
             DB::rollback();
-            return back()->with('error', 'Erreur lors de la création : ' . $e->getMessage());
+
+            \Log::error($e);
+
+            return back()->with(
+                'error',
+                'Erreur lors de la création : ' . $e->getMessage()
+            );
+        }
+    }
+
+    public function updateDocType(Request $request, DocumentType $documentType)
+    {
+        $validated = $request->validate([
+
+            'label' => 'required|string|max:255',
+
+            'code' => 'required|string|max:50|unique:document_types,code,' . $documentType->id,
+
+            'max_size_mb' => 'required|integer|min:1',
+
+            'required_keywords' => 'nullable|string',
+
+            'forbidden_keywords' => 'nullable|string',
+
+            'min_score' => 'required|integer|min:1',
+
+            'required_metadata' => 'nullable|string',
+
+            'is_perishable' => 'nullable|boolean',
+
+            'expiry_patterns' => 'nullable|string',
+
+            'extensions' => 'required|array',
+        ]);
+
+        try {
+
+            DB::beginTransaction();
+
+            $documentType->update([
+
+                'label' => $validated['label'],
+
+                'code' => strtoupper($validated['code']),
+
+                'max_size_kb' => $validated['max_size_mb'] * 1024,
+
+                'validation_rules' => [
+
+                    'required_keywords' => array_filter(
+                        array_map('trim', explode(',', $request->required_keywords))
+                    ),
+
+                    'forbidden_keywords' => array_filter(
+                        array_map('trim', explode(',', $request->forbidden_keywords))
+                    ),
+
+                    'required_metadata' => array_filter(
+                        array_map('trim', explode(',', $request->required_metadata))
+                    ),
+
+                    'expiry_patterns' => array_filter(
+                        array_map('trim', explode(',', $request->expiry_patterns))
+                    ),
+
+                    'min_score' => (int)$validated['min_score']
+                ],
+
+                'is_perishable' => $request->boolean('is_perishable')
+            ]);
+
+            // Synchronise les extensions
+            $documentType
+                ->allowedExtensions()
+                ->sync($validated['extensions']);
+
+            DB::commit();
+
+            return back()->with(
+                'success',
+                'Type de document modifié avec succès.'
+            );
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            \Log::error($e);
+
+            return back()->with(
+                'error',
+                'Erreur : ' . $e->getMessage()
+            );
         }
     }
 

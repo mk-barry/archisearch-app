@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class DocumentType extends Model
 {
-    protected $fillable = ['code', 'label', 'validation_rules', 'max_size_kb'];
+    protected $fillable = ['code', 'label', 'validation_rules', 'max_size_kb', 'is_perishable'];
 
     protected $casts = [
-        'allowed_extensions' => 'array', // Transforme le JSON en tableau PHP
+        // 'allowed_extensions' => 'array', // Transforme le JSON en tableau PHP
         'validation_rules' => 'array', // Transforme le JSON en tableau PHP
+        'is_perishable' => 'boolean',
     ];
 
     public function events()

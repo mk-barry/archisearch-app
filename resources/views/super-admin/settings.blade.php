@@ -28,7 +28,7 @@
             <div class="dashboard-card">
                 <div class="card-title">
                     Types de documents & OCR
-                    <button onclick="document.getElementById('modal-add-type').style.display='flex'" class="btn-primary"
+                    <button onclick="openCreateModal()" class="btn-primary"
                         style="padding: 0.5rem 1rem; font-size: 0.8rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="3">
@@ -55,7 +55,30 @@
                                 <div style="display: flex; align-items: center; gap: 12px;">
                                     <span style="font-size: 0.85rem; color: #94a3b8;">{{ $type->documents_count }}
                                         docs</span>
-                                    <button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24"
+                                    <button
+                                        class="action-btn edit-doc-type-btn"
+
+                                        data-id="{{ $type->id }}"
+
+                                        data-label="{{ $type->label }}"
+
+                                        data-code="{{ $type->code }}"
+
+                                        data-max-size="{{ round($type->max_size_kb / 1024) }}"
+
+                                        data-min-score="{{ $type->validation_rules['min_score'] ?? 1 }}"
+
+                                        data-required-keywords="{{ implode(', ', $type->validation_rules['required_keywords'] ?? []) }}"
+
+                                        data-forbidden-keywords="{{ implode(', ', $type->validation_rules['forbidden_keywords'] ?? []) }}"
+
+                                        data-required-metadata="{{ implode(', ', $type->validation_rules['required_metadata'] ?? []) }}"
+
+                                        data-expiry-patterns="{{ implode(', ', $type->validation_rules['expiry_patterns'] ?? []) }}"
+
+                                        data-is-perishable="{{ $type->is_perishable ? 1 : 0 }}"
+
+                                        data-extensions='@json($type->allowedExtensions->pluck("id"))'><svg width="14" height="14" viewBox="0 0 24 24"
                                             fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                                         </svg></button>
@@ -91,31 +114,32 @@
             <!-- Modal simple pour l'ajout (à mettre en bas de page) -->
             <div id="modal-add-type" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding: 20px;">
                 <div class="dashboard-card" style="width: 550px; background:white; max-height: 90vh; overflow-y: auto;">
-                    <div class="card-title">Configurer un nouveau type de document</div>
+                    <div class="card-title" id="modal-title">Configurer un nouveau type de document</div>
 
-                    <form action="{{ route('super-admin.document-types.store') }}" method="POST">
+                    <form id="doc-type-form action="{{ route('super-admin.document-types.store') }}" method="POST">
                         @csrf
+                        <div id="method-container"></div>
                         <div style="display:flex; flex-direction:column; gap:1.2rem; margin-top:1rem;">
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div>
                                     <label style="font-size:0.85rem; font-weight: 700;">Libellé complet</label>
-                                    <input type="text" name="label" placeholder="ex: Diplôme de Licence" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
+                                    <input type="text" id="label" name="label" placeholder="ex: Diplôme de Licence" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
                                 </div>
                                 <div>
                                     <label style="font-size:0.85rem; font-weight: 700;">Code (Unique)</label>
-                                    <input type="text" name="code" placeholder="ex: LICENCE_DIP" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
+                                    <input type="text" id="code" name="code" placeholder="ex: LICENCE_DIP" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
                                 </div>
                             </div>
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div>
                                     <label style="font-size:0.85rem; font-weight: 700;">Taille Max (Mo)</label>
-                                    <input type="number" name="max_size_mb" value="5" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
+                                    <input type="number" id="max_size_mb" name="max_size_mb" value="5" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
                                 </div>
                                 <div>
                                     <label style="font-size:0.85rem; font-weight: 700;">Score OCR Min.</label>
-                                    <input type="number" name="min_score" value="2" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
+                                    <input type="number" id="min_score" name="min_score" value="2" required style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; margin-top: 5px;">
                                 </div>
                             </div>
 
@@ -143,6 +167,7 @@
                                 </label>
 
                                 <textarea
+                                    id="required_keywords"
                                     name="required_keywords"
                                     placeholder="baccalauréat, baccalau, diplôme..."
                                     style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
@@ -158,6 +183,7 @@
                                 </label>
 
                                 <textarea
+                                    id="forbidden_keywords"
                                     name="forbidden_keywords"
                                     placeholder="probatoire, specimen..."
                                     style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
@@ -173,6 +199,7 @@
                                 </label>
 
                                 <textarea
+                                    id="required_metadata"
                                     name="required_metadata"
                                     placeholder="jury, mention, student_name..."
                                     style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
@@ -185,6 +212,7 @@
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <input
                                     type="checkbox"
+                                    id="is_perishable"
                                     name="is_perishable"
                                     value="1"
                                     id="is_perishable">
@@ -200,13 +228,14 @@
                                 </label>
 
                                 <textarea
+                                    id="expiry_patterns"
                                     name="expiry_patterns"
                                     placeholder="expire le..."
                                     style="width:100%; padding:0.6rem; border:1px solid #ddd; border-radius:8px; height:70px; margin-top:5px;"></textarea>
                             </div>
 
                             <div style="display:flex; justify-content:flex-end; gap:1rem; padding-top: 10px; border-top: 1px solid #f1f5f9;">
-                                <button type="button" onclick="document.getElementById('modal-add-type').style.display='none'" class="btn-outline">Annuler</button>
+                                <button type="button" onclick="closeCreateModal()" class="btn-outline">Annuler</button>
                                 <button type="submit" class="btn-primary" style="padding: 0.6rem 1.5rem;">Créer et configurer</button>
                             </div>
                         </div>
@@ -252,7 +281,7 @@
                     </div>
 
                     <div class="dashboard-card">
-                        <div class="progress-container" style="display: flex; justify-content: space-between; font-weight: 700%;">                                Formats de fichiers gérés
+                        <div class="progress-container" style="display: flex; justify-content: space-between; font-weight: 700%;"> Formats de fichiers gérés
                             <form action="{{ route('super-admin.extensions.store') }}" method="POST" style="display: flex; gap: 5px;">
                                 @csrf
                                 <input type="text" name="name" placeholder="ex: PDF" style="width: 60px; padding: 2px 5px; font-size: 0.7rem; border: 1px solid #ddd; border-radius: 4px; outline: none;">
@@ -262,35 +291,35 @@
                         </div>
                         <div class="card-ext">
                             @foreach($fileExtensions as $ext)
-                                <label style="display: flex; align-items: center; gap: 5px; background: #f8fafc; padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0;">
-                                    <span style="font-size: 0.8rem; font-weight: 600; display: flex; flex-direction: column;">
-                                        {{ strtoupper($ext->name) }} <small style="color: #94a3b8;">({{ $ext->mime_type }})</small>
-                                    </span>
-                                </label>
-                                <form id="del-{{$ext->id}}"
-                                    action="{{ route('super-admin.extensions.destroy', $ext->id) }}"
-                                    method="POST"
-                                    style="display:inline;">
+                            <label style="display: flex; align-items: center; gap: 5px; background: #f8fafc; padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0;">
+                                <span style="font-size: 0.8rem; font-weight: 600; display: flex; flex-direction: column;">
+                                    {{ strtoupper($ext->name) }} <small style="color: #94a3b8;">({{ $ext->mime_type }})</small>
+                                </span>
+                            </label>
+                            <form id="del-{{$ext->id}}"
+                                action="{{ route('super-admin.extensions.destroy', $ext->id) }}"
+                                method="POST"
+                                style="display:inline;">
 
-                                    @csrf
-                                    @method('DELETE')
-                                    <span class="tag" style="background: #eff6ff; color: #1e40af; display: flex; justify-content: center; align-items: center; gap: 5px;">
-                                        <!-- {{ strtoupper($ext->label) }} -->
-                                        <!-- Optionnel : bouton de suppression -->
-                                        <button
-                                            type="button"
-                                            onclick="ASAlerts.confirmAction(
+                                @csrf
+                                @method('DELETE')
+                                <span class="tag" style="background: #eff6ff; color: #1e40af; display: flex; justify-content: center; align-items: center; gap: 5px;">
+                                    <!-- {{ strtoupper($ext->label) }} -->
+                                    <!-- Optionnel : bouton de suppression -->
+                                    <button
+                                        type="button"
+                                        onclick="ASAlerts.confirmAction(
                                             'Supprimer ?',
                                             'Voulez-vous supprimer cette extension ?',
                                             () => this.closest('form').submit()
                                         )"
-                                            style="border:none; background:none; cursor:pointer; display: flex; justify-content:center; align-items: center;">
-                                            ×
-                                        </button>
-                                    </span>
+                                        style="border:none; background:none; cursor:pointer; display: flex; justify-content:center; align-items: center;">
+                                        ×
+                                    </button>
+                                </span>
 
-                                </form>
-                                @endforeach
+                            </form>
+                            @endforeach
                         </div>
 
                         <!-- <div class="tag-list" style="margin-top: 1rem;">
@@ -347,4 +376,124 @@
                         <button class="btn-outline">Annuler</button>
                         <button class="btn-primary" style="padding: 0.75rem 2rem;">Enregistrer les paramètres</button>
                     </div> -->
+
+            <script>
+
+    const modal = document.getElementById('modal-add-type');
+
+    const form = document.getElementById('doc-type-form');
+
+    const modalTitle = document.getElementById('modal-title');
+
+    const methodContainer = document.getElementById('method-container');
+
+    // =========================
+    // MODE EDITION
+    // =========================
+
+    document.querySelectorAll('.edit-doc-type-btn')
+        .forEach(button => {
+
+            button.addEventListener('click', function () {
+
+                modal.style.display = 'flex';
+
+                modalTitle.innerText =
+                    'Modifier le type de document';
+
+                // FORM ACTION
+                form.action =
+                    '/super-admin/document-types/' +
+                    this.dataset.id;
+
+                // PUT METHOD
+                methodContainer.innerHTML =
+                    '@method("PUT")';
+
+                // FILL INPUTS
+                document.getElementById('label').value =
+                    this.dataset.label;
+
+                document.getElementById('code').value =
+                    this.dataset.code;
+
+                document.getElementById('max_size_mb').value =
+                    this.dataset.maxSize;
+
+                document.getElementById('min_score').value =
+                    this.dataset.minScore;
+
+                document.getElementById('required_keywords').value =
+                    this.dataset.requiredKeywords;
+
+                document.getElementById('forbidden_keywords').value =
+                    this.dataset.forbiddenKeywords;
+
+                document.getElementById('required_metadata').value =
+                    this.dataset.requiredMetadata;
+
+                document.getElementById('expiry_patterns').value =
+                    this.dataset.expiryPatterns;
+
+                document.getElementById('is_perishable').checked =
+                    this.dataset.isPerishable == 1;
+
+                // RESET EXTENSIONS
+                document
+                    .querySelectorAll(
+                        'input[name="extensions[]"]'
+                    )
+                    .forEach(el => el.checked = false);
+
+                // RECHECK EXTENSIONS
+                const extensions =
+                    JSON.parse(this.dataset.extensions);
+
+                extensions.forEach(id => {
+
+                    const checkbox =
+                        document.querySelector(
+                            'input[name="extensions[]"][value="' + id + '"]'
+                        );
+
+                    if (checkbox) {
+
+                        checkbox.checked = true;
+                    }
+                });
+
+            });
+        });
+
+    // =========================
+    // MODE CREATE
+    // =========================
+
+    function openCreateModal() {
+
+        modal.style.display = 'flex';
+
+        modalTitle.innerText =
+            'Configurer un nouveau type de document';
+
+        form.reset();
+
+        form.action =
+            "{{ route('super-admin.document-types.store') }}";
+
+        methodContainer.innerHTML = '';
+
+        document
+            .querySelectorAll(
+                'input[name="extensions[]"]'
+            )
+            .forEach(el => el.checked = false);
+    }
+
+    function closeCreateModal()
+    {
+        modal.style.display = 'none';
+    }
+
+</script>
 </x-super-admin-layout>
