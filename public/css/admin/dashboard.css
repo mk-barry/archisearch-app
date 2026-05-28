@@ -8,7 +8,7 @@
 .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
 .dashboard-card { background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); }
 .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-.chart-container { height: 250px; position: relative; margin-top: 1rem; width: 100%; }
+.chart-container { height: 250px; margin-top: 1rem; width: 100%; }
 
 .compact-progress-row { margin-bottom: 1rem; }
 .compact-progress-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; font-weight: 500; color: #64748b; }
@@ -31,7 +31,7 @@
     .dashboard-grid { grid-template-columns: 1fr; }
 }
 @media screen and (max-width: 768px) {
-    .stat-card { flex-direction: row; align-items: center; gap: 1.5rem; }
+    .stat-card { flex-direction: row; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
     .stat-icon { margin-bottom: 0; }
     .card-title { justify-content: center; text-align: center; }
 }

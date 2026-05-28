@@ -1,6 +1,10 @@
 <x-admin-layout sec_css="{{ asset('css/admin/dashboard.css') }}" active="dashboard">
+    
     <div class="page-header">
-        <h1>Tableau de bord</h1>
+        <div class="page-info">
+            <div class="breadcrumb-small">Portail Admin > Tableau de bord</div>
+            <h1>Tableau de bord</h1>
+        </div>
         <div class="admin-info">
             <div class="avatar-base avatar-md">
                 @if(Auth::user()->avatar_path)

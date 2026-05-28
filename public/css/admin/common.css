@@ -22,11 +22,16 @@ body { background-color: var(--body-bg); color: var(--text-main); }
 .nav-item:hover { background: var(--primary-light); color: var(--primary-blue); }
 .nav-item.active { background: var(--primary-blue); color: white; }
 .sidebar-footer { margin-top: auto; padding: 1.5rem 0.75rem; border-top: 1px solid var(--border-color); }
+/* .main-sidebar a[title] { pointer-events: none; } */
 
 main { margin-left: var(--sidebar-width); flex: 1; padding: 2rem; width: calc(100% - var(--sidebar-width)); }
 .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
 .page-header h1 { font-size: 1.5rem; font-weight: 700; }
 .breadcrumb-small { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.menu { display: none; justify-content: space-between; align-items: center; }
+.menu .sidebar-header { padding: 1.5rem 0; }
+.hambuger { display: flex; flex-direction: column; align-items: center; justify-content: space-around; height:35px; width: 35px; background-color: red; border-radius: 50%; }
+.trait { width: 60%; background-color: #1e293b; height: 10%; }
 
 /* Utilitaires & Composants Communs */
 .flex-row-between { display: flex; justify-content: space-between; align-items: center; width: 100%; }
@@ -92,8 +97,14 @@ td { font-size: 0.9rem; vertical-align: middle; }
 /* Reponsive Mobile-First Global */
 @media screen and (max-width: 768px) {
     .main-sidebar { display: none; }
-    main { margin-left: 0; width: 100%; padding: 1rem; }
-    .page-header { flex-direction: column; }
+    .overlay { background: rgba(178, 186, 197, 0.5); position: fixed; pointer-events: none; z-index: 3; width: 100dvh; height: 100dvh; overflow: hidden;}
+    .disabled { pointer-events: none; }
+    #hambuger { pointer-events: initial;}
+    main { margin-left: 0; width: 100%; padding: 1rem; justify-content: center; align-items: center; /*background-color: burlywood;*/ }
+    .menu { display: flex; }
+    /* .page-header { flex-direction: column; } */
     .controls-row { flex-direction: column; align-items: stretch; }
     .search-filter-group { flex-direction: column; align-items: stretch; }
+    /* .main-sidebar .link-label, .brand-name, .nav-label { display: none; } */
+    /* .aside-header { justify-content: center; width: 100%; } */
 }

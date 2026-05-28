@@ -23,6 +23,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/alerts.js') }}"></script>
 
+    <!-- Sidebar display -->
+     <script src="{{ asset('js/hambuger.js') }}" defer></script>
 
     <!-- Select2 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -32,10 +34,12 @@
 
 <body>
     <div class="app-container">
-        <aside class="main-sidebar">
+        <aside class="main-sidebar" id="main-sidebar">
+            
             <div class="sidebar-header">
                 <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
                 <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
+                <button onclick="sidebarToggle()" style="margin-left: 5%; border-radius: 50%; width: 20px; height: 20px; border: none; background-color: palegreen; display: flex; justify-content: center; align-items: center;">x</button>
             </div>
 
             <div class="nav-group">
@@ -46,7 +50,8 @@
                         <rect width="7" height="5" x="14" y="3" rx="1" />
                         <rect width="7" height="9" x="14" y="12" rx="1" />
                         <rect width="7" height="5" x="3" y="16" rx="1" />
-                    </svg> Tableau de bord
+                    </svg>
+                    <span class="link-label">Tableau de bord</span>
                 </a>
                 <a href="{{ route('admin.evenements') }}" class="nav-item {{ $active == 'evenements' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -54,26 +59,30 @@
                         <line x1="16" x2="16" y1="2" y2="6" />
                         <line x1="8" x2="8" y1="2" y2="6" />
                         <line x1="3" x2="21" y1="10" y2="10" />
-                    </svg> Événements
+                    </svg>
+                    <span class="link-label">Événements</span>
                 </a>
                 <a href="{{ route('admin.documents') }}" class="nav-item {{ $active == 'documents' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                         <polyline points="14 2 14 8 20 8" />
-                    </svg> Documents
+                    </svg>
+                    <span class="link-label">Documents</span>
                 </a>
                 <a href="{{ route('admin.recherche') }}" class="nav-item {{ $active == 'recherche' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
-                    </svg> Recherche
+                    </svg>
+                    <span class="link-label">Recherche</span>
                 </a>
                 <a href="{{ route('admin.archives') }}" class="nav-item {{ $active == 'archives' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="21 8 21 21 3 21 3 8" />
                         <rect width="22" height="5" x="1" y="3" />
                         <line x1="10" x2="14" y1="12" y2="12" />
-                    </svg> Archives
+                    </svg>
+                    <span class="link-label">Archives</span>
                 </a>
             </div>
 
@@ -82,9 +91,10 @@
                 <a href="{{ route('admin.cloud') }}" class="nav-item {{ $active == 'cloud' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17.5 19A5.5 5.5 0 0 0 18 8.02a1 1 0 0 1-.89-.66 7 7 0 0 0-12.22 0 1 1 0 0 1-.89.66A5.5 5.5 0 0 0 4.5 19Z" />
-                    </svg> Sauvegarde Cloud
+                    </svg>
+                    <span class="link-label">Sauvegarde Cloud</span>
                 </a>
-                <a href="{{ route('profile.edit') }}" class="nav-item {{ $active == 'profil' ? 'active' : '' }}">
+                <a href="{{ route('profile.edit') }}" class="nav-item {{ $active == 'profil' ? 'active' : '' }}" title="Pofil">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -93,7 +103,7 @@
                         <circle cx="12" cy="7" r="4" />
 
                     </svg>
-                    Profil
+                    <span class="link-label">Profil</span>
                 </a>
             </div>
 
@@ -104,13 +114,29 @@
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" x2="9" y1="12" y2="12" />
-                    </svg> <span>Déconnexion</span>
+                    </svg>
+                    <span class="link-label">Déconnexion</span>
                 </a>
             </div>
         </aside>
 
         <div class="flex-col" style="flex: 1;">
-            <main>
+            <div id="overlay" class="" onclick="sidebarToggle()">
+
+            </div>
+            <main id="main">
+                <div class="menu">
+                    <div class="sidebar-header">
+                        <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
+                        <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
+                    </div>
+                    <button class="hambuger" id="hambuger" onclick="sidebarToggle()">
+                        <div class="trait"></div>
+                        <div class="trait"></div>
+                        <div class="trait"></div>
+                    </button>
+                </div>
+                
                 {{ $slot }}
             </main>
         </div>

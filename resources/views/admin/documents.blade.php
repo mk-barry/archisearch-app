@@ -1,6 +1,7 @@
 <x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="documents" title="Documents - ArchiSearch">
     <div class="page-header">
         <div class="page-info">
+            <div class="breadcrumb-small">Portail Admin > Documents</div>
             <h1>Documents de l'événement</h1>
         </div>
         <div class="admin-info">
