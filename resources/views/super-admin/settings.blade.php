@@ -304,8 +304,6 @@
                                 @csrf
                                 @method('DELETE')
                                 <span class="tag" style="background: #eff6ff; color: #1e40af; display: flex; justify-content: center; align-items: center; gap: 5px;">
-                                    <!-- {{ strtoupper($ext->label) }} -->
-                                    <!-- Optionnel : bouton de suppression -->
                                     <button
                                         type="button"
                                         onclick="ASAlerts.confirmAction(
