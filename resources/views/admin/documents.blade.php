@@ -6,14 +6,13 @@
         </div>
 
         <div class="admin-info">
-            <div class="avatar avatar-base avatar-md">
+            <div class="avatar-base avatar-md">
                 @if(Auth::user()->avatar_path)
-                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar de {{ Auth::user()->name }}">
+                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
                 @else
-                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
                 @endif
             </div>
-
             <div class="flex-col-start">
                 <span class="admin-name">{{ Auth::user()->name }}</span>
                 <span class="admin-mail">{{ Auth::user()->role }}</span>

@@ -39,7 +39,7 @@
             <div class="sidebar-header">
                 <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
                 <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
-                <button onclick="sidebarToggle()" style="margin-left: 5%; border-radius: 50%; width: 20px; height: 20px; border: none; background-color: palegreen; display: flex; justify-content: center; align-items: center;">x</button>
+                <button onclick="sidebarToggle()" class="fermeraside">x</button>
             </div>
 
             <div class="nav-group">
@@ -76,24 +76,24 @@
                     </svg>
                     <span class="link-label">Recherche</span>
                 </a>
-                <a href="{{ route('admin.archives') }}" class="nav-item {{ $active == 'archives' ? 'active' : '' }}">
+                <!-- <a href="{{ route('admin.archives') }}" class="nav-item {{ $active == 'archives' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="21 8 21 21 3 21 3 8" />
                         <rect width="22" height="5" x="1" y="3" />
                         <line x1="10" x2="14" y1="12" y2="12" />
                     </svg>
                     <span class="link-label">Archives</span>
-                </a>
+                </a> -->
             </div>
 
             <div class="nav-group">
                 <div class="nav-label">Paramètres</div>
-                <a href="{{ route('admin.cloud') }}" class="nav-item {{ $active == 'cloud' ? 'active' : '' }}">
+                <!-- <a href="{{ route('admin.cloud') }}" class="nav-item {{ $active == 'cloud' ? 'active' : '' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17.5 19A5.5 5.5 0 0 0 18 8.02a1 1 0 0 1-.89-.66 7 7 0 0 0-12.22 0 1 1 0 0 1-.89.66A5.5 5.5 0 0 0 4.5 19Z" />
                     </svg>
                     <span class="link-label">Sauvegarde Cloud</span>
-                </a>
+                </a> -->
                 <a href="{{ route('profile.edit') }}" class="nav-item {{ $active == 'profil' ? 'active' : '' }}" title="Pofil">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2"

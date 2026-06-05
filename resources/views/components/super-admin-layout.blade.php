@@ -29,6 +29,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/alerts.js') }}"></script>
 
+    <!-- Sidebar display -->
+     <script src="{{ asset('js/hambuger.js') }}" defer></script>
+
     <!-- Select2 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -39,12 +42,11 @@
 <body>
     <div class="app-container">
         <!-- Sidebar -->
-        <aside class="main-sidebar">
+        <aside class="main-sidebar"  id="main-sidebar">
             <div class="sidebar-header">
-                <div class="logo-box"
-                    style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">
-                    AS</div>
+                <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
                 <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
+                <button onclick="sidebarToggle()" class="fermeraside">x</button>
             </div>
 
             <div class="nav-group">
@@ -168,8 +170,22 @@
                     </div>
                 </div>
             </nav> -->
+            <div id="overlay" class="" onclick="sidebarToggle()">
 
-            <main>
+            </div>
+            <main id="main">
+                <div class="menu">
+                    <div class="sidebar-header">
+                        <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
+                        <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
+                    </div>
+                    <button class="hambuger" id="hambuger" onclick="sidebarToggle()">
+                        <div class="trait"></div>
+                        <div class="trait"></div>
+                        <div class="trait"></div>
+                    </button>
+                </div>
+                
                 {{ $slot }}
             </main>
         </div>

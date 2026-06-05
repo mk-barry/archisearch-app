@@ -80,10 +80,10 @@
                     <span>Actions</span>
                 </div>
 
-                <button>Telecharger</button>
-                <button>Partager</button>
-                <button>Rejeter</button>
-                <button>Valider</button>
+                <!-- <button>Telecharger</button>
+                <button>Partager</button> -->
+                <button  class="bg-reject">Rejeter</button>
+                <button class="bg-validate">Valider</button>
             </div>
 
             <div class="bottom-card comments">
@@ -92,13 +92,24 @@
                 </div>
 
                 <div class="content">
-                    <div class="avatar"></div>
+                    @if(!$document->admin)
+                        <p style="text-align: center; width: 100%;">Aucun commentaire disponible</p>
+                        <input type="text" placeholder="commentez ici">
+                    @else
+                        <div class="avatar-base avatar-md">
+                            @if($document->admin?->avatar_path)
+                                <img src="{{ asset('storage/' . $document->admin->avatar_path) }}" alt="Avatar">
+                            @else
+                                {{ collect(explode(' ', $document->admin?->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                            @endif
+                        </div>
 
-                    <div class="buble me">
-                        <span class="info name">{{ $document->name }}</span>
-                        <span class="info text">{{ $document->rejection_reason }}</span>
-                        <span class="info date">{{ $document->processed_at }}</span>
-                    </div>
+                        <div class="buble me">
+                            <!-- <span class="info name">{{ $document->name }}</span> -->
+                            <span class="info text">{{ $document->rejection_reason }}</span>
+                            <span class="info date">{{ $document->processed_at }}</span>
+                        </div>
+                    @endif
                 </div>
             </div>
 

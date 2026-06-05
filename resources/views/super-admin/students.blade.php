@@ -20,19 +20,18 @@
             </div>
 
             <div class="admin-info">
-                <div class="avatar"
-                    style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                    @if(Auth::user()->avatar)
-                        <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar de {{ Auth::user()->name }}">
-                    @else
-                        {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
-                    @endif
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                    <span class="admin-name">{{ Auth::user()->name }}</span>
-                    <span class="admin-mail">{{ Auth::user()->role }}</span>
-                </div>
+            <div class="avatar-base avatar-md">
+                @if(Auth::user()->avatar_path)
+                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
+                @else
+                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                @endif
             </div>
+            <div class="flex-col-start">
+                <span class="admin-name">{{ Auth::user()->name }}</span>
+                <span class="admin-mail">{{ Auth::user()->role }}</span>
+            </div>
+        </div>
         </div>
 
         <div class="controls-row">

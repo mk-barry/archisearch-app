@@ -66,7 +66,7 @@ class Documents extends Model
 
     public function admin()
     {
-        return $this->belongsTo(User::class, 'processed_by');
+        return $this->belongsTo(User::class, 'processed_by', 'name');
     }
 
     /**
