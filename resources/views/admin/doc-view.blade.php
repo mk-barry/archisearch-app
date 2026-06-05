@@ -1,4 +1,4 @@
-<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" sec_css="{{  asset('css/admin/view-docs.css') }}" active="documents" title="Vue Document - ArchiSearch">
+<x-admin-layout sec_css="{{ asset('css/admin/view-docs.css') }}" active="documents" title="Vue Document - ArchiSearch">
     <div class="page-header">
         <div class="page-info">
             <h1>Expertise : {{ $document->title }}</h1>

@@ -46,7 +46,7 @@
                                 <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
                                 <path d="M3 21v-5h5" />
                             </svg>
-                            <span>Renvoyer le code dans <span class="resend-timer">02:34</span></span>
+                            <button id="resendBtn" disabled>Renvoyer le code dans <span class="resend-timer" id="timer"></span></button>
                         </div>
 
                         <button type="submit" class="submit-btn" style="margin-top: 1rem;">Vérifier le code</button>
@@ -99,6 +99,36 @@
                     hiddenInput.value = code;
                 }
             </script>
+
+            <script>
+const expiresAt = new Date("{{ session('otp_expires_at') }}").getTime();
+
+const timer = document.getElementById('timer');
+const btn = document.getElementById('resendBtn');
+
+const interval = setInterval(() => {
+
+    const now = Date.now();
+    const diff = Math.floor((expiresAt - now) / 1000);
+
+    if (diff <= 0) {
+
+        clearInterval(interval);
+
+        btn.disabled = false;
+        // btn.textContent = "Renvoyer le code";
+
+        return;
+    }
+
+    const minutes = Math.floor(diff / 60);
+    const seconds = diff % 60;
+
+    timer.textContent =
+        `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+
+}, 1000);
+</script>
 </x-auth-layout>
 
 </html>

@@ -1,0 +1,91 @@
+/* ========================================
+   EDIT EVENT PAGE
+======================================== */
+
+.event-edit-container {
+    max-width: 800px;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin: 0 auto;
+}
+
+.event-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.event-edit-full {
+    grid-column: span 2;
+}
+
+.event-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.event-input,
+.event-textarea,
+.event-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.event-input:focus,
+.event-textarea:focus,
+.event-select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.edit-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 20px;
+}
+
+.edit-actions .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-actions .btn-save {
+    background-color: #0369a1;
+}
+
+@media screen and (max-width: 768px) {
+    .event-edit-container {
+        padding: 1.25rem;
+    }
+
+    .event-edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-edit-full {
+        grid-column: span 1;
+    }
+
+    .edit-actions {
+        flex-direction: column;
+    }
+
+    .edit-actions .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}

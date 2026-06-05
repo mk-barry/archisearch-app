@@ -8,6 +8,21 @@ use Illuminate\Support\Facades\Auth;
 
 class OtpController extends Controller
 {
+    public function resend()
+{
+    $otp = random_int(100000, 999999);
+
+    session([
+        'otp_code' => $otp,
+        'otp_expires_at' => now()->addMinutes(10),
+    ]);
+
+    Mail::to(User::find(session('auth_id'))->email)
+        ->send(new OtpCodeMail($otp));
+
+    return back();
+}
+
     public function verify(Request $request)
     {
         $request->validate(['code' => 'required|numeric|digits:6']);

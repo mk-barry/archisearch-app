@@ -1,4 +1,4 @@
-<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="evenements">
+<x-admin-layout sec_css="{{ asset('css/admin/voir-event.css') }}" active="evenements">
     <x-slot:title>Détails de l'événement - ArchiSearch</x-slot>
 
         <div class="page-header">

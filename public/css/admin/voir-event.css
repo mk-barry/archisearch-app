@@ -1,0 +1,152 @@
+/* ========================================
+   VIEW EVENT PAGE
+======================================== */
+
+.event-edit-link {
+    background-color: var(--primary-blue);
+    text-decoration: none;
+    padding: 1rem;
+    border-radius: 10px;
+    color: white;
+    width: fit-content;
+    min-width: 240px;
+    display: flex;
+    justify-content: center;
+}
+
+.event-details-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.event-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.event-card-title {
+    margin-bottom: 1rem;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.event-description {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.event-divider {
+    margin: 1.5rem 0;
+    border: 0;
+    border-top: 1px solid #f1f5f9;
+}
+
+.document-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.document-tag {
+    background: #f1f5f9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--text-main);
+}
+
+.event-stats {
+    font-size: 0.9rem;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.participants-card {
+    margin-top: 20px;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.participants-title {
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.participants-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.participants-table th {
+    padding: 12px;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+}
+
+.participants-table td {
+    padding: 12px;
+}
+
+.student-name {
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.student-matricule {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ecfdf5;
+    color: #059669;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+}
+
+.empty-state {
+    padding: 20px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+@media screen and (max-width: 768px) {
+    .event-edit-link {
+        width: 100%;
+    }
+
+    .event-details-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .participants-table {
+        min-width: 650px;
+    }
+}

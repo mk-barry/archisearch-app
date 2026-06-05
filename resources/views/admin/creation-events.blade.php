@@ -1,4 +1,4 @@
-<x-admin-layout sec_css="{{  asset('css/dashboard/main.css') }}" active="evenements">
+<x-admin-layout sec_css="{{ asset('css/admin/creation-events.css') }}" active="evenements">
     <x-slot:title>Créer un événement - ArchiSearch</x-slot>
 
     <div class="page-header">

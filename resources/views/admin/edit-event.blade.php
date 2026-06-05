@@ -1,4 +1,4 @@
-<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="evenements">
+<x-admin-layout sec_css="{{ asset('css/admin/edit-event.css') }}" active="evenements">
     <x-slot:title>Modifier l'événement - ArchiSearch</x-slot>
 
         <div class="page-header">
@@ -14,51 +14,50 @@
                         {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
                     @endif
                 </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <div class="flex-col-start">
                     <span class="admin-name">{{ Auth::user()->name }}</span>
                     <span class="admin-mail">{{ Auth::user()->role }}</span>
                 </div>
             </div>
         </div>
 
-        <div class="form-container"
-            style="max-width: 800px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 0 auto;">
+        <div class="form-container event-edit-container">
             <form id="editEventForm" action="{{ route('admin.evenements.update', $event->uuid) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Titre de
+                <div class="event-edit-grid">
+                    <div class="form-group event-edit-full">
+                        <label class="event-label">Titre de
                             l'événement</label>
                         <input type="text" name="title" value="{{ old('title', $event->title) }}" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                            class="event-input">
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Description</label>
+                        <label class="event-label">Description</label>
                         <textarea name="description" rows="3"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">{{ old('description', $event->description) }}</textarea>
+                            class="event-textarea">{{ old('description', $event->description) }}</textarea>
                     </div>
 
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Date de début</label>
+                        <label class="event-label">Date de début</label>
                         <input type="date" name="start_date"
                             value="{{ old('start_date', $event->start_date->format('Y-m-d')) }}" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                            class="event-input">
                     </div>
 
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Date de fin</label>
+                        <label class="event-label">Date de fin</label>
                         <input type="date" name="end_date"
                             value="{{ old('end_date', $event->end_date->format('Y-m-d')) }}" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                            class="event-input">
                     </div>
 
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Type d'invitation</label>
+                        <label class="event-label">Type d'invitation</label>
                         <select name="invite_type"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                            class="event-select">
                             <option value="tous" {{ $event->invite_type == 'tous' ? 'selected' : '' }}>Tous les étudiants
                             </option>
                             <option value="particuliers" {{ $event->invite_type == 'particuliers' ? 'selected' : '' }}>
@@ -67,9 +66,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Statut</label>
+                        <label class="event-label">Statut</label>
                         <select name="status"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                            class="event-input">
                             <option value="actif" {{ $event->status == 'actif' ? 'selected' : '' }}>Actif</option>
                             <option value="cloture" {{ $event->status == 'cloture' ? 'selected' : '' }}>Cloturé</option>
                             <option value="archive" {{ $event->status == 'archive' ? 'selected' : '' }}>Archivé</option>
@@ -79,10 +78,9 @@
                 </div>
 
                 <div
-                    style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                    class="edit-actions">
                     <a href="{{ route('admin.evenements') }}" class="btn-primary">Annuler</a>
-                    <button type="submit" class="btn-primary"
-                        style="background-color: #0369a1; display: flex; align-items: center; gap: 8px;">
+                    <button type="submit" class="btn-primary">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />

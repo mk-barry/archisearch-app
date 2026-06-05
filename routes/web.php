@@ -14,6 +14,7 @@ Route::get('/', [GuestController::class, 'login'])->name('login');
 Route::post('/', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 Route::get('/verify-2fa', [GuestController::class, 'twoFactor'])->name('two-factor');
 Route::post('/verify-2fa', [OtpController::class, 'verify'])->name('two-factor.verify');
+Route::post('/otp/resend', [OtpController::class, 'resend'])->name('otp.resend');
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // --- Routes d'Invitation (Visiteurs/Candidats) ---
