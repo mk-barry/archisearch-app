@@ -32,7 +32,7 @@ const ASAlerts = {
     info: function (title, text) {
         Swal.fire({
             icon: "info",
-            title: title,
+            title: title || "Humm...",
             text: text,
             confirmButtonColor: "#2563eb",
         });

@@ -68,13 +68,14 @@
                     </div>
 
                     <div class="info-cards">
-                        <span class="label">statut OCR</span>
-                        <span class="data">Indexé</span>
+                        <span class="label">statut</span>
+                        <span class="data">{{ ucfirst($document->status) }}</span>
                     </div>
 
                 </div>
             </div>
 
+            @if($document->status === "pending")
             <div class="bottom-card actions">
                 <div class="title">
                     <span>Actions</span>
@@ -85,6 +86,7 @@
                 <button  class="bg-reject">Rejeter</button>
                 <button class="bg-validate">Valider</button>
             </div>
+            @endif
 
             <div class="bottom-card comments">
                 <div class="title">
@@ -92,10 +94,12 @@
                 </div>
 
                 <div class="content">
-                    @if(!$document->admin)
+                    @if($document->status === "validated")
                         <p style="text-align: center; width: 100%;">Aucun commentaire disponible</p>
-                        <input type="text" placeholder="commentez ici">
+                    @elseif($document->status === "pending")
+                        <input type="text" id="rejectionComment" placeholder="commentez ici">
                     @else
+                        <div class="buble-row me">
                         <div class="avatar-base avatar-md">
                             @if($document->admin?->avatar_path)
                                 <img src="{{ asset('storage/' . $document->admin->avatar_path) }}" alt="Avatar">
@@ -103,9 +107,10 @@
                                 {{ collect(explode(' ', $document->admin?->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
                             @endif
                         </div>
+                        <span class="info name">{{ $document->admin->name }}</span>
+                        </div>
 
                         <div class="buble me">
-                            <!-- <span class="info name">{{ $document->name }}</span> -->
                             <span class="info text">{{ $document->rejection_reason }}</span>
                             <span class="info date">{{ $document->processed_at }}</span>
                         </div>
@@ -149,4 +154,104 @@
 
     </div>
 
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const validateBtn = document.querySelector('.bg-validate');
+    const rejectBtn = document.querySelector('.bg-reject');
+
+    const url = "{{ route('admin.documents.updateStatus', $document) }}";
+
+    const csrfToken = document.querySelector(
+        'meta[name="csrf-token"]'
+    ).getAttribute('content');
+
+    // ==========================
+    // VALIDATION
+    // ==========================
+
+    validateBtn?.addEventListener('click', async () => {
+
+        if (!confirm('Valider ce document ?')) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    status: 'validated'
+                })
+            });
+
+            const data = await response.json();
+
+            alert(data.message);
+
+            if (data.success) {
+                location.reload();
+            }
+
+        } catch (error) {
+
+            alert('Erreur lors de la validation');
+            console.error(error);
+        }
+    });
+
+    // ==========================
+    // REJET
+    // ==========================
+
+    rejectBtn?.addEventListener('click', async () => {
+
+    const comment = document
+        .getElementById('rejectionComment')
+        .value
+        .trim();
+
+    if (comment.length < 5) {
+        ASAlerts.info(
+            '',
+            'Veuillez préciser un motif de rejet (minimum 5 caractères).'
+        );
+        return;
+    }
+
+    try {
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                status: 'rejected',
+                comment: comment
+            })
+        });
+
+        const data = await response.json();
+
+        alert(data.message);
+
+        if (data.success) {
+            location.reload();
+        }
+
+    } catch (error) {
+
+        console.error(error);
+        alert('Erreur lors du rejet.');
+    }
+});
+
+});
+</script>
 </x-admin-layout>
