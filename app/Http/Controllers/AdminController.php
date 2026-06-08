@@ -381,9 +381,11 @@ class AdminController extends Controller
             // PYTHON
             // =========================================================
 
-            $pythonPath = base_path(
-                '.venv/Scripts/python.exe'
-            );
+            // $pythonPath = base_path(
+            //     '.venv/Scripts/python.exe'
+            // );
+
+            $pythonPath = base_path(env('PYTHON_PATH'));
 
             $scriptPath = base_path(
                 'scripts/deep_analysis.py'

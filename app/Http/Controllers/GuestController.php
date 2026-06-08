@@ -130,7 +130,8 @@ class GuestController extends Controller
         $matricule = session('student_matricule');
         $path = $file->storeAs("documents/{$event->title}/{$matricule}", time() . '_' . $file->getClientOriginalName(), 'public');
         $fullPath = storage_path("app/public/" . $path);
-        $pythonPath = base_path('.venv\Scripts\python.exe');
+        // $pythonPath = base_path('.venv\Scripts\python.exe');
+        $pythonPath = base_path(env('PYTHON_PATH'));
 
         // --- LOGIQUE OCR ---
         $scriptPath = base_path('scripts/ocr_script.py');
