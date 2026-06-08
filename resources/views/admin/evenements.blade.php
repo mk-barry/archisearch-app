@@ -181,7 +181,7 @@
         function copyEventLink(uuid) {
             const cleanUrl = window.location.origin + "/invitation/" + uuid;
             navigator.clipboard.writeText(cleanUrl).then(() => {
-                alert("Lien d'invitation copié avec succès !");
+                ASAlerts.success("Lien d'invitation copié avec succès !");
             }).catch(err => {
                 console.error('Erreur lors de la copie :', err);
             });

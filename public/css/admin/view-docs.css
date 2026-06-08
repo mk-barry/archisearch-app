@@ -17,11 +17,17 @@
     overflow: hidden;
 }
 
+.left{
+    min-height: 0;
+    background: goldenrod;
+}
+
 .left iframe {
     width: 100%;
-    min-height: 900px;
+    height: 100%;
+    /* min-height: 900px; */
     border: none;
-    background: #f8fafc;
+    /* background: red; */
 }
 
 .right {

@@ -20,7 +20,7 @@
     <div class="section-container">
 
         <section class="left card">
-            <iframe src="{{ asset('storage/' . $document->file_path) }}"></iframe>
+            <iframe src="{{ asset('storage/' . $document->file_path) }}#zoom=page-fit"></iframe>
         </section>
 
         <section class="right">
@@ -67,6 +67,13 @@
                         <span class="data">{{ $document->documentType->label }}</span>
                     </div>
 
+                    @if($document->status !== "pending")
+                        <div class="info-cards">
+                            <span class="label">Traité par</span>
+                            <span class="data">{{ $document->admin->name }}</span>
+                        </div>
+                    @endif
+
                     <div class="info-cards">
                         <span class="label">statut</span>
                         <span class="data">{{ ucfirst($document->status) }}</span>
@@ -76,16 +83,16 @@
             </div>
 
             @if($document->status === "pending")
-            <div class="bottom-card actions">
-                <div class="title">
-                    <span>Actions</span>
-                </div>
+                <div class="bottom-card actions">
+                    <div class="title">
+                        <span>Actions</span>
+                    </div>
 
-                <!-- <button>Telecharger</button>
-                <button>Partager</button> -->
-                <button  class="bg-reject">Rejeter</button>
-                <button class="bg-validate">Valider</button>
-            </div>
+                    <!-- <button>Telecharger</button>
+                    <button>Partager</button> -->
+                    <button class="bg-reject">Rejeter</button>
+                    <button class="bg-validate">Valider</button>
+                </div>
             @endif
 
             <div class="bottom-card comments">
@@ -100,14 +107,14 @@
                         <input type="text" id="rejectionComment" placeholder="commentez ici">
                     @else
                         <div class="buble-row me">
-                        <div class="avatar-base avatar-md">
-                            @if($document->admin?->avatar_path)
-                                <img src="{{ asset('storage/' . $document->admin->avatar_path) }}" alt="Avatar">
-                            @else
-                                {{ collect(explode(' ', $document->admin?->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
-                            @endif
-                        </div>
-                        <span class="info name">{{ $document->admin->name }}</span>
+                            <div class="avatar-base avatar-md">
+                                @if($document->admin?->avatar_path)
+                                    <img src="{{ asset('storage/' . $document->admin->avatar_path) }}" alt="Avatar">
+                                @else
+                                    {{ collect(explode(' ', $document->admin?->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                                @endif
+                            </div>
+                            <span class="info name">{{ $document->admin->name }}</span>
                         </div>
 
                         <div class="buble me">
@@ -155,103 +162,121 @@
     </div>
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
 
-    const validateBtn = document.querySelector('.bg-validate');
-    const rejectBtn = document.querySelector('.bg-reject');
+            const validateBtn = document.querySelector('.bg-validate');
+            const rejectBtn = document.querySelector('.bg-reject');
 
-    const url = "{{ route('admin.documents.updateStatus', $document) }}";
+            const url = "{{ route('admin.documents.updateStatus', $document) }}";
 
-    const csrfToken = document.querySelector(
-        'meta[name="csrf-token"]'
-    ).getAttribute('content');
+            const csrfToken = document.querySelector(
+                'meta[name="csrf-token"]'
+            ).getAttribute('content');
 
-    // ==========================
-    // VALIDATION
-    // ==========================
+            // ==========================
+            // VALIDATION
+            // ==========================
 
-    validateBtn?.addEventListener('click', async () => {
+            validateBtn?.addEventListener('click', () => {
 
-        if (!confirm('Valider ce document ?')) {
-            return;
-        }
+                ASAlerts.confirmAction(
+                    'Valider ce document ?',
+                    'Le document sera marqué comme validé.',
+                    async () => {
 
-        try {
+                        try {
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    status: 'validated'
-                })
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify({
+                                    status: 'validated'
+                                })
+                            });
+
+                            const data = await response.json();
+
+                            if (data.success) {
+
+                                ASAlerts.success(
+                                    data.message || 'Document validé avec succès.'
+                                );
+
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+
+                            } else {
+
+                                ASAlerts.warning(
+                                    data.message || 'La validation a échoué.'
+                                );
+                            }
+
+                        } catch (error) {
+
+                            console.error(error);
+
+                            ASAlerts.error(
+                                'Une erreur est survenue lors de la validation.'
+                            );
+                        }
+                    }
+                );
+
             });
 
-            const data = await response.json();
+            // ==========================
+            // REJET
+            // ==========================
 
-            alert(data.message);
+            rejectBtn?.addEventListener('click', async () => {
 
-            if (data.success) {
-                location.reload();
-            }
+                const comment = document
+                    .getElementById('rejectionComment')
+                    .value
+                    .trim();
 
-        } catch (error) {
+                if (comment.length < 5) {
+                    ASAlerts.info(
+                        '',
+                        'Veuillez préciser un motif de rejet (minimum 5 caractères).'
+                    );
+                    return;
+                }
 
-            alert('Erreur lors de la validation');
-            console.error(error);
-        }
-    });
+                try {
 
-    // ==========================
-    // REJET
-    // ==========================
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            status: 'rejected',
+                            comment: comment
+                        })
+                    });
 
-    rejectBtn?.addEventListener('click', async () => {
+                    const data = await response.json();
 
-    const comment = document
-        .getElementById('rejectionComment')
-        .value
-        .trim();
+                    alert(data.message);
 
-    if (comment.length < 5) {
-        ASAlerts.info(
-            '',
-            'Veuillez préciser un motif de rejet (minimum 5 caractères).'
-        );
-        return;
-    }
+                    if (data.success) {
+                        location.reload();
+                    }
 
-    try {
+                } catch (error) {
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({
-                status: 'rejected',
-                comment: comment
-            })
+                    console.error(error);
+                    ASAlerts.error('Erreur lors du rejet.');
+                }
+            });
+
         });
-
-        const data = await response.json();
-
-        alert(data.message);
-
-        if (data.success) {
-            location.reload();
-        }
-
-    } catch (error) {
-
-        console.error(error);
-        alert('Erreur lors du rejet.');
-    }
-});
-
-});
-</script>
+    </script>
 </x-admin-layout>
