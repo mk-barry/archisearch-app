@@ -226,6 +226,7 @@ class SuperAdminController extends Controller
 
     public function storeDocType(Request $request)
     {
+        // dd('Hello');
         $validated = $request->validate([
             'label' => 'required|string|max:255',
 
