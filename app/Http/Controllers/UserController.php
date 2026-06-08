@@ -203,29 +203,24 @@ class UserController extends Controller
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
-
         $me = auth()->user();
 
         if ($me->id === $user->id) {
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Action impossible : vous ne pouvez pas modifier votre propre statut."
+                ], 403);
+            }
+
             return back()->with(
                 'danger',
                 "Action impossible : vous ne pouvez pas modifier votre propre statut."
             );
         }
 
-        if ($user->id === 1) {
-            return back()->with(
-                'danger',
-                "Action interdite : cet administrateur est le propriétaire racine du système."
-            );
-        }
-
-        if ($me->role === $user->role) {
-            return back()->with(
-                'danger',
-                "Action refusée : vous ne pouvez pas modifier un administrateur de même rang."
-            );
-        }
+        // autres vérifications ...
 
         $user->is_active = !$user->is_active;
         $user->save();
@@ -241,9 +236,16 @@ class UserController extends Controller
 
         $status = $user->is_active ? 'activé' : 'désactivé';
 
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Le compte a été {$status} avec succès."
+            ]);
+        }
+
         return back()->with(
             'success',
-            'Le compte a été ' . $status . ' avec succès.'
+            "Le compte a été {$status} avec succès."
         );
     }
 

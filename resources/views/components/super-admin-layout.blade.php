@@ -202,6 +202,11 @@
         ASAlerts.error(@json(session('error')));
     </script>
     @endif
+    @if(session('danger'))
+    <script>
+        ASAlerts.danger(@json(session('danger')));
+    </script>
+    @endif
 </body>
 
 </html>

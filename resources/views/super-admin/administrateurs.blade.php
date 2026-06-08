@@ -6,18 +6,18 @@
                 <h1>Gestion des administrateurs</h1>
             </div>
             <div class="admin-info">
-            <div class="avatar-base avatar-md">
-                @if(Auth::user()->avatar_path)
-                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
-                @else
-                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
-                @endif
+                <div class="avatar-base avatar-md">
+                    @if(Auth::user()->avatar_path)
+                        <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
+                    @else
+                        {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                    @endif
+                </div>
+                <div class="flex-col-start">
+                    <span class="admin-name">{{ Auth::user()->name }}</span>
+                    <span class="admin-mail">{{ Auth::user()->role }}</span>
+                </div>
             </div>
-            <div class="flex-col-start">
-                <span class="admin-name">{{ Auth::user()->name }}</span>
-                <span class="admin-mail">{{ Auth::user()->role }}</span>
-            </div>
-        </div>
         </div>
 
         <!-- Controls Row -->
@@ -343,37 +343,71 @@
                     SWEETALERT TOGGLE STATUS (Optimisé)
                 ======================================= */
                 tableBody?.addEventListener('click', function (e) {
+
                     const toggleBtn = e.target.closest('.btn-toggle');
+
                     if (!toggleBtn) return;
 
                     e.preventDefault();
 
                     const form = toggleBtn.closest('form');
                     const adminName = toggleBtn.dataset.name;
-                    const actionText = toggleBtn.dataset.status; // "Activer" ou "Désactiver"
+                    const actionText = toggleBtn.dataset.status;
 
-                    // On utilise notre objet ASAlerts défini dans alerts.js
                     ASAlerts.confirmAction(
-                        `Confirmer la modification ?`,
+                        'Confirmer la modification ?',
                         `Voulez-vous vraiment ${actionText.toLowerCase()} le compte de ${adminName} ?`,
-                        () => {
-                            // Action à exécuter si l'utilisateur clique sur "Oui"
-                            ASAlerts.showLoading('Mise à jour du statut...');
+                        async () => {
 
-                            fetch(form.action, {
-                                method: 'POST',
-                                body: new FormData(form),
-                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                            })
-                                .then(r => {
-                                    if (r.ok) {
-                                        ASAlerts.success('Statut mis à jour !');
-                                        // On rafraîchit le tableau sans recharger la page complète
-                                        updateContent(getFullUrl("{{ route('super-admin.administrateurs') }}"));
-                                    } else {
-                                        ASAlerts.error('Erreur', 'Impossible de modifier le statut.');
+                            try {
+
+                                ASAlerts.showLoading(
+                                    'Mise à jour du statut...'
+                                );
+
+                                const response = await fetch(
+                                    form.action,
+                                    {
+                                        method: 'POST',
+                                        body: new FormData(form),
+                                        headers: {
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        }
                                     }
-                                });
+                                );
+
+                                const data = await response.json();
+
+                                if (!response.ok) {
+
+                                    ASAlerts.danger('Oups...',
+                                        data.message ||
+                                        'Impossible de modifier le statut.'
+                                    );
+
+                                    return;
+                                }
+
+                                ASAlerts.success(
+                                    data.message ||
+                                    'Statut mis à jour avec succès.'
+                                );
+
+                                updateContent(
+                                    getFullUrl(
+                                        "{{ route('super-admin.administrateurs') }}"
+                                    )
+                                );
+
+                            } catch (error) {
+
+                                console.error(error);
+
+                                ASAlerts.error(
+                                    'Erreur réseau',
+                                    'Impossible de contacter le serveur.'
+                                );
+                            }
                         }
                     );
                 });
