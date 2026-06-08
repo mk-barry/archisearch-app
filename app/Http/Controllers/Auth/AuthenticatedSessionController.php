@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // 3. Génération du code OTP
-        $otpCode = rand(100000, 999999);
+        // $otpCode = rand(100000, 999999);
         $otpCode = 111111;
 
         // 4. Stockage en session (plus simple que de modifier la DB)
