@@ -102,8 +102,21 @@
                         @foreach ($users as $user)
                             <tr>
                                 <td>
+                                    @php
+                                            $colors = [
+                                                '#0369a1',
+                                                '#059669',
+                                                '#16a34a',
+                                                '#1e293b',
+                                                '#2563eb',
+                                                '#6366f1',
+                                                '#dc2626'
+                                            ];
+
+                                            $color = $colors[$user->id % count($colors)];
+                                        @endphp
                                     <div class="admin-info">
-                                        <div class="avatar-base avatar-md" style="width: 36px; height: 36px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
+                                        <div class="avatar-base avatar-md" style="width: 36px; height: 36px; font-size: 0.8rem; background-color: {{ $color }}; color: #fff;" data-name="{{ $user->name }}">
                                             @if($user->avatar_path)
                                                 <img src="{{ asset('storage/' . $user->avatar_path) }}" alt="Avatar">
                                             @else

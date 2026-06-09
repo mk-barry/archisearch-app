@@ -1,0 +1,15 @@
+/* Utilitaires spécifiques aux tables */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.fw-600 { font-weight: 600; }
+.whitespace-nowrap { white-space: nowrap; }
+.inline-form { display: inline-block; }
+.text-warning { color: var(--warning) !important; }
+.text-success { color: var(--success) !important; }
+.admin-email { font-size: 0.8rem; color: var(--text-muted); }
+
+/* Logs spécifiques */
+.log-tabs { display: flex; gap: 0.5rem; padding: 4px; border-radius: 10px; flex-wrap: wrap;}
+.log-tab { padding: 6px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; color: var(--text-muted); background: var(--body-bg); transition: all 0.2s; }
+.log-tab.active { background: var(--primary-blue); color: white; }
+.action-text { color: var(--primary-blue); font-weight: 600; font-size: 0.85rem; }
