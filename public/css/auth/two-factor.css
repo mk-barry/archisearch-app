@@ -111,6 +111,7 @@ body {
     color: #64748b;
     font-size: 0.9rem;
     margin-bottom: 2rem;
+    margin-top: 1.2rem;
 }
 
 .resend-timer {
@@ -132,6 +133,8 @@ body {
     line-height: 1.4;
     text-align: left;
 }
+
+#resendBtn { color: #2563eb; border: none; background: none; font-size: 1.2rem; }
 
 .alert-icon {
     color: #d97706;
@@ -166,4 +169,12 @@ body {
     align-items: center;
     justify-content: center;
     margin: 0 auto 1.5rem;
+}
+
+@media screen and (max-width: 768px) {
+     main{
+        
+    }
+    
+    .otp-box {width: 30px; height: 40px;}
 }

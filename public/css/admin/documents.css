@@ -23,6 +23,12 @@
     background: #1e3a8a;
 }
 
+.document-download-btn{
+    background: #10b981;
+    justify-content: center;
+    color: whitesmoke;
+}
+
 .documents-checkbox-th {
     width: 40px;
 }
@@ -37,6 +43,11 @@
     font-weight: 700;
     color: #1e293b;
 }
+
+.action-btn-danger { color: #ef4444; border-color: transparent; }
+.action-btn-edit { color: #10b981; border-color: transparent; }
+.action-btn-view { color: #2563eb; border-color: transparent; }
+.action-btn-link { color: #1e3a8a; border-color: transparent; }
 
 .document-contributor {
     font-weight: 500;
@@ -91,11 +102,12 @@
         flex-direction: column;
     }
 
-    .documents-search-wrapper {
-        width: 100%;
+    .document-actions-grid {
+        display: flex;
+        gap: 10px;
     }
 
-    .table-container {
+    .documents-search-wrapper {
         width: 100%;
     }
 

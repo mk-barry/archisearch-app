@@ -96,6 +96,7 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />
                                 </svg>
+                                <span class="action-span">Voir</span>
                             </a>
 
                             @if($event->status === 'actif')
@@ -103,6 +104,7 @@
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                                     </svg>
+                                    <span class="action-span">Editer</span>
                                 </a>
                             @else
                                 <button class="action-btn opacity-30 cursor-not-allowed" disabled>
@@ -110,6 +112,7 @@
                                         <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                                     </svg>
                                 </button>
+                                <span class="action-span span-disabled">Editer</span>
                             @endif
 
                             <button class="action-btn btn-copy action-btn-link" onclick="copyEventLink('{{ $event->uuid }}')" title="Copier le lien">
@@ -117,6 +120,7 @@
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                                 </svg>
+                                <span class="action-span">Lien</span>
                             </button>
 
                             @if($event->status === 'actif')
@@ -129,6 +133,7 @@
                                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                             <line x1="10" y1="16" x2="14" y2="16"></line>
                                         </svg>
+                                        <span class="action-span">Cloturer</span>
                                     </button>
                                 </form>
                             @else
@@ -137,6 +142,7 @@
                                         <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
                                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                     </svg>
+                                    <span class="action-span span-disabled">Cloturer</span>
                                 </button>
                             @endif
                         </div>

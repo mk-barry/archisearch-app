@@ -1257,6 +1257,8 @@ input:checked + .slider:before {
         margin-left: 0;
     }
 
+    .admin-info { display: none; }
+
     .fermeraside { display: flex; }
     /* .main-sidebar { display: none; } */
     .overlay { background: rgba(178, 186, 197, 0.5); position: fixed; pointer-events: none; z-index: 3; width: 100dvh; height: 100dvh; overflow: hidden;}

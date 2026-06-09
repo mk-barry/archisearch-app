@@ -40,7 +40,7 @@
         </div>
 
         <div class="documents-actions-group">
-            <button class="btn-outline" id="bulkDownload">
+            <button class="btn-outline document-download-btn" id="bulkDownload">
                 Tout télécharger
             </button>
 
@@ -78,7 +78,7 @@
 
                             <td>
                                 <div class="document-file-info">
-                                    <div class="file-icon-box bg-{{ $doc->extension }}">
+                                    <div class="file-icon-box bg bg-{{ $doc->extension }}">
                                         {{ strtoupper($doc->extension) }}
                                     </div>
 
@@ -109,31 +109,33 @@
                             </td>
 
                             <td>
-                                <span class="badge {{ $doc->status_class }}">
+                                <span class="badge badge-{{ $doc->status }}">
                                     {{ $doc->status }}
                                 </span>
                             </td>
 
                             <td>
                                 <div class="document-actions-grid">
-                                    <a href="{{ route('admin.doc.show', $doc->id) }}" class="action-btn">
+                                    <a href="{{ route('admin.doc.show', $doc->id) }}" class="action-btn action-btn-view">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2">
                                             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                                             <circle cx="12" cy="12" r="3" />
                                         </svg>
+                                        <span class="action-span">Voir</span>
                                     </a>
 
-                                    <a href="{{ route('admin.documents.download', $doc->id) }}" class="action-btn">
+                                    <a href="{{ route('admin.documents.download', $doc->id) }}" class="action-btn action-btn-edit">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2">
                                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                             <polyline points="7 10 12 15 17 10" />
                                             <line x1="12" x2="12" y1="15" y2="3" />
                                         </svg>
+                                        <span class="action-span">Telecharger</span>
                                     </a>
 
-                                    <button class="action-btn"
+                                    <button class="action-btn action-btn-link"
                                         onclick="shareDocument('{{ basename($doc->file_path) }}', '{{ Storage::url($doc->file_path) }}')"
                                         title="Partager le document">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -144,6 +146,7 @@
                                             <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
                                             <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
                                         </svg>
+                                        <span class="action-span">Partager</span>
                                     </button>
 
                                     <button class="action-btn delete-doc-btn delete-document-btn" data-id="{{ $doc->id }}">
@@ -153,6 +156,7 @@
                                             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
                                             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                                         </svg>
+                                        <span class="action-span act">Supprimer</span>
                                     </button>
                                 </div>
                             </td>

@@ -7,7 +7,7 @@
                 <link rel="stylesheet" href="{{ asset('css/auth/two-factor.css') }}">
             @endpush
 
-            <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+            <main style="flex: 1; display: flex; align-items: center; justify-content: center;">
                 <x-auth.card style="width: 500px; text-align: center; padding: 2rem 2.5rem;">
                     <div class="shield-icon-wrapper" style="margin-bottom: 0.5rem;">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -16,8 +16,8 @@
                         </svg>
                     </div>
 
-                    <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Vérification en deux étapes</h2>
-                    <p class="subtitle" style="margin-bottom: 1.5rem;">Un code OTP à 6 chiffres a été envoyé
+                    <h2 style="margin-bottom: 1.8rem; font-size: 1.5rem;">Vérification en deux étapes</h2>
+                    <p class="subtitle" style="margin-bottom: 1.8rem;">Un code OTP à 6 chiffres a été envoyé
                         à<br><strong style="color: #1e293b;">a***n@exemple.gouv</strong></p>
 
                     <form action="{{ route('two-factor.verify') }}" method="POST">
@@ -38,6 +38,10 @@
                             <span class="text-red-500 text-sm">{{ $errors->first('code') }}</span>
                         @endif
 
+
+
+                        <button type="submit" class="submit-btn" style="margin: 1.2rem 0;">Vérifier le code</button>
+                        <span>Vous n'avez pas reçu de code ?</span>
                         <div class="resend-text">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -46,19 +50,7 @@
                                 <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
                                 <path d="M3 21v-5h5" />
                             </svg>
-                            <button id="resendBtn" disabled>Renvoyer le code dans <span class="resend-timer" id="timer"></span></button>
-                        </div>
-
-                        <button type="submit" class="submit-btn" style="margin-top: 1rem;">Vérifier le code</button>
-                        <div class="alert-info">
-                            <svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10" />
-                                <line x1="12" x2="12" y1="8" y2="12" />
-                                <line x1="12" x2="12.01" y1="16" y2="16" />
-                            </svg>
-                            <span>Connexion détectée depuis un nouvel appareil. Confirmez votre identité pour
-                                continuer.</span>
+                            <button id="resendBtn">Renvoyer le code <span class="resend-timer" id="timer"></span></button>
                         </div>
 
                         <a href="{{ route('login') }}" class="back-to-login">
@@ -101,34 +93,34 @@
             </script>
 
             <script>
-const expiresAt = new Date("{{ session('otp_expires_at') }}").getTime();
+                const expiresAt = new Date("{{ session('otp_expires_at') }}").getTime();
 
-const timer = document.getElementById('timer');
-const btn = document.getElementById('resendBtn');
+                const timer = document.getElementById('timer');
+                const btn = document.getElementById('resendBtn');
 
-const interval = setInterval(() => {
+                const interval = setInterval(() => {
 
-    const now = Date.now();
-    const diff = Math.floor((expiresAt - now) / 1000);
+                    const now = Date.now();
+                    const diff = Math.floor((expiresAt - now) / 1000);
 
-    if (diff <= 0) {
+                    if (diff <= 0) {
 
-        clearInterval(interval);
+                        clearInterval(interval);
 
-        btn.disabled = false;
-        // btn.textContent = "Renvoyer le code";
+                        btn.disabled = false;
+                        // btn.textContent = "Renvoyer le code";
 
-        return;
-    }
+                        return;
+                    }
 
-    const minutes = Math.floor(diff / 60);
-    const seconds = diff % 60;
+                    const minutes = Math.floor(diff / 60);
+                    const seconds = diff % 60;
 
-    timer.textContent =
-        `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+                    timer.textContent =
+                        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-}, 1000);
-</script>
+                }, 1000);
+            </script>
 </x-auth-layout>
 
 </html>

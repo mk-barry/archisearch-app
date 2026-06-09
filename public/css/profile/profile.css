@@ -1,4 +1,4 @@
-.profile-container { max-width: 800px; margin: 0 auto; padding: 2rem 0; }
+.profile-container { margin: 0 auto; padding: 2rem 0; }
 .alert-success { background: #d1fae5; color: #065f46; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
 .profile-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 .profile-avatar-row { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #e5e7eb; }
