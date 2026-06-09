@@ -62,38 +62,17 @@ def clean_ocr_text(text):
     if not text:
         return ""
 
+    text = str(text)
+
     text = re.sub(
-        r'\s+',
+        r'[ \t]+',
         ' ',
         text
     )
 
     text = re.sub(
-        r'([a-zàâéèêëîïôùûüç])([A-Z])',
-        r'\1 \2',
-        text
-    )
-
-    text = re.sub(
-        r'(\d)([A-Za-z])',
-        r'\1 \2',
-        text
-    )
-
-    text = re.sub(
-        r'([A-Za-z])(\d)',
-        r'\1 \2',
-        text
-    )
-
-    text = re.sub(
-        r'([A-Z]{4,})',
-        lambda m: " ".join(
-            re.findall(
-                r'.{1,4}',
-                m.group(1)
-            )
-        ),
+        r'\n+',
+        '\n',
         text
     )
 
@@ -103,6 +82,28 @@ def clean_ocr_text(text):
 # IMAGE PREPROCESSING
 # ======================================================================================
 
+# def preprocess_image(image):
+
+#     gray = cv2.cvtColor(
+#         image,
+#         cv2.COLOR_BGR2GRAY
+#     )
+
+#     denoise = cv2.fastNlMeansDenoising(
+#         gray
+#     )
+
+#     thresh = cv2.adaptiveThreshold(
+#         denoise,
+#         255,
+#         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+#         cv2.THRESH_BINARY,
+#         11,
+#         2
+#     )
+
+#     return thresh
+
 def preprocess_image(image):
 
     gray = cv2.cvtColor(
@@ -110,20 +111,15 @@ def preprocess_image(image):
         cv2.COLOR_BGR2GRAY
     )
 
-    denoise = cv2.fastNlMeansDenoising(
-        gray
+    gray = cv2.fastNlMeansDenoising(
+        gray,
+        None,
+        10,
+        7,
+        21
     )
 
-    thresh = cv2.adaptiveThreshold(
-        denoise,
-        255,
-        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY,
-        11,
-        2
-    )
-
-    return thresh
+    return gray
 
 # ======================================================================================
 # PDF TO IMAGES
@@ -138,7 +134,7 @@ def pdf_to_images(pdf_path):
     for page in document:
 
         pix = page.get_pixmap(
-            matrix=fitz.Matrix(3, 3)
+            matrix=fitz.Matrix(4,4)
         )
 
         img = np.frombuffer(
@@ -193,11 +189,13 @@ def perform_ocr(images):
 
     for page_index, image in enumerate(images):
 
-        processed = preprocess_image(
-            image
-        )
+        result, _ = ocr(image)
 
-        result, _ = ocr(processed)
+        if not result:
+
+            processed = preprocess_image(image)
+
+            result, _ = ocr(processed)
 
         if not result:
             continue
@@ -277,18 +275,26 @@ def keyword_exists(keyword, text):
 
     keyword = normalize(keyword)
 
-    words = normalize(text).split()
+    text = normalize(text)
 
-    for word in words:
+    if keyword in text:
 
-        ratio = similarity(
-            keyword,
-            word
-        )
+        return True
 
-        if ratio >= 0.80:
+    words = text.split()
 
-            return True
+    keyword_words = keyword.split()
+
+    if len(keyword_words) == 1:
+
+        for word in words:
+
+            if similarity(
+                keyword,
+                word
+            ) >= 0.85:
+
+                return True
 
     return False
 
@@ -411,27 +417,41 @@ def extract_metadata(text, metadata_patterns):
 def analyze_name(expected_name, text):
 
     if not expected_name:
-
         return {
-
             "match": False,
-
             "score": 0
         }
 
-    ratio = similarity(
-        expected_name,
-        text
+    text = normalize(text)
+
+    expected_words = [
+        normalize(word)
+        for word in expected_name.split()
+        if word.strip()
+    ]
+
+    matched = 0
+
+    for word in expected_words:
+
+        if word in text:
+            matched += 1
+            continue
+
+        for token in text.split():
+
+            if similarity(word, token) >= 0.85:
+                matched += 1
+                break
+
+    score = round(
+        matched / len(expected_words) * 100,
+        2
     )
 
     return {
-
-        "match": ratio >= 0.75,
-
-        "score": round(
-            ratio * 100,
-            2
-        )
+        "match": score >= 80,
+        "score": score
     }
 
 # ======================================================================================
@@ -442,9 +462,11 @@ def extract_dates(text):
 
     patterns = [
 
-        r'\d{2}[\/\-]\d{2}[\/\-]\d{4}',
+        r'\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4}',
 
-        r'\d{4}[\/\-]\d{2}[\/\-]\d{2}'
+        r'\d{4}[\/\-\.]\d{2}[\/\-\.]\d{2}',
+
+        r'\d{1,2}\s+[A-Za-zéèêàâîôû]+\s+\d{4}'
     ]
 
     dates = []
@@ -454,38 +476,73 @@ def extract_dates(text):
         dates.extend(
             re.findall(
                 pattern,
-                text
+                text,
+                re.IGNORECASE
             )
         )
 
     parsed_dates = []
 
+    french_months = {
+
+        "janvier":"01",
+        "février":"02",
+        "fevrier":"02",
+        "mars":"03",
+        "avril":"04",
+        "mai":"05",
+        "juin":"06",
+        "juillet":"07",
+        "août":"08",
+        "aout":"08",
+        "septembre":"09",
+        "octobre":"10",
+        "novembre":"11",
+        "décembre":"12",
+        "decembre":"12"
+    }
+
     for date in dates:
 
-        formats = [
+        try:
 
-            '%d/%m/%Y',
+            for month, value in french_months.items():
 
-            '%d-%m-%Y',
-
-            '%Y-%m-%d'
-        ]
-
-        for fmt in formats:
-
-            try:
-
-                parsed_dates.append(
-                    datetime.strptime(
-                        date,
-                        fmt
-                    )
+                date = re.sub(
+                    month,
+                    value,
+                    date,
+                    flags=re.IGNORECASE
                 )
 
-                break
+            date = date.replace(".", "/")
+            date = date.replace("-", "/")
 
-            except:
-                continue
+            parsed_dates.append(
+
+                datetime.strptime(
+                    date,
+                    "%d/%m/%Y"
+                )
+            )
+
+            continue
+
+        except:
+            pass
+
+        try:
+
+            parsed_dates.append(
+
+                datetime.strptime(
+                    date,
+                    "%Y/%m/%d"
+                )
+            )
+
+        except:
+            pass
 
     return parsed_dates
 
@@ -743,10 +800,9 @@ def analyze_document(data):
 
     semantic_score = round(
 
-        (
-            detection["score"]
-            + name_analysis["score"]
-        ) / 2,
+        detection["score"] * 0.7
+        +
+        name_analysis["score"] * 0.3,
 
         2
     )

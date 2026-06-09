@@ -146,7 +146,7 @@
 
                 <div class="result name-check">
                     Correspondance :
-                    <span class="flag red">{{ $analysis['name_match_score'] * 100 }}%</span>
+                    <span class="flag red">{{ $analysis['name_match_score']}}%</span>
                 </div>
 
                 @if($analysis['is_expired'])

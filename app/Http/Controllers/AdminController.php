@@ -362,20 +362,20 @@ class AdminController extends Controller
                 ]
             ];
 
-            if (!empty($document->ocr_score)) {
+            // if (!empty($document->ocr_score)) {
 
-                return view(
-                'admin.doc-view',
-                [
-                    'document' => $document,
-                    'analysis' => data_get(
-                    json_decode($document->metadata, true),
-                        'analysis',
-                        []
-                    )
-                ]
-                );
-            }
+            //     return view(
+            //     'admin.doc-view',
+            //     [
+            //         'document' => $document,
+            //         'analysis' => data_get(
+            //         json_decode($document->metadata, true),
+            //             'analysis',
+            //             []
+            //         )
+            //     ]
+            //     );
+            // }
 
             // =========================================================
             // PYTHON
