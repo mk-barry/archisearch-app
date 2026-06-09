@@ -154,6 +154,11 @@
                         Conclusion :
                         <span class="flag green">{{ $analysis['expiry_date'] }}</span>
                     </div>
+                @elseif($analysis['is_flagged'])
+                    <div class="result expiration-check">
+                        Défauts :
+                        <span class="flag red">{{ implode(',', $analysis['flags']) }}</span>
+                    </div>
                 @endif
             </div>
 

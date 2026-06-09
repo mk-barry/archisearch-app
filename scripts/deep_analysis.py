@@ -798,6 +798,7 @@ def analyze_document(data):
             "Nom incohérent"
         )
 
+
     semantic_score = round(
 
         detection["score"] * 0.7
@@ -840,6 +841,7 @@ def analyze_document(data):
         "is_flagged": (
             fraud_score >= 40
             or expiration["expired"]
+            or not name_analysis["match"]
         ),
 
         "is_expired": (
