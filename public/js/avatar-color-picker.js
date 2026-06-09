@@ -1,4 +1,10 @@
-const blues = [
+// const blues = [
+    
+// ];
+
+// const color = blues[Math.floor(Math.random() * blues.length)];
+
+const colors = [
     '#0369a1',
     '#059669',
     '#16a34a',
@@ -14,7 +20,9 @@ const blues = [
     '#10b981'
 ];
 
-const color = blues[Math.floor(Math.random() * blues.length)];
+const avatars = document.querySelectorAll('.avatar-md');
 
-// document.querySelector('.avatar-base').style.backgroundColor = color;
-document.getElementsByClassName('avatar-base').style.bgColor = "green";
+avatars.forEach(avatar => {
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    avatar.style.backgroundColor = color + "!important";
+});

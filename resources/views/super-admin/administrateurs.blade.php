@@ -103,7 +103,7 @@
                             <tr>
                                 <td>
                                     <div class="admin-info">
-                                        <div class="avatar-base avatar-md" style="width: 36px; height: 36px; font-size: 0.8rem; color: #0369a1;">
+                                        <div class="avatar-base avatar-md" style="width: 36px; height: 36px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
                                             @if($user->avatar_path)
                                                 <img src="{{ asset('storage/' . $user->avatar_path) }}" alt="Avatar">
                                             @else

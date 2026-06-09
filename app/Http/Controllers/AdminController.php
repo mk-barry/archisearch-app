@@ -54,11 +54,12 @@ class AdminController extends Controller
             ->get();
 
         // 5. Invités sans soumission (Exemple : Users qui n'ont aucun document lié)
-        $invitesEnAttente = AuthorizedStudent::where('matricule')
-            ->whereDoesntHave('documents')
+        $invitesEnAttente = AuthorizedStudent::whereDoesntHave('documents')
             ->latest()
-            ->take(4)
+            ->take(5)
             ->get();
+
+        // dd($invitesEnAttente);
 
         return view('admin.dashboard', compact('stats', 'last7Days', 'evenementStats', 'derniersDocs', 'invitesEnAttente'));
     }
@@ -209,6 +210,7 @@ class AdminController extends Controller
         $event = Events::with(['documentTypes', 'authorizedStudent'])
             ->where('uuid', $uuid)
             ->firstOrFail();
+        
 
         return view('admin.voir-event', compact('event'));
     }

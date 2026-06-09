@@ -7,16 +7,14 @@
                 <h1>{{ $event->title }}</h1>
             </div>
             <div class="admin-info">
-                <div class="avatar"
-                    style="width: 40px; height: 40px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                    @if(Auth::user()->avatar)
-                        <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar de {{ Auth::user()->name }}">
+                <div class="avatar-base avatar-md">
+                    @if(Auth::user()->avatar_path)
+                        <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
                     @else
-                        <!-- <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar par défaut"> -->
-                        {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+                        {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
                     @endif
                 </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <div class="flex-col-start">
                     <span class="admin-name">{{ Auth::user()->name }}</span>
                     <span class="admin-mail">{{ Auth::user()->role }}</span>
                 </div>
@@ -69,38 +67,51 @@
             </h3>
 
             <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <table class="participant-table">
                     <thead>
-                        <tr style="text-align: left; border-bottom: 2px solid #f1f5f9;">
-                            <th style="padding: 12px; color: #64748b; font-weight: 600;">Étudiant</th>
-                            <th style="padding: 12px; color: #64748b; font-weight: 600;">Documents</th>
-                            <th style="padding: 12px; color: #64748b; font-weight: 600;">Dernière activité</th>
-                            <th style="padding: 12px; color: #64748b; font-weight: 600; text-align: right;">Action</th>
+                        <tr>
+                            <th>Étudiant</th>
+                            <th>Documents</th>
+                            <th>Dernière activité</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                        
                         @if($event->authorizedStudent && $event->authorizedStudent->count() > 0)
-                            <span>ok</span>
                             @foreach($event->authorizedStudent as $student)
                                 <tr>
                                     {{-- Ton code de ligne ici --}}
-                                    <td style="padding: 12px;">
+                                    <td>
                                         <div style="font-weight: 500; color: #1e293b;">{{ $student->name }}</div>
                                         <div style="font-size: 0.75rem; color: #94a3b8;">{{ $student->matricule }}</div>
                                     </td>
-                                    <td style="padding: 12px;">
+                                    <td>
                                         {{-- Badge dynamique selon le statut --}}
-                                        <span
-                                            style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #059669; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500;">
-                                            <span style="width: 6px; height: 6px; background: #10b981; border-radius: 50%;">
-                                        </span>
-                                        CNI [Soumis]
+                                        <span style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #059669; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500;">
+                                            <span style="width: 6px; height: 6px; background: #10b981; border-radius: 50%;"></span>
+                                        
+                                        @if (!$student->documents)
+                                            {{ $student->documents
+                                            ->where('event_id', $event->id)
+                                            ->pluck('title')
+                                            ->implode(', ') }}
+                                        @else
+                                            Aucun document
+                                        @endif
                                         </span>
                                     </td>
-                                    <td style="padding: 12px; color: #64748b;">
-                                        12/05/2026 à 14h30
+                                    <td style="color: #64748b;">
+                                        @if (!$student->documents)
+                                            {{ $student->documents
+                                            ->where('event_id', $event->id)
+                                            ->pluck('created_at')
+                                            ->implode(', ') }}
+                                        @else
+                                            Aucune activité
+                                        @endif
                                     </td>
-                                    <td style="padding: 12px; text-align: right;">
+                                    <td>
                                         <button class="action-btn" title="Consulter le dossier"
                                             style="color: #0369a1; border: none; background: none; cursor: pointer;">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
