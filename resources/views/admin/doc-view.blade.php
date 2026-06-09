@@ -20,7 +20,7 @@
     <div class="section-container">
 
         <section class="left card">
-            <iframe src="{{ asset('storage/' . $document->file_path) }}#zoom=page-fit"></iframe>
+            <iframe src="{{ asset('storage/' . $document->file_path) }}"></iframe>
         </section>
 
         <section class="right">

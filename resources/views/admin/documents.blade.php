@@ -223,14 +223,14 @@
             };
 
             function updateUI(isAuto = false) {
-                console.log("Envoi des données :", state);
+                // console.log("Envoi des données :", state);
 
                 $.ajax({
                     url: "{{ route('admin.documents') }}",
                     data: state,
 
                     success: function (res) {
-                        console.log("Réponse reçue :", res);
+                        // console.log("Réponse reçue :", res);
                         $('#documents-body').html(res['table-body']);
                         $('#pagination-container').html(res['pagination']);
                     },
@@ -357,7 +357,7 @@
                 const fullUrl = window.location.origin + url;
 
                 if (navigator.share) {
-                    console.log("yo")
+                    // console.log("yo")
 
                     navigator.share({
                         title: 'Document ArchiSearch : ' + title,

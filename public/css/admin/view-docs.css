@@ -19,7 +19,7 @@
 
 .left{
     min-height: 0;
-    background: goldenrod;
+    /* background: goldenrod; */
 }
 
 .left iframe {
