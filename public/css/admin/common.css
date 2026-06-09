@@ -104,14 +104,14 @@ td { font-size: 0.9rem; vertical-align: middle; }
 /* Reponsive Mobile-First Global */
 @media screen and (max-width: 768px) {
     .main-sidebar { display: none; height: 100%; }
-    .overlay { background: rgba(178, 186, 197, 0.5); position: fixed; pointer-events: none; z-index: 3; width: 100dvh; height: 100%; overflow: hidden;}
+    .overlay { background: rgba(178, 186, 197, 0.5); position: fixed; pointer-events: none; z-index: 3; width: 100vw; height: 100%; overflow: hidden;}
     .disabled { pointer-events: none; }
     .fermeraside { display: flex; }
     #hambuger { pointer-events: initial;}
     main { margin-left: 0; width: 100%; padding: 1rem; justify-content: center; align-items: center; /*background-color: burlywood;*/ }
     .menu { display: flex; }
     /* .page-header { flex-direction: column; } */
-    .table-container{ overflow-x: auto; width: 420px; }
+    .table-container{ overflow-x: auto; width: 80%; max-width: 100%; }
 
     .log-tabs { justify-content: space-around; }
 
