@@ -208,3 +208,14 @@
     padding-left: 1.25rem;
     border-left: 1px solid #f1f5f9;
 }
+
+
+@media screen and (max-width: 768px) {
+    .search-input-big svg, .search-input-big input {
+        font-size: 0.6rem;
+    }
+
+    .meta-item {
+        font-size: 0.5rem
+    }
+}
