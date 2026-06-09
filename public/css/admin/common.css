@@ -17,7 +17,7 @@ body { background-color: var(--body-bg); color: var(--text-main); }
 .main-sidebar { width: var(--sidebar-width); background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
 .sidebar-header { padding: 1.5rem; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); }
 .nav-group { padding: 1.5rem 0.75rem; }
-.fermeraside { display: none; margin-left: 5%; border-radius: 50%; width: 20px; height: 20px; border: none; background-color: palegreen; justify-content: center; align-items: center; }
+.fermeraside { display: none; margin-left: 5%; border-radius: 50%; width: 20px; height: 20px; border: none; background-color: #2563eb; color: #e0f2fe; justify-content: center; align-items: center; }
 .nav-label { padding: 0 0.75rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.75rem; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 0.75rem; text-decoration: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; border-radius: 10px; transition: all 0.2s; }
 .nav-item:hover { background: var(--primary-light); color: var(--primary-blue); }
