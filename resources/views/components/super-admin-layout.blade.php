@@ -29,6 +29,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/alerts.js') }}"></script>
 
+    <!-- Avatars Random Coloration -->
+    <script src="{{ asset('js/avatar-color-picker.js') }}"></script>
+
     <!-- Sidebar display -->
      <script src="{{ asset('js/hambuger.js') }}" defer></script>
 
