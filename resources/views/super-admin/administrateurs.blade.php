@@ -103,9 +103,12 @@
                             <tr>
                                 <td>
                                     <div class="admin-info">
-                                        <div class="avatar"
-                                            style="width: 36px; height: 36px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
-                                            {{ collect(explode(' ', $user->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
+                                        <div class="avatar-base avatar-md" style="width: 36px; height: 36px; font-size: 0.8rem; background: #e0f2fe; color: #0369a1;">
+                                            @if($user->avatar_path)
+                                                <img src="{{ asset('storage/' . $user->avatar_path) }}" alt="Avatar">
+                                            @else
+                                                {{ collect(explode(' ', $user->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                                            @endif
                                         </div>
                                         <div style="display: flex; flex-direction: column; align-items: flex-start;">
                                             <span class="admin-name">{{ $user->name }}</span>

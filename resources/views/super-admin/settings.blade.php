@@ -285,10 +285,10 @@
                                     <span class="tag"
                                         style="background: #eff6ff; color: #1e40af; display: flex; justify-content: center; align-items: center; gap: 5px;">
                                         <button type="button" onclick="ASAlerts.confirmAction(
-                                                'Supprimer ?',
-                                                'Voulez-vous supprimer cette extension ?',
-                                                () => this.closest('form').submit()
-                                            )"
+                                                    'Supprimer ?',
+                                                    'Voulez-vous supprimer cette extension ?',
+                                                    () => this.closest('form').submit()
+                                                )"
                                             style="border:none; background:none; cursor:pointer; display: flex; justify-content:center; align-items: center;">
                                             ×
                                         </button>

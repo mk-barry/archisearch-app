@@ -7,18 +7,18 @@
                 <h1>Tableau de bord de supervision</h1>
             </div>
             <div class="admin-info">
-            <div class="avatar-base avatar-md">
-                @if(Auth::user()->avatar_path)
-                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
-                @else
-                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
-                @endif
+                <div class="avatar-base avatar-md">
+                    @if(Auth::user()->avatar_path)
+                        <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
+                    @else
+                        {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                    @endif
+                </div>
+                <div class="flex-col-start">
+                    <span class="admin-name">{{ Auth::user()->name }}</span>
+                    <span class="admin-mail">{{ Auth::user()->role }}</span>
+                </div>
             </div>
-            <div class="flex-col-start">
-                <span class="admin-name">{{ Auth::user()->name }}</span>
-                <span class="admin-mail">{{ Auth::user()->role }}</span>
-            </div>
-        </div>
         </div>
 
         <div class="stats-grid">
@@ -146,7 +146,8 @@
                             <div style="flex: 1;">
                                 <div style="font-size: 0.9rem; font-weight: 600;">{{ $log->message }}</div>
                                 <div style="font-size: 0.75rem; color: #94a3b8;">{{ $log->created_at->diffForHumans() }} par
-                                    {{ $log->user->name ?? 'Systeme' }}</div>
+                                    {{ $log->user->name ?? 'Systeme' }}
+                                </div>
                             </div>
                         </div>
                     @endforeach

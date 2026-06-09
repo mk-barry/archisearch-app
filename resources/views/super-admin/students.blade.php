@@ -20,18 +20,18 @@
             </div>
 
             <div class="admin-info">
-            <div class="avatar-base avatar-md">
-                @if(Auth::user()->avatar_path)
-                    <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
-                @else
-                    {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
-                @endif
+                <div class="avatar-base avatar-md">
+                    @if(Auth::user()->avatar_path)
+                        <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">
+                    @else
+                        {{ collect(explode(' ', Auth::user()->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
+                    @endif
+                </div>
+                <div class="flex-col-start">
+                    <span class="admin-name">{{ Auth::user()->name }}</span>
+                    <span class="admin-mail">{{ Auth::user()->role }}</span>
+                </div>
             </div>
-            <div class="flex-col-start">
-                <span class="admin-name">{{ Auth::user()->name }}</span>
-                <span class="admin-mail">{{ Auth::user()->role }}</span>
-            </div>
-        </div>
         </div>
 
         <div class="controls-row">
@@ -124,7 +124,8 @@
         <div id="pagination-row" class="pagination-row">
             @fragment('pagination')
                 <span>
-                    Affichage {{ $students->firstItem() }}-{{ $students->lastItem() }} sur {{ $students->total() }} étudiants
+                    Affichage {{ $students->firstItem() }}-{{ $students->lastItem() }} sur {{ $students->total() }}
+                    étudiants
                 </span>
 
                 <div class="page-numbers">
@@ -132,7 +133,8 @@
                     @if ($students->onFirstPage())
                         <button class="page-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Précédent</button>
                     @else
-                        <a href="{{ $students->previousPageUrl() }}" class="page-btn" style="text-decoration: none;">Précédent</a>
+                        <a href="{{ $students->previousPageUrl() }}" class="page-btn"
+                            style="text-decoration: none;">Précédent</a>
                     @endif
 
                     {{-- Numéros de pages --}}
@@ -155,111 +157,111 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                    const searchInput = document.getElementById('search-input');
-                    const tableBody = document.getElementById('table-body');
-                    const paginationContainer = document.getElementById('pagination-row');
-                    const filterSelect = document.getElementById('filtre');
-                    // const sortSelect = document.getElementById('tri');
+                const searchInput = document.getElementById('search-input');
+                const tableBody = document.getElementById('table-body');
+                const paginationContainer = document.getElementById('pagination-row');
+                const filterSelect = document.getElementById('filtre');
+                // const sortSelect = document.getElementById('tri');
 
-                    let timeout = null;
+                let timeout = null;
 
-                    /* ===============================
-                       CONSTRUCTION URL (Filtres & Tri inclus)
-                    =============================== */
-                    function getFullUrl(baseUrl, page = null) {
-                        const url = new URL(baseUrl);
+                /* ===============================
+                   CONSTRUCTION URL (Filtres & Tri inclus)
+                =============================== */
+                function getFullUrl(baseUrl, page = null) {
+                    const url = new URL(baseUrl);
 
-                        if (searchInput?.value)
-                            url.searchParams.set('search', searchInput.value);
+                    if (searchInput?.value)
+                        url.searchParams.set('search', searchInput.value);
 
-                        if (page)
-                            url.searchParams.set('page', page);
+                    if (page)
+                        url.searchParams.set('page', page);
 
-                        // Récupération des filtres Select2 (Participation : has_uploads, no_uploads)
-                        const filters = $(filterSelect).val();
-                        filters.forEach(f => url.searchParams.append('filters', f));
+                    // Récupération des filtres Select2 (Participation : has_uploads, no_uploads)
+                    const filters = $(filterSelect).val();
+                    filters.forEach(f => url.searchParams.append('filters', f));
 
-                        // // Récupération du tri (A-Z, Nombre de docs, etc.)
-                        // const sorts = $(sortSelect).val() || [];
-                        // sorts.forEach(s => url.searchParams.append('sort[]', s));
+                    // // Récupération du tri (A-Z, Nombre de docs, etc.)
+                    // const sorts = $(sortSelect).val() || [];
+                    // sorts.forEach(s => url.searchParams.append('sort[]', s));
 
-                        return url.href;
-                    }
+                    return url.href;
+                }
 
-                    /* ===============================
-                       MISE À JOUR AJAX
-                    =============================== */
-                    function updateContent(url, push = true) {
-                        fetch(url, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                /* ===============================
+                   MISE À JOUR AJAX
+                =============================== */
+                function updateContent(url, push = true) {
+                    fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                        .then(r => r.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+
+                            const newTable = doc.getElementById('table-body');
+                            const newPagination = doc.getElementById('pagination-row');
+
+                            if (newTable && tableBody)
+                                tableBody.innerHTML = newTable.innerHTML;
+
+                            if (newPagination && paginationContainer)
+                                paginationContainer.innerHTML = newPagination.innerHTML;
+
+                            if (push)
+                                history.pushState({ url }, '', url);
                         })
-                            .then(r => r.text())
-                            .then(html => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
+                        .catch(err => console.error('Erreur AJAX:', err));
+                }
 
-                                const newTable = doc.getElementById('table-body');
-                                const newPagination = doc.getElementById('pagination-row');
+                /* ===============================
+                   ÉCOUTEURS D'ÉVÉNEMENTS
+                =============================== */
 
-                                if (newTable && tableBody)
-                                    tableBody.innerHTML = newTable.innerHTML;
-
-                                if (newPagination && paginationContainer)
-                                    paginationContainer.innerHTML = newPagination.innerHTML;
-
-                                if (push)
-                                    history.pushState({ url }, '', url);
-                            })
-                            .catch(err => console.error('Erreur AJAX:', err));
-                    }
-
-                    /* ===============================
-                       ÉCOUTEURS D'ÉVÉNEMENTS
-                    =============================== */
-
-                    // Recherche (Debounce 300ms)
-                    if (searchInput) {
-                        searchInput.addEventListener('keyup', function () {
-                            clearTimeout(timeout);
-                            timeout = setTimeout(() => {
-                                updateContent(getFullUrl("{{ route('super-admin.students') }}"));
-                            }, 300);
-                        });
-                    }
-
-                    // Changement de Filtres
-                    $(filterSelect).on('change', function () {
-                        updateContent(getFullUrl("{{ route('super-admin.students') }}"));
+                // Recherche (Debounce 300ms)
+                if (searchInput) {
+                    searchInput.addEventListener('keyup', function () {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            updateContent(getFullUrl("{{ route('super-admin.students') }}"));
+                        }, 300);
                     });
+                }
 
-                    // // Changement de Tri (si tu as un select #tri)
-                    // if (sortSelect) {
-                    //     $(sortSelect).on('change', function () {
-                    //         updateContent(getFullUrl("{{ route('super-admin.students') }}"));
-                    //     });
-                    // }
-
-                    // Pagination
-                    paginationContainer?.addEventListener('click', function (e) {
-                        const link = e.target.closest('a');
-                        if (!link) return;
-                        e.preventDefault();
-
-                        const pageUrl = new URL(link.href);
-                        const page = pageUrl.searchParams.get('page');
-
-                        updateContent(getFullUrl("{{ route('super-admin.students') }}", page));
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    });
-
-                    // Gestion du bouton retour navigateur
-                    window.addEventListener('popstate', function (event) {
-                        if (event.state?.url) {
-                            updateContent(event.state.url, false);
-                        } else {
-                            updateContent(window.location.href, false);
-                        }
-                    });
+                // Changement de Filtres
+                $(filterSelect).on('change', function () {
+                    updateContent(getFullUrl("{{ route('super-admin.students') }}"));
                 });
+
+                // // Changement de Tri (si tu as un select #tri)
+                // if (sortSelect) {
+                //     $(sortSelect).on('change', function () {
+                //         updateContent(getFullUrl("{{ route('super-admin.students') }}"));
+                //     });
+                // }
+
+                // Pagination
+                paginationContainer?.addEventListener('click', function (e) {
+                    const link = e.target.closest('a');
+                    if (!link) return;
+                    e.preventDefault();
+
+                    const pageUrl = new URL(link.href);
+                    const page = pageUrl.searchParams.get('page');
+
+                    updateContent(getFullUrl("{{ route('super-admin.students') }}", page));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+
+                // Gestion du bouton retour navigateur
+                window.addEventListener('popstate', function (event) {
+                    if (event.state?.url) {
+                        updateContent(event.state.url, false);
+                    } else {
+                        updateContent(window.location.href, false);
+                    }
+                });
+            });
         </script>
 </x-super-admin-layout>
