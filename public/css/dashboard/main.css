@@ -162,10 +162,10 @@ main {
     margin-bottom: 0.5rem;
 }
 
-.fermeraside { display: none; margin-left: 5%; border-radius: 50%; width: 20px; height: 20px; border: none; background-color: palegreen; justify-content: center; align-items: center; }
+.fermeraside { display: none; margin-left: 5%; border-radius: 50%; width: 20px; height: 20px; border: none; background-color: #2563eb; color: #cbd5e1; justify-content: center; align-items: center; }
 .menu { display: none; justify-content: space-between; align-items: center; }
 .menu .sidebar-header { padding: 1.5rem 0; }
-.hambuger { display: flex; flex-direction: column; align-items: center; justify-content: space-around; height:35px; width: 35px; background-color: red; border-radius: 50%; }
+.hambuger { display: flex; flex-direction: column; align-items: center; justify-content: space-around; height:35px; width: 35px; background-color: #2563eb; border-radius: 50%; }
 .trait { width: 60%; background-color: #1e293b; height: 10%; }
 
 /* Stats Grid */
