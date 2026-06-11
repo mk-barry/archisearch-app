@@ -113,7 +113,7 @@
 
                                             $color = $colors[$user->id % count($colors)];
                                         @endphp
-                                    <div class="admin-info">
+                                    <div class="admin-info-mobile">
                                         <div class="avatar-base avatar-sm" style="background-color: {{ $color }}; color: #fff;" data-name="{{ $user->name }}">
                                             @if($user->avatar_path)
                                                 <img src="{{ asset('storage/' . $user->avatar_path) }}" alt="Avatar">
