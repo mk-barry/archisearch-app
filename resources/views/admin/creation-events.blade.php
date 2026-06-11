@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="form-container" style="max-width: 850px; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin: 0 auto;">
+    <div class="form-container">
         <form action="{{ route('admin.events.store') }}" method="POST" id="createEventForm">
             @csrf
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">

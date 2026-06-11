@@ -1,4 +1,4 @@
-<x-super-admin-layout active="evenements">
+<x-super-admin-layout active="evenements" sec_css="forms.css">
     <x-slot:title>Autoriser un étudiant - ArchiSearch</x-slot>
 
         <div class="page-header">
@@ -21,42 +21,38 @@
             </div>
         </div>
 
-        <div class="form-container"
-            style="max-width: 800px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div class="form-container" style="max-width: 800px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
 
             <form action="{{ route('super-admin.students.store') }}" method="POST" id="createStudentForm">
                 @csrf
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-grid">
                     <div class="form-group">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500;">Matricule /
                             Identifiant</label>
                         <input type="text" name="matricule" placeholder="ex: 22B567" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                            class="form-input">
                     </div>
 
                     <div class="form-group">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500;">Nom complet</label>
                         <input type="text" name="name" placeholder="ex: Jean Dupont" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                            class="form-input">
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500;">Adresse Email
                             (Optionnelle)</label>
                         <input type="email" name="email" placeholder="j.dupont@univ.com"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                            class="form-input">
                     </div>
                 </div>
 
-                <div
-                    style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 20px;">
-                    <a href="{{ route('admin.evenements') }}" class="btn-outline"
-                        style="text-decoration: none; display: flex; align-items: center;">
+                <div class="form-footer">
+                    <a href="{{ route('admin.evenements') }}" class="btn-outline">
                         Annuler
                     </a>
-                    <button type="submit" class="btn-primary"
-                        style="cursor: pointer; border: none; display: flex; align-items: center; gap: 8px;">
+                    <button type="submit" class="btn-primary">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />

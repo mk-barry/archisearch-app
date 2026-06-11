@@ -1,4 +1,4 @@
-<x-super-admin-layout active="logs">
+<x-super-admin-layout active="logs"  sec_css="tables.css">
     <x-slot:title>Journaux système - ArchiSearch</x-slot>
 
         <div class="page-header">
@@ -38,8 +38,8 @@
                 <div class="log-tabs" id="level-filters">
                     <button data-level="" value="" class="log-tab active">Tous</button>
                     <button data-level="info" value="info" class="log-tab">INFO</button>
-                    <button data-level="alerte" value="alerte" class="log-tab">WARNING</button>
-                    <button data-level="erreur" value="erreur" class="log-tab">ERROR</button>
+                    <button data-level="alerte" value="alerte" class="log-tab">ALERTE</button>
+                    <button data-level="erreur" value="erreur" class="log-tab">ERREUR</button>
                 </div>
             </div>
         </div>

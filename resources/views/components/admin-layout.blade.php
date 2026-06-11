@@ -1,4 +1,4 @@
-@props(['pri_css' => asset('css/admin/common.css'), 'sec_css' => '', 'active' => 'dashboard', 'title' => 'ArchiSearch - Admin Dashboard'])
+@props(['sec_css' => '', 'active' => 'dashboard', 'title' => 'ArchiSearch - Admin Dashboard'])
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -9,9 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title }}</title>
 
-    <link rel="stylesheet" href="{{ $pri_css }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/common.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profile/profile.css') }}">
     @if($sec_css)
-    <link rel="stylesheet" href="{{ $sec_css }}">
+        <link rel="stylesheet" href="{{ $sec_css }}">
     @endif
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,9 +38,9 @@
         <aside class="main-sidebar" id="main-sidebar">
             
             <div class="sidebar-header">
-                <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
-                <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
-                <button onclick="sidebarToggle()" class="fermeraside">x</button>
+                <div class="logo-box">AS</div>
+                <span class="brand-name">ArchiSearch</span>
+                <button class="fermeraside">x</button>
             </div>
 
             <div class="nav-group">
@@ -121,23 +122,23 @@
         </aside>
 
         <div class="flex-col" style="flex: 1;">
-            <div id="overlay" class="" onclick="sidebarToggle()">
-
-            </div>
+            <div id="overlay" class=""></div>
             <main id="main">
-                <div class="menu">
-                    <div class="sidebar-header">
-                        <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
-                        <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
+                <div class="mobile-header">
+                    <div class="brand-mobile">
+                        <div class="logo-box">AS</div>
+                        <span class="brand-name">ArchiSearch</span>
                     </div>
-                    <button class="hambuger" id="hambuger" onclick="sidebarToggle()">
+                    <button class="hambuger" id="hambuger">
                         <div class="trait"></div>
                         <div class="trait"></div>
                         <div class="trait"></div>
                     </button>
                 </div>
                 
-                {{ $slot }}
+                <div class="content-wrapper">
+                    {{ $slot }}
+                </div>
             </main>
         </div>
     </div>

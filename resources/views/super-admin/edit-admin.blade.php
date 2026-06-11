@@ -1,4 +1,4 @@
-<x-super-admin-layout active="administrateurs">
+<x-super-admin-layout active="administrateurs" sec_css="forms.css">
     <x-slot:title>Modifier l'administrateur - ArchiSearch</x-slot>
 
         <div class="page-header">
@@ -21,25 +21,24 @@
             </div>
         </div>
 
-        <div class="form-container"
-            style="max-width: 800px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div class="form-container">
 
             <form id="editAdminForm" action="{{ route('users.update', $user->id) }}" method="POST">
                 @csrf
                 @method('PUT') {{-- CRUCIAL : HTML ne supporte pas PUT, Laravel le simule ici --}}
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-grid">
                     <div class="form-group">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500;">Nom complet</label>
                         <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                            class="form-input">
                         @error('name') <span style="color: red; font-size: 0.8rem;">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="form-group">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500;">Adresse Email</label>
                         <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                            class="form-input">
                         @error('email') <span style="color: red; font-size: 0.8rem;">{{ $message }}</span> @enderror
                     </div>
 
@@ -47,13 +46,13 @@
                         <label style="display: block; margin-bottom: 8px; font-weight: 500;">Organisation /
                             Direction</label>
                         <input type="text" name="organisation" value="{{ old('organisation', $user->organisation) }}"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                            class="form-input">
                     </div>
 
                     <div class="form-group">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500;">Role</label>
                         <select name="role" id="role" class="form-control"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                            class="form-input">
                             @foreach($roles as $role)
                                 <option value="{{ $role }}" {{ $user->role === $role ? 'selected' : '' }}>
                                     {{ ucfirst(str_replace('-', ' ', $role)) }}
@@ -64,19 +63,16 @@
                     <!-- <div class="form-group">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500;">Mot de passe</label>
                     <input type="password" name="password" placeholder="Laisser vide pour ne pas changer"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;">
+                        class="form-input">
                     <small style="color: #64748b;">Ne remplir que pour modifier le mot de passe actuel.</small>
                 </div> -->
                 </div>
 
-                <div
-                    style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 20px;">
-                    <a href="{{ route('super-admin.administrateurs') }}" class="btn-outline"
-                        style="text-decoration: none; display: flex; align-items: center;">
+                <div class="form-footer">
+                    <a href="{{ route('super-admin.administrateurs') }}" class="btn-outline">
                         Annuler
                     </a>
-                    <button type="submit" class="btn-primary"
-                        style="cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; background-color: #0369a1;">
+                    <button type="submit" class="btn-primary">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />

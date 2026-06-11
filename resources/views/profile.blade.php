@@ -1,4 +1,4 @@
-<x-profil-layout sec_css="{{ asset('css/profile/profile.css') }}" active="profil" title="Mon Profil">
+<x-profil-layout active="profil" title="Mon Profil">
     <div class="page-header">
         <div class="page-info">
             <div class="breadcrumb-small">Portail {{ ucfirst(Auth::user()->role) }} > Profil</div>
@@ -29,7 +29,7 @@
             @method('patch')
 
             <div class="profile-avatar-row">
-                <div class="avatar-base avatar-lg">
+                <div class="avatar-base avatar-md">
                     @if(Auth::user()->avatar_path)
                         <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" id="avatarPreview">
                     @else

@@ -1,4 +1,4 @@
-<x-super-admin-layout active="administrateurs">
+<x-super-admin-layout active="administrateurs"  sec_css="tables.css">
     <x-slot:title>Gestion des administrateurs - ArchiSearch</x-slot>
         <div class="page-header">
             <div class="page-info">
@@ -23,15 +23,13 @@
         <!-- Controls Row -->
         <div class="controls-row">
             <div class="search-filter-group">
-                <div class="input-wrapper"
-                    style="display: flex; width: 350px; background: white; justify-content: center; align-items: center; gap: 5px; border-radius: 10px;">
+                <div class="input-wrapper">
                     <svg class="input-icon" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="text" id="search-input" placeholder="Rechercher un administrateur..."
-                        style="width: 80%; padding: 0.75rem 1rem 0.75rem 1rem; border: none; outline: none;">
+                    <input type="text" id="search-input" placeholder="Rechercher un administrateur...">
                 </div>
                 <select class="js-basic-multiple" name="filters[]" multiple="multiple" id="filtre">
                     <optgroup label="Statut">
@@ -74,7 +72,7 @@
                 </select>
             </div>
 
-            <a href="{{ route('super-admin.creation-admin') }}" class="btn-primary" style="text-decoration: none;">
+            <a href="{{ route('super-admin.creation-admin') }}" class="btn-primary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                     stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -94,7 +92,7 @@
                         <th>Statut</th>
                         <th>Dernière connexion</th>
                         <th>Documents</th>
-                        <th style="text-align: right;">Actions</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -116,14 +114,14 @@
                                             $color = $colors[$user->id % count($colors)];
                                         @endphp
                                     <div class="admin-info">
-                                        <div class="avatar-base avatar-md" style="width: 36px; height: 36px; font-size: 0.8rem; background-color: {{ $color }}; color: #fff;" data-name="{{ $user->name }}">
+                                        <div class="avatar-base avatar-sm" style="background-color: {{ $color }}; color: #fff;" data-name="{{ $user->name }}">
                                             @if($user->avatar_path)
                                                 <img src="{{ asset('storage/' . $user->avatar_path) }}" alt="Avatar">
                                             @else
                                                 {{ collect(explode(' ', $user->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->implode('') }}
                                             @endif
                                         </div>
-                                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                        <div class="flex-col-start">
                                             <span class="admin-name">{{ $user->name }}</span>
                                             <span class="admin-email">{{ $user->email }}</span>
                                         </div>
@@ -139,8 +137,8 @@
                                     data-seen="{{ $user->last_seen_at }}">
                                     {!! $user->status !!}
                                 </td>
-                                <td style="font-weight: 500;">{{ $user->documents_count ?? 0 }}</td>
-                                <td style="text-align: right; white-space: nowrap;">
+                                <td class="text-center fw-600">{{ $user->documents_count ?? 0 }}</td>
+                                <td class="text-right whitespace-nowrap">
                                     {{-- Bouton Modifier --}}
                                     <a href="{{ route('users.edit', $user->id) }}" class="action-btn no-ajax" title="editer">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -153,9 +151,9 @@
                                         style="display:inline;">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="action-btn btn-toggle"
+                                        <button type="submit"
                                             title="{{ $user->is_active ? 'Désactiver le compte' : 'Activer le compte' }}"
-                                            style="color: {{ $user->is_active ? '#f97316' : '#22c55e' }}; border: none; background: none; cursor: pointer;"
+                                             class="action-btn btn-toggle {{ $user->is_active ? 'text-warning' : 'text-success' }}"
                                             data-name="{{$user->name}}"
                                             data-status="{{$user->is_active ? 'Désactiver le compte' : 'Activer le compte'}}">
 

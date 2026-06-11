@@ -1,4 +1,4 @@
-<x-super-admin-layout active="evenements">
+<x-super-admin-layout active="evenements"   sec_css="tables.css">
     <x-slot:title>Gestion des étudiants - ArchiSearch</x-slot>
 
         <div class="page-header">
@@ -36,24 +36,22 @@
 
         <div class="controls-row">
             <div class="search-filter-group">
-                <div class="input-wrapper"
-                    style="display: flex; width: 350px; background: white; align-items: center; gap: 5px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div class="input-wrapper" style="max-width: 350px;">
                     <svg style="margin-left: 10px; color: #94a3b8;" width="20" height="20" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="text" id="search-input" placeholder="Rechercher par nom ou matricule..."
-                        style="width: 100%; padding: 0.75rem; border: none; outline: none; background: transparent;">
+                    <input type="text" id="search-input" placeholder="Rechercher par nom ou matricule...">
                 </div>
 
-                <select class="" name="filters" id="filtre">
-                    <optgroup label="Participation">
-                        <option value="">Tous</option>
-                        <option value="has_uploads">Ayant déjà déposé</option>
-                        <option value="no_uploads">Aucun dépôt</option>
-                    </optgroup>
-                </select>
+                <div class="select-container">
+                    <select class="" name="filters" id="filtre">
+                            <option value="">Tous</option>
+                            <option value="has_uploads">Ayant déjà déposé</option>
+                            <option value="no_uploads">Aucun dépôt</option>
+                    </select>
+                </div>
             </div>
 
             <a href="{{ route('super-admin.students.create') }}" class="btn-primary"
@@ -83,29 +81,27 @@
                             <tr>
                                 <td>
                                     <div class="admin-info">
-                                        <div class="avatar"
+                                        <div class="avatar-base avatar-sm"
                                             style="width: 32px; height: 32px; font-size: 0.75rem; background: #f1f5f9; color: #475569;">
                                             {{ collect(explode(' ', $student->name))->map(fn($w) => strtoupper(substr($w, 0, 1)))->implode('') }}
                                         </div>
                                         <span class="admin-name">{{ $student->name }}</span>
                                     </div>
                                 </td>
-                                <td><code
-                                        style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ $student->matricule }}</code>
+                                <td>
+                                    <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ $student->matricule }}</code>
                                 </td>
                                 <td style="color: #64748b;">{{ $student->email ?? '—' }}</td>
-                                <td style="text-align: center; font-weight: 600;">{{ $student->documents_count ?? 0 }}</td>
-                                <td style="text-align: right;">
-                                    <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                <td class="text-center fw-600">{{ $student->documents_count ?? 0 }}</td>
+                                <td class="text-right">
                                         <a href="#" class="action-btn" title="Modifier">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2">
                                                 <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                                             </svg>
                                         </a>
-                                        <button class="action-btn red btn-delete" data-id="{{ $student->id }}"
-                                            data-name="{{ $student->name }}"
-                                            style="border:none; background:none; cursor:pointer; color: #ef4444;">
+                                        <button class="action-btn red" data-id="{{ $student->id }}" title="Supprimer"
+                                            data-name="{{ $student->name }}">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2">
                                                 <path

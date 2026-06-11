@@ -1,6 +1,3 @@
-# creation-events.css
-
-```css
 /* ========================================
    CREATE EVENT PAGE
 ======================================== */
@@ -120,13 +117,7 @@
         justify-content: center;
     }
 }
-```
 
----
-
-# edit-event.css
-
-```css
 /* ========================================
    EDIT EVENT PAGE
 ======================================== */
@@ -218,13 +209,7 @@
         justify-content: center;
     }
 }
-```
 
----
-
-# voir-event.css
-
-```css
 /* ========================================
    VIEW EVENT PAGE
 ======================================== */
@@ -377,13 +362,7 @@
         min-width: 650px;
     }
 }
-```
 
----
-
-# view-docs.css
-
-```css
 /* ========================================
    DOCUMENT VIEW PAGE
 ======================================== */
@@ -591,55 +570,3 @@
         width: calc(100% - 2rem);
     }
 }
-```
-
----
-
-# Ce qu’il faut modifier dans les blades
-
-## creation-events.blade.php
-
-* Ajouter :
-
-```php
-sec_css="{{ asset('css/admin/creation-events.css') }}"
-```
-
-* Remplacer les styles inline par les classes correspondantes.
-
----
-
-## edit-event.blade.php
-
-* Ajouter :
-
-```php
-sec_css="{{ asset('css/admin/edit-event.css') }}"
-```
-
-* Supprimer tous les styles inline.
-
----
-
-## voir-event.blade.php
-
-* Ajouter :
-
-```php
-sec_css="{{ asset('css/admin/voir-event.css') }}"
-```
-
-* Remplacer toutes les div inline-stylées par les classes CSS proposées.
-
----
-
-## doc-view.blade.php
-
-Ton fichier utilise déjà :
-
-```php
-sec_css="{{ asset('css/admin/view-docs.css') }}"
-```
-
-Mais plusieurs styles sont encore absents du CSS.
-Le bloc ci-dessus permet donc de compléter correctement `view-docs.css` afin de retirer presque tous les styles inline du blade.

@@ -1,4 +1,4 @@
-<x-super-admin-layout active="parametres">
+<x-super-admin-layout active="parametres" sec_css="settings.css">
     <x-slot:title>Paramètres globaux - ArchiSearch</x-slot>
 
         <div class="page-header">

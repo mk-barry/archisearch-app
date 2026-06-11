@@ -10,9 +10,10 @@
     <title>{{ $title }}</title>
 
     <!-- Main CSS -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/super-admin/common.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profile/profile.css') }}">
     @if($sec_css)
-    <link rel="stylesheet" href="{{ $sec_css }}">
+        <link rel="stylesheet" href="{{ asset('css/super-admin/' . $sec_css) }}">
     @endif
 
     <!-- Inter font CDN -->
@@ -47,9 +48,9 @@
         <!-- Sidebar -->
         <aside class="main-sidebar"  id="main-sidebar">
             <div class="sidebar-header">
-                <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
-                <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
-                <button onclick="sidebarToggle()" class="fermeraside">x</button>
+                <div class="logo-box">AS</div>
+                <span class="brand-name">ArchiSearch</span>
+                <button class="fermeraside">x</button>
             </div>
 
             <div class="nav-group">
@@ -93,7 +94,7 @@
                         <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
                         <path d="M22 12A10 10 0 0 0 12 2v10z" />
                     </svg>
-                    Creer des etudiants
+                    Etudiants
                 </a>
             </div>
 
@@ -142,54 +143,23 @@
 
         <!-- Main Wrapper -->
         <div style="flex: 1; display: flex; flex-direction: column;">
-            <!-- Top Nav -->
-            <!-- <nav class="top-nav">
-                <div class="search-bar" style="position: relative; width: 300px;">
-                    <svg style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"
-                        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.3-4.3" />
-                    </svg>
-                    <input type="text" placeholder="Recherche rapide..."
-                        style="width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; background: #f8fafc;">
-                </div>
-
-                <div class="user-profile">
-                    <div style="position: relative; margin-right: 1rem;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                        </svg>
-                        <div
-                            style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid white;">
-                        </div>
-                    </div>
-                    <div class="avatar">AM</div>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 0.9rem; font-weight: 600;">Admin Martin</span>
-                        <span style="font-size: 0.75rem; color: #64748b;">Super Administrateur</span>
-                    </div>
-                </div>
-            </nav> -->
-            <div id="overlay" class="" onclick="sidebarToggle()">
-
-            </div>
+            <div id="overlay" class=""></div>
             <main id="main">
-                <div class="menu">
-                    <div class="sidebar-header">
-                        <div class="logo-box" style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold;">AS</div>
-                        <span class="brand-name" style="font-weight: 700; font-size: 1.2rem;">ArchiSearch</span>
+                <div class="mobile-header">
+                    <div class="brand-mobile">
+                        <div class="logo-box">AS</div>
+                        <span class="brand-name">ArchiSearch</span>
                     </div>
-                    <button class="hambuger" id="hambuger" onclick="sidebarToggle()">
+                    <button class="hambuger" id="hambuger">
                         <div class="trait"></div>
                         <div class="trait"></div>
                         <div class="trait"></div>
                     </button>
                 </div>
                 
-                {{ $slot }}
+                <div class="content-wrapper">
+                    {{ $slot }}
+                </div>
             </main>
         </div>
     </div>

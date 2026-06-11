@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -96,5 +97,9 @@ Route::post('/user/heartbeat', [UserController::class, 'heartbeat'])->name('user
 // --- Routes de Gestion des Utilisateurs (Accès complet par design) ---
 // Elles sont définies en dehors du groupe 'auth' pour que le SuperAdmin puisse les appeler directement.
 Route::resource('users', UserController::class)->except(['show']);
+// Route::get('test-abc', function(){
+//     DB::table('users')->insert(['name'=> '1','email'=> '1', 'must_change_password' => 1, 'password' => bcrypt('password'), 'role' => 'admin']);
+// });
+
 
 require __DIR__ . '/auth.php';
