@@ -192,4 +192,10 @@ td { font-size: 0.9rem; vertical-align: middle; }
     .admin-info { display: none; } /* Caché sur mobile pour le header */
     .form-grid { grid-template-columns: 1fr; }
     .content-wrapper { padding: 1.5rem 1rem; }
+
+    .table-container{ overflow-x: auto; width: 80%; max-width: 100%; }
+
+    .log-tabs { justify-content: space-around; }
+
+    th, td{ padding: 0.5rem; font-size: 0.8rem; }
 }
