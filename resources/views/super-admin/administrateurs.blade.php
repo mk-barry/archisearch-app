@@ -72,7 +72,7 @@
                 </select>
             </div>
 
-            <a href="{{ route('super-admin.creation-admin') }}" class="btn-primary">
+            <a href="{{ route('super-admin.creation-admin') }}" class="btn-primary last">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                     stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -128,17 +128,17 @@
                                     </div>
                                 </td>
                                 <!-- <td>{{ $user->organisation ?? 'Non spécifiée' }}</td> -->
-                                <td>
+                                <td data-label="statut">
                                     <span class="badge {{ $user->is_active ? 'badge-green' : 'badge-orange' }}">
                                         {{ $user->is_active ? 'Actif' : 'Inactif' }}
                                     </span>
                                 </td>
                                 <td class="statut-cell" data-login="{{ $user->last_login_at }}"
-                                    data-seen="{{ $user->last_seen_at }}">
+                                    data-seen="{{ $user->last_seen_at }}" data-label="connexion">
                                     {!! $user->status !!}
                                 </td>
-                                <td class="text-center fw-600">{{ $user->documents_count ?? 0 }}</td>
-                                <td class="text-right whitespace-nowrap">
+                                <td class="text-center fw-600" data-label="documents">{{ $user->documents_count ?? 0 }}</td>
+                                <td class="text-right whitespace-nowrap" data-label="actions"  style="">
                                     {{-- Bouton Modifier --}}
                                     <a href="{{ route('users.edit', $user->id) }}" class="action-btn no-ajax" title="editer">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"

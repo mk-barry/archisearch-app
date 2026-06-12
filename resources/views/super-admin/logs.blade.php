@@ -60,13 +60,13 @@
                     @fragment('logs-table')
                         @foreach ($recentActivities as $log)
                             <tr>
-                                <td style="color: #94a3b8;">{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
-                                <td style="font-weight: 600;">{{ $log->user->role ?? 'System' }}.{{ $log->user->name ?? '' }}
+                                <td style="color: #94a3b8;" data-label="horodatage">{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
+                                <td style="font-weight: 600;" data-label="utilisateur">{{ $log->user->role ?? 'System' }}.{{ $log->user->name ?? '' }}
                                 </td>
-                                <td><span class="action-text">{{ $log->actionDescription->slug ?? 'ACTION' }}</span></td>
-                                <td>{{ $log->target }}</td>
-                                <td>{{ $log->ip_address }}</td>
-                                <td style="text-align: right;">
+                                <td data-label="action"><span class="action-text">{{ $log->actionDescription->slug ?? 'ACTION' }}</span></td>
+                                <td data-label="cible">{{ $log->target }}</td>
+                                <td data-label="adresse ip">{{ $log->ip_address }}</td>
+                                <td style="text-align: right;" data-label="categorie">
                                     <span class="badge 
                                             @if(($log->actionDescription->badge ?? '') === 'info') badge-blue 
                                             @elseif(($log->actionDescription->badge ?? '') === 'alerte') badge-orange 

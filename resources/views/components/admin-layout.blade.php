@@ -109,8 +109,8 @@
             </div>
 
             <div class="sidebar-footer">
-                <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: none;">@csrf</form>
-                <a href="{{ route('logout') }}" class="nav-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: none;" onclick>@csrf</form>
+                <a href="{{ route('logout') }}" class="nav-item" onclick="event.preventDefault(); ASAlerts.confirmAction('Confirmer la déconnection ?', `Voulez-vous vraiment vous déconnecter ?`, () => { document.getElementById('logout-form').submit(); })">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                         <polyline points="16 17 21 12 16 7" />

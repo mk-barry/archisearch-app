@@ -33,8 +33,8 @@
                 <button class="log-tab active" data-status="">Tous</button>
                 <button class="log-tab" data-status="actif">Actif</button>
                 <button class="log-tab" data-status="cloture">Clôturé</button>
-                <button class="log-tab" data-status="archive">Archivé</button>
-                <button class="log-tab" data-status="brouillon">Brouillon</button>
+                <!-- <button class="log-tab" data-status="archive">Archivé</button> -->
+                <!-- <button class="log-tab" data-status="brouillon">Brouillon</button> -->
             </div>
         </div>
 

@@ -168,7 +168,7 @@ td { font-size: 0.9rem; vertical-align: middle; }
 
     .table-container{ overflow-x: auto; }
 
-    .log-tabs { justify-content: space-around; }
+    .log-tabs { justify-content: space-around; flex-wrap: wrap; }
 
     th, td{ padding: 0.5rem; font-size: 0.8rem; }
 

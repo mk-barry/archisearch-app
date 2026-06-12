@@ -88,12 +88,12 @@
                                         <span class="admin-name">{{ $student->name }}</span>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="matricule">
                                     <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ $student->matricule }}</code>
                                 </td>
-                                <td style="color: #64748b;">{{ $student->email ?? '—' }}</td>
-                                <td class="text-center fw-600">{{ $student->documents_count ?? 0 }}</td>
-                                <td class="text-right">
+                                <td style="color: #64748b;"  data-label="email">{{ $student->email ?? '—' }}</td>
+                                <td class="text-center fw-600"  data-label="soumissions">{{ $student->documents_count ?? 0 }}</td>
+                                <td class="text-right"  data-label="actions" style="justify-content: right;">
                                         <a href="#" class="action-btn" title="Modifier">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2">
