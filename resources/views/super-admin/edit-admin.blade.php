@@ -6,7 +6,7 @@
                 <div class="breadcrumb-small">Super Admin > Administrateurs > Modifier</div>
                 <h1>Modifier le profil de {{ $user->name }}</h1>
             </div>
-            <div class="admin-info">
+            <div class="admin-info header">
                 <div class="avatar-base avatar-md">
                     @if(Auth::user()->avatar_path)
                         <img src="{{ asset('storage/' . Auth::user()->avatar_path) }}" alt="Avatar">

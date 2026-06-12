@@ -189,7 +189,7 @@ td { font-size: 0.9rem; vertical-align: middle; }
     #overlay.active { opacity: 1; pointer-events: auto; }
 
     .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .admin-info-mobile { display: none; } /* Caché sur mobile pour le header */
+    .admin-info.header { display: none; } /* Caché sur mobile pour le header */
     .form-grid { grid-template-columns: 1fr; }
     /* .content-wrapper { padding: 1.5rem 1rem; } */
 
