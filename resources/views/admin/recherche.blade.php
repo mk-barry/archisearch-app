@@ -57,7 +57,8 @@
 
             <div class="quick-filter-row" style="margin-top: 1rem; display: flex; gap: 10px; align-items: center;">
                 
-                <select name="event" class="select-filter">
+                <div class="select-container">
+                    <select name="event" class="select-filter">
 
                     <option value="">
                         Événement : Tous
@@ -74,19 +75,9 @@
                     @endforeach
 
                 </select>
-
-                <!-- <select name="date" class="select-filter">
-
-                    <option value="">
-                        Date : Tous
-                    </option>
-                    <option value=""></option>
-                    <option value=""></option>
-                    <option value=""></option>
-
-                </select> -->
-
-                <select name="type" class="select-filter">
+                </div>
+                <div class="select-container">
+                    <select name="type" class="select-filter">
 
                     <option value="">
                         Type : Tous
@@ -105,8 +96,9 @@
                     @endforeach
 
                 </select>
-
-                <select name="uploader" class="select-filter">
+                </div>
+                <div class="select-container">
+                    <select name="uploader" class="select-filter">
 
                     <option value="">
                         Auteur : Tous
@@ -125,36 +117,14 @@
                     @endforeach
 
                 </select>
-
-                <select name="status" class="select-filter">
+                </div>
+                <div class="select-container">
+                    <select name="status" class="select-filter">
 
                     <option value="">
                         Status : Tous
                     </option>
-
-                    <!-- <option>
-                        Soumis
-                    </option>
-
-                    <option>
-                        En attente
-                    </option>
-
-                    <option>
-                        Valide
-                    </option>
-
-                    <option>
-                        Rejete
-                    </option>
-
-                    <option>
-                        Erreur
-                    </option>
-
-                    <option>
-                        Archive
-                    </option> -->
+                    
                     @foreach($statuses as $status)
                     <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
                         {{ ucfirst($status) }}
@@ -162,6 +132,25 @@
                     @endforeach
 
                 </select>
+                </div>
+                <!-- <div class="select-container"></div> -->
+
+                <!-- <select name="date" class="select-filter">
+
+                    <option value="">
+                        Date : Tous
+                    </option>
+                    <option value=""></option>
+                    <option value=""></option>
+                    <option value=""></option>
+
+                </select> -->
+
+                
+
+                
+
+                
 
                 <button type="button" id="saveSearchBtn" class="btn-outline"
                     style="border-radius: 10px; padding: 0.6rem 1.25rem; font-size: 0.9rem; border-color: #3b82f6; color: #3b82f6;">
