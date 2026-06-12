@@ -23,7 +23,7 @@ class AdminController extends Controller
         // 1. Stats des Cartes
         $stats = [
             'evenements_actifs' => Events::where('status', 'actif')->count(),
-            'docs_recus_semaine' => Documents::where('created_at', '<=', now()->startOfWeek())->count(),
+            'docs_recus_semaine' => Documents::where('created_at', '>=', now()->startOfWeek())->count(),
             'en_attente' => Documents::where('status', 'pending')->count(),
             'anomalies' => Documents::whereNotNull('flags')
                 ->orWhere('status', 'rejected')->count(),

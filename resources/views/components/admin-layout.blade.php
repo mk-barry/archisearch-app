@@ -121,7 +121,7 @@
             </div>
         </aside>
 
-        <div class="flex-col" style="flex: 1;">
+        <!-- <div class="flex-col" style="flex: 1;"> -->
             <div id="overlay" class=""></div>
             <main id="main">
                 <div class="mobile-header">
@@ -140,7 +140,7 @@
                     {{ $slot }}
                 </div>
             </main>
-        </div>
+        <!-- </div> -->
     </div>
     @stack('scripts')
     @if(session('success'))

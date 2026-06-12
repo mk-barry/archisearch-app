@@ -1,4 +1,4 @@
-<x-admin-layout pri_css="{{  asset('css/dashboard/main.css') }}" active="recherche" title="Recherche de documents - ArchiSearch">
+<x-admin-layout sec_css="{{  asset('css/admin/recherche.css') }}" active="recherche" title="Recherche de documents - ArchiSearch">
     <div class="page-header">
         <div class="page-info">
             <div class="breadcrumb-small">Portail Admin > Recherche</div>
