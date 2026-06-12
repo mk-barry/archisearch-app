@@ -76,7 +76,7 @@
                                 <input type="checkbox" class="doc-checkbox" value="{{ $doc->id }}">
                             </td>
 
-                            <td>
+                            <td data-label="DOCUMENT">
                                 <div class="document-file-info">
                                     <div class="file-icon-box bg bg-{{ $doc->extension }}">
                                         {{ strtoupper($doc->extension) }}
@@ -94,27 +94,27 @@
                                 </div>
                             </td>
 
-                            <td>
+                            <td data-label="CATÉGORIE">
                                 <span class="tag">
                                     {{ $doc->documentType->name ?? $doc->category }}
                                 </span>
                             </td>
 
-                            <td class="document-contributor">
+                            <td class="document-contributor" data-label="CONTRIBUTEUR">
                                 {{ $doc->student->name ?? $doc->identifier }}
                             </td>
 
-                            <td class="document-date">
+                            <td class="document-date" data-label="DATE">
                                 {{ $doc->created_at->format('d M') }}
                             </td>
 
-                            <td>
+                            <td data-label="STATUT">
                                 <span class="badge badge-{{ $doc->status }}">
                                     {{ $doc->status }}
                                 </span>
                             </td>
 
-                            <td>
+                            <td data-label="actions" class="last">
                                 <div class="document-actions-grid">
                                     <a href="{{ route('admin.doc.show', $doc->id) }}" class="action-btn action-btn-view">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
